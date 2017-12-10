@@ -1,6 +1,7 @@
 /* charq */
 
 /* character queue */
+/* last modified %G% version %I% */
 
 
 /* revision history:
@@ -20,9 +21,9 @@
 
 
 struct charq_head {
-	char	*buf ;
-	int	ri, wi ;
-	int	size, count ;
+	char		*buf ;
+	int		ri, wi ;
+	int		size, count ;
 } ;
 
 

@@ -12,9 +12,7 @@
 /* revision history:
 
 	= 1997-05-09, David A­D­ Morano
-
 	This subroutine and program was originally written.
-
 
 */
 
@@ -195,11 +193,9 @@ void	*contextp ;
 #endif
 
 	    while ((rs = breadline(ifp,lbuf,LINEBUFLEN)) > 0) {
-
 		len = rs ;
-	        if (lbuf[len - 1] == '\n')
-	            len -= 1 ;
 
+	        if (lbuf[len - 1] == '\n') len -= 1 ;
 	        lbuf[len] = '\0' ;
 
 #if	CF_DEBUGS
@@ -265,7 +261,6 @@ void	*contextp ;
 	    } /* end while (reading lines) */
 
 	    bclose(ifp) ;
-
 	} /* end if (reading standard input) */
 
 #if	CF_DEBUGS

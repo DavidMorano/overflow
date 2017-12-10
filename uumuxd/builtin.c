@@ -62,6 +62,7 @@
 #include	"nistinfo.h"
 #include	"config.h"
 #include	"defs.h"
+#include	"clientinfo.h"
 #include	"builtin.h"
 #include	"standing.h"
 #include	"muximsg.h"
@@ -70,7 +71,6 @@
 
 /* local defines */
 
-#define	MAGIC		0x12345678
 #define	IPC_MAGIC	0x83726154
 
 #define	IPCDIRMODE	0777
@@ -143,21 +143,21 @@ struct ipcmsg_testint {
 static uint	mknettime(time_t) ;
 
 static int	builtin_help(BUILTIN *,STANDING *,
-			struct clientinfo *,const char **) ;
+			CLIENTINFO *,const char **) ;
 static int	builtin_daytime(BUILTIN *,STANDING *,
-			struct clientinfo *,const char **) ;
+			CLIENTINFO *,const char **) ;
 static int	builtin_time(BUILTIN *,STANDING *,
-			struct clientinfo *,const char **) ;
+			CLIENTINFO *,const char **) ;
 static int	builtin_sysmisc(BUILTIN *,STANDING *,
-			struct clientinfo *,const char **) ;
+			CLIENTINFO *,const char **) ;
 static int	builtin_test1(BUILTIN *,STANDING *,
-			struct clientinfo *,const char **) ;
+			CLIENTINFO *,const char **) ;
 static int	builtin_test2(BUILTIN *,STANDING *,
-			struct clientinfo *,const char **) ;
+			CLIENTINFO *,const char **) ;
 
 #ifdef	COMMENT
 static int	builtin_test3(BUILTIN *,STANDING *,
-			struct clientinfo *,const char **) ;
+			CLIENTINFO *,const char **) ;
 #endif
 
 static int	ipc_open(struct ipc *,PROGINFO *) ;
@@ -165,11 +165,11 @@ static int	ipc_send(struct ipc *,const char *,int) ;
 static int	ipc_recv(struct ipc *,char *,int) ;
 static int	ipc_close(struct ipc *) ;
 
-static int	scall_sysmisc(BUILTIN *,struct ipc *,struct clientinfo *,
+static int	scall_sysmisc(BUILTIN *,struct ipc *,CLIENTINFO *,
 			STANDING_SYSMISC *) ;
 
 #ifdef	COMMENT
-static int	scall_testint(BUILTIN *,struct ipc *,struct clientinfo *,
+static int	scall_testint(BUILTIN *,struct ipc *,CLIENTINFO *,
 			struct ipcmsg_testint *) ;
 #endif
 
@@ -213,8 +213,8 @@ enum bisvcs {
 
 
 int builtin_start(bip,pip)
-BUILTIN			*bip ;
-PROGINFO		*pip ;
+BUILTIN		*bip ;
+PROGINFO	*pip ;
 {
 	int		rs = SR_OK ;
 
@@ -231,7 +231,7 @@ PROGINFO		*pip ;
 
 	memset(&bip->c,0,sizeof(struct builtin_cache)) ;
 
-	bip->magic = MAGIC ;
+	bip->magic = BUILTIN_MAGIC ;
 
 	return rs ;
 }
@@ -279,13 +279,11 @@ int builtin_match(bip,service)
 BUILTIN		*bip ;
 const char	service[] ;
 {
-	PROGINFO	*pip ;
+	PROGINFO	*pip = bip->pip ;
 	int		rs = SR_NOTFOUND ;
 	int		i ;
 
-	if (bip == NULL) return SR_FAULT ;
-
-	pip = bip->pip ;
+	if (pip == NULL) return SR_FAULT ;
 
 	for (i = 0 ; bisvcs[i] != NULL ; i += 1) {
 	    if (strcasecmp(service,bisvcs[i]) == 0) {
@@ -301,18 +299,17 @@ const char	service[] ;
 
 /* execute a builtin service request */
 int builtin_execute(bip,ourp,cip,si,sargv)
-BUILTIN			*bip ;
-STANDING		*ourp ;
-struct clientinfo	*cip ;
-int			si ;			/* service index */
-const char		*sargv[] ;
+BUILTIN		*bip ;
+STANDING	*ourp ;
+CLIENTINFO	*cip ;
+int		si ;			/* service index */
+const char	*sargv[] ;
 {
-	PROGINFO	*pip ;
+	PROGINFO	*pip = bip->pip ;
 	int		rs = SR_OK ;
 
-	if (bip == NULL) return SR_FAULT ;
+	if (pip == NULL) return SR_FAULT ;
 
-	pip = bip->pip ;
 	switch (si) {
 	case bisvc_help:
 	    rs = builtin_help(bip,ourp,cip,sargv) ;
@@ -353,85 +350,78 @@ const char		*sargv[] ;
 
 
 static int builtin_help(bip,ourp,cip,sargv)
-BUILTIN			*bip ;
-STANDING		*ourp ;
-struct clientinfo	*cip ;
-const char		*sargv[] ;
+BUILTIN		*bip ;
+STANDING	*ourp ;
+CLIENTINFO	*cip ;
+const char	*sargv[] ;
 {
-	PROGINFO	*pip ;
-	SVCFILE_CUR	cur ;
+	PROGINFO	*pip = bip->pip ;
 	BUFFER		bo ;
 	int		rs ;
-	int		i ;
+	int		rs1 ;
 	int		blen = 0 ;
-	const char	*bp ;
-	char		svcname[SVCNAMELEN + 1] ;
 
-	pip = bip->pip ;
-	rs = buffer_start(&bo,200) ;
-	if (rs < 0)
-	    goto ret0 ;
+	if (pip == NULL) return SR_FAULT ;
+
+	if ((rs = buffer_start(&bo,200)) >= 0) {
+	    SVCFILE_CUR	cur ;
+	    const int	svclen = SVCNAMELEN ;
+	    int		i ;
+	    cchar	*bp ;
+	    char	svcbuf[SVCNAMELEN + 1] ;
 
 /* list out the builtin servers */
 
 	for (i = 0 ; bisvcs[i] != NULL ; i += 1) {
-
 	    if (svcfile_match(bip->sfp,bisvcs[i]) < 0) {
-
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
 	            debugprintf("builtin_help: bisvc=%s\n",bisvcs[i]) ;
 #endif
-
 	        buffer_buf(&bo,bisvcs[i],-1) ;
-
 	        buffer_char(&bo,'\n') ;
-
 	    } /* end if */
-
 	} /* end for */
 
 /* list out the servers in the current server table file */
 
 	svcfile_curbegin(bip->sfp,&cur) ;
 
-	while ((i = svcfile_enumsvc(bip->sfp,&cur,svcname,SVCNAMELEN)) >= 0) {
+	while ((i = svcfile_enumsvc(bip->sfp,&cur,svcbuf,svclen)) >= 0) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5))
-	        debugprintf("builtin_help: svclen=%u svc=%s\n",i,svcname) ;
+	        debugprintf("builtin_help: svclen=%u svc=%s\n",i,svcbuf) ;
 #endif
 
-	    if (matstr(bisvcs,svcname,-1) < 0) {
-
-	        buffer_buf(&bo,svcname,-1) ;
-
+	    if (matstr(bisvcs,svcbuf,-1) < 0) {
+	        buffer_buf(&bo,svcbuf,-1) ;
 	        buffer_char(&bo,'\n') ;
-
 	    } /* end if (not already listed) */
 
 	} /* end while */
 
 	svcfile_curend(bip->sfp,&cur) ;
 
-	rs = buffer_get(&bo,&bp) ;
-	blen = rs ;
-	if (rs >= 0)
+	if ((rs = buffer_get(&bo,&bp)) >= 0) {
+	    blen = rs ;
 	    rs = uc_writen(cip->fd_output,bp,blen) ;
+	}
 
-	buffer_finish(&bo) ;
+	    rs1 = buffer_finish(&bo) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (buffer) */
 
-ret0:
 	return (rs >= 0) ? blen : rs ;
 }
 /* end subroutine (builtin_help) */
 
 
 static int builtin_daytime(bip,ourp,cip,sargv)
-BUILTIN			*bip ;
-STANDING		*ourp ;
-struct clientinfo	*cip ;
-const char		*sargv[] ;
+BUILTIN		*bip ;
+STANDING	*ourp ;
+CLIENTINFO	*cip ;
+const char	*sargv[] ;
 {
 	PROGINFO	*pip = bip->pip ;
 	struct nistinfo	ni ;
@@ -458,10 +448,10 @@ const char		*sargv[] ;
 
 
 static int builtin_time(bip,ourp,cip,sargv)
-BUILTIN			*bip ;
-STANDING		*ourp ;
-struct clientinfo	*cip ;
-const char		*sargv[] ;
+BUILTIN		*bip ;
+STANDING	*ourp ;
+CLIENTINFO	*cip ;
+const char	*sargv[] ;
 {
 	PROGINFO	*pip = bip->pip ;
 	int		rs = SR_OK ;
@@ -484,10 +474,10 @@ const char		*sargv[] ;
 
 /* handle the 'sysmisc' service */
 static int builtin_sysmisc(bip,ourp,cip,sargv)
-BUILTIN			*bip ;
-STANDING		*ourp ;
-struct clientinfo	*cip ;
-const char		*sargv[] ;
+BUILTIN		*bip ;
+STANDING	*ourp ;
+CLIENTINFO	*cip ;
+const char	*sargv[] ;
 {
 	struct sysmisc_request	m0 ;
 	struct sysmisc_loadave	m1 ;
@@ -886,10 +876,10 @@ badrequest:
 
 /* testing services */
 static int builtin_test1(bip,ourp,cip,sargv)
-BUILTIN			*bip ;
-STANDING		*ourp ;
-struct clientinfo	*cip ;
-const char		*sargv[] ;
+BUILTIN		*bip ;
+STANDING	*ourp ;
+CLIENTINFO	*cip ;
+const char	*sargv[] ;
 {
 	STANDING_SYSMISC	sdata ;
 	PROGINFO	*pip = bip->pip ;
@@ -1046,10 +1036,10 @@ bad:
 
 /* more testing services */
 static int builtin_test2(bip,ourp,cip,sargv)
-BUILTIN			*bip ;
-STANDING		*ourp ;
-struct clientinfo	*cip ;
-const char		*sargv[] ;
+BUILTIN		*bip ;
+STANDING	*ourp ;
+CLIENTINFO	*cip ;
+const char	*sargv[] ;
 {
 	STANDING_SYSMISC	sdata ;
 	PROGINFO	*pip = bip->pip ;
@@ -1176,10 +1166,10 @@ bad:
 #ifdef	COMMENT
 
 static int builtin_test3(bip,ourp,cip,sargv)
-BUILTIN			*bip ;
-STANDING		*ourp ;
-struct clientinfo	*cip ;
-const char		*sargv[] ;
+BUILTIN		*bip ;
+STANDING	*ourp ;
+CLIENTINFO	*cip ;
+const char	*sargv[] ;
 {
 	STANDING_SYSMISC	sdata ;
 	PROGINFO	*pip = bip->pip ;
@@ -1454,18 +1444,17 @@ bad1:
 
 	u_unlink(ip->sfname) ;
 	ip->sfname[0] = '\0' ;
-
 bad0:
 	goto ret0 ;
 }
 /* end subroutine (ipc_open) */
 
 
-static int ipc_close(ip)
-struct ipc	*ip ;
+static int ipc_close(struct ipc *ip)
 {
 	PROGINFO	*pip = ip->pip ;
 
+	if (pip == NULL) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	debugprintf("builtin/ipc_close: not NULL\n") ;
@@ -1531,7 +1520,7 @@ int		buflen ;
 static int scall_sysmisc(bip,ip,cip,dp)
 BUILTIN		*bip ;
 struct ipc	*ip ;
-struct clientinfo	*cip ;
+CLIENTINFO	*cip ;
 STANDING_SYSMISC	*dp ;
 {
 	PROGINFO	*pip = bip->pip ;
@@ -1541,6 +1530,8 @@ STANDING_SYSMISC	*dp ;
 	int		rc ;
 	int		blen ;
 	char		buf[MSGBUFLEN + 1] ;
+
+	if (pip == NULL) return SR_FAULT ;
 
 	m1.tag = 0 ;
 	blen = muximsg_getsysmisc(&m1,0,buf,MSGBUFLEN) ;
@@ -1602,7 +1593,7 @@ bad:
 static int scall_testint(bip,ip,cip,ap)
 BUILTIN		*bip ;
 struct ipc	*ip ;
-struct clientinfo	*cip ;
+CLIENTINFO	*cip ;
 struct ipcmsg_testint	*ap ;
 {
 	PROGINFO	*pip = bip->pip ;

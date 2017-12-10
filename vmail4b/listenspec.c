@@ -1,6 +1,7 @@
 /* listenspec */
 
 /* hold (or manage) a "listen" specification */
+/* last modified %G% version %I% */
 
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
@@ -165,14 +166,12 @@ static int	listenspec_passinfo(LISTENSPEC *,LISTENSPEC_INFO *) ;
 static int	listenspec_procargs(LISTENSPEC *,ARGINFO *,int,cchar **) ;
 
 #if	CF_OPENPORT
-static int	listenspec_openport(LISTENSPEC *,int,
-			const char *,const char *,int) ;
-static int	listenspec_openporter(LISTENSPEC *,const char *,int,
-			const char *,int,int) ;
-static int	listenspec_openportaddr(LISTENSPEC *,const char *,
-			struct addrinfo *,char *,int,const char *) ;
-static int	listenspec_openportaddrone(LISTENSPEC *,
-			char *,int,const char *) ;
+static int	listenspec_openport(LISTENSPEC *,int,cchar *,cchar *,int) ;
+static int	listenspec_openporter(LISTENSPEC *,cchar *,int,
+			cchar *,int,int) ;
+static int	listenspec_openportaddr(LISTENSPEC *,cchar *,
+			struct addrinfo *,char *,int,cchar *) ;
+static int	listenspec_openportaddrone(LISTENSPEC *,char *,int,cchar *) ;
 #endif /* CF_OPENPORT */
 
 static int	listenspec_prlocal(LISTENSPEC *) ;
@@ -191,7 +190,7 @@ static int	arginfo_finish(ARGINFO *) ;
 
 /* local variables */
 
-static const char	*ltypes[] = {
+static cchar	*ltypes[] = {
 	"none",
 	"tcp",
 	"uss",
@@ -207,7 +206,7 @@ enum ltypes {
 	ltype_overlast
 } ;
 
-static const char	*lopts[] = {
+static cchar	*lopts[] = {
 	"here",
 	"reuse",
 	"ra",
@@ -353,11 +352,11 @@ int listenspec_issame(LISTENSPEC *op,LISTENSPEC *otherp)
 /* end subroutine (listenspec_issame) */
 
 
+/* set the "active" status (either active or non-active) */
 int listenspec_active(LISTENSPEC *op,int opts,int f)
 {
 	int		rs = SR_OK ;
 	int		f_previous ;
-
 
 #if	CF_SAFE
 	if (op == NULL) return SR_FAULT ;
@@ -366,6 +365,8 @@ int listenspec_active(LISTENSPEC *op,int opts,int f)
 
 #if	CF_DEBUGS
 	debugprintf("listenspec_active: ent f=%u\n",f) ;
+	debugprintf("listenspec_active: previous f_act=%u\n",op->f.active) ;
+	debugprintf("listenspec_active: ltype=%d\n",op->ltype) ;
 #endif
 
 	f_previous = op->f.active ;
@@ -386,6 +387,10 @@ int listenspec_active(LISTENSPEC *op,int opts,int f)
 
 /* if we just activated (rs > 0), then set Close-On-Exec */
 
+#if	CF_DEBUGS
+	debugprintf("listenspec_active: mid2 rs=%d fd=%d\n",rs,op->fd) ;
+#endif
+
 	if ((rs > 0) && (op->fd >= 0) && op->f.active) {
 	    rs = uc_closeonexec(op->fd,TRUE) ;
 #if	CF_NONBLOCK
@@ -396,7 +401,6 @@ int listenspec_active(LISTENSPEC *op,int opts,int f)
 	        listenspec_active(op,opts,FALSE) ;
 	    }
 	} /* end if (just activated) */
-
 
 #if	CF_DEBUGS
 	debugprintf("listenspec_active: ret rs=%d f_prev=%u fd=%d\n",
@@ -507,8 +511,9 @@ int listenspec_accept(LISTENSPEC *op,void *fromp,int *fromlenp,int to)
 	        rs = SR_DOM ;
 	        break ;
 	    } /* end switch */
-	} else
+	} else {
 	    rs = SR_BADFD ;
+	}
 
 #if	CF_DEBUGS
 	debugprintf("listenspec_accept: ret rs=%d\n",rs) ;
@@ -829,9 +834,9 @@ static int listenspec_tcpactive(LISTENSPEC *op,int opts,int f)
 	if (f && (! op->f.active)) {
 	    LISTENSPEC_TCP *ip = (LISTENSPEC_TCP *) op->info ;
 	    int		af ;
-	    const char	*cp ;
-	    const char	*hostspec ;
-	    const char	*portspec ;
+	    cchar	*cp ;
+	    cchar	*hostspec ;
+	    cchar	*portspec ;
 
 /* address family */
 
@@ -912,7 +917,7 @@ static int listenspec_tcpactive(LISTENSPEC *op,int opts,int f)
 static int listenspec_tcpaccept(LISTENSPEC *op,void *fp,int *flp,int to)
 {
 	int		rs ;
-	int		fd = 0 ;
+	int		fd = -1 ;
 
 	rs = uc_accepte(op->fd,fp,flp,to) ;
 	fd = rs ;
@@ -1057,7 +1062,7 @@ static int listenspec_ussactive(LISTENSPEC *op,int opts,int f)
 static int listenspec_ussaccept(LISTENSPEC *op,void *fp,int *flp,int to)
 {
 	int		rs ;
-	int		fd = 0 ;
+	int		fd = -1 ;
 
 	rs = uc_accepte(op->fd,fp,flp,to) ;
 	fd = rs ;
@@ -1181,6 +1186,10 @@ static int listenspec_passactive(LISTENSPEC *op,int opts,int f)
 	int		rs = SR_OK ;
 	int		f_a = FALSE ;
 
+#if	CF_DEBUGS
+	debugprintf("listenspec_passactive: ent fn=%s\n",ip->fname) ;
+#endif
+
 	if (f && (! op->f.active)) {
 	    if ((rs = listenpass(ip->fname,ip->mode,opts)) >= 0) {
 	        op->fd = rs ;
@@ -1210,7 +1219,7 @@ static int listenspec_passactive(LISTENSPEC *op,int opts,int f)
 static int listenspec_passaccept(LISTENSPEC *op,void *fp,int *flp,int to)
 {
 	int		rs ;
-	int		fd = 0 ;
+	int		fd = -1 ;
 
 	if (fp != NULL) {
 	    *flp = sizeof(long) ;
@@ -1441,7 +1450,7 @@ const char	portspec[] ;
 int		opts ;
 {
 	int		rs ;
-	int		fd = 0 ;
+	int		fd = -1 ;
 	const char	*protoname = PROTONAME_TCP ;
 	const char	*hp = hostspec ;
 
@@ -1468,8 +1477,9 @@ int		opts ;
 		     fd = rs ;
 		} /* end if (listenspec_prlocal) */
 	    } /* end if (getportnum) */
-	} else
+	} else {
 	    rs = SR_INVALID ;
+	}
 
 #if	CF_DEBUGS
 	debugprintf("listenspec_openport: ret rs=%d fd=%u\n",rs,fd) ;
@@ -1486,7 +1496,7 @@ static int listenspec_openporter(LISTENSPEC *op,cchar *pr,int af,cchar *hp,
 {
 	struct addrinfo	ai ;
 	int		rs ;
-	int		fd = 0 ;
+	int		fd = -1 ;
 	char		addr[INETXADDRLEN + 1] ;
 
 #if	CF_DEBUGS

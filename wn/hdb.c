@@ -1,6 +1,7 @@
 /* hdb */
 
 /* general-purpose in-core hashing */
+/* last modified %G% version %I% */
 
 
 #define	CF_DEBUGS	0		/* debugging print-outs */
@@ -518,6 +519,9 @@ int hdb_delkey(HDB *op,HDB_DATUM key)
 	The cursor is set so that further fetches from the same cursor
 	will work properly (the cursor is moved back)!
 
+	f_adv=0		cursor backs up
+	f_adv=1		cursor advances to net entry
+
 ****/
 
 int hdb_delcur(HDB *op,HDB_CUR *curp,int f_adv)
@@ -561,8 +565,7 @@ int hdb_delcur(HDB *op,HDB_CUR *curp,int f_adv)
 	            if (ep->next == NULL) {
 	                ncur.j = 0 ;
 	                for (i = (ncur.i + 1) ; i < op->htlen ; i += 1) {
-	                    if (hepp[i] != NULL)
-	                        break ;
+	                    if (hepp[i] != NULL) break ;
 	                }
 	                ncur.i = i ;
 	            } else {
@@ -576,8 +579,7 @@ int hdb_delcur(HDB *op,HDB_CUR *curp,int f_adv)
 	                ncur.j = 0 ;
 	                ncur.k = 0 ;
 	                for (i = (curp->i - 1) ; i >= 0 ; i -= 1) {
-	                    if (hepp[i] != NULL)
-	                        break ;
+	                    if (hepp[i] != NULL) break ;
 	                }
 	                if (i >= 0) {
 	                    pep = hepp[i] ;
@@ -1948,13 +1950,10 @@ HDB_DATUM	**rpp ;
 
 #if	CF_DEBUGS
 
-static int mkprstr(buf,buflen,s,slen)
-char		buf[] ;
-int		buflen ;
-const char	s[] ;
-int		slen ;
+static int mkprstr(char *buf,int buflen,cchar *s,int slen)
 {
-	int		n, i ;
+	int		n = 0 ;
+	int		i ;
 
 	if (buf == NULL) return SR_FAULT ;
 	if (s == NULL) return SR_FAULT ;
@@ -1966,12 +1965,12 @@ int		slen ;
 	if (buflen < 0)
 	    buflen = INT_MAX ;
 
-	n = 0 ;
 	for (i = 0 ; (i < slen) && s[i] ; i += 1) {
+	    const int	ch = MKCHAR(s[i]) ;
 	    if (n >= buflen) break ;
 	    buf[n] = ('?' + 128) ;
-	    if (isprintlatin(s[i])) {
-	        buf[n] = s[i] ;
+	    if (isprintlatin(ch)) {
+	        buf[n] = ch ;
 	    }
 	    n += 1 ;
 	} /* end for */

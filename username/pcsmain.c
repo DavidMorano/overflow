@@ -61,6 +61,8 @@
 *******************************************************************************/
 
 
+#include	<envstandards.h>	/* MUST be first to configure */
+
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
 #else
@@ -70,8 +72,6 @@
 #if	(defined(KSHBUILTIN) && (KSHBUILTIN > 0))
 #include	<shell.h>
 #endif
-
-#include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -191,9 +191,11 @@ extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
+extern int	hasnonwhite(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
 extern int	isNotPresent(int) ;
+extern int	isStrEmpty(cchar *,int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
@@ -236,6 +238,7 @@ static int	procfindconf(PROGINFO *) ;
 static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
 static int	procuserinfo_end(PROGINFO *) ;
 static int	procuserinfo_logid(PROGINFO *) ;
+static int	procuserinfo_hostname(PROGINFO *) ;
 
 static int	procourconf_begin(PROGINFO *) ;
 static int	procourconf_end(PROGINFO *) ;
@@ -285,8 +288,8 @@ static cchar	*argopts[] = {
 	"mspoll",
 	"speed",
 	"speedint",
+	"intconf",
 	"intspeed",
-	"intconfig",
 	"zerospeed",
 	"caf",
 	"disable",
@@ -317,8 +320,8 @@ enum argopts {
 	argopt_mspoll,
 	argopt_speed,
 	argopt_speedint,
+	argopt_intconf,
 	argopt_intspeed,
-	argopt_intconfig,
 	argopt_zerospeed,
 	argopt_caf,
 	argopt_disable,
@@ -355,10 +358,17 @@ static const struct mapex	mapexs[] = {
 static cchar	*progopts[] = {
 	"lockinfo",
 	"quiet",
-	"intspeed",
-	"intconfig",
 	"intrun",
+	"intidle",
 	"intpoll",
+	"intconf",
+	"intsvcs",
+	"intwait",
+	"intcache",
+	"intmaint",
+	"intspeed",
+	"intdirmaint",
+	"intclient",
 	"quick",
 	"listen",
 	"ra",
@@ -368,16 +378,24 @@ static cchar	*progopts[] = {
 	"reqfile",
 	"mntfile",
 	"msfile",
+	"maint",
 	NULL
 } ;
 
 enum progopts {
 	progopt_lockinfo,
 	progopt_quiet,
-	progopt_intspeed,
-	progopt_intconfig,
 	progopt_intrun,
+	progopt_intidle,
 	progopt_intpoll,
+	progopt_intconf,
+	progopt_intsvcs,
+	progopt_intwait,
+	progopt_intcache,
+	progopt_intmaint,
+	progopt_intspeed,
+	progopt_intdirmaint,
+	progopt_intclient,
 	progopt_quick,
 	progopt_listen,
 	progopt_ra,
@@ -387,6 +405,7 @@ enum progopts {
 	progopt_reqfile,
 	progopt_mntfile,
 	progopt_msfile,
+	progopt_maint,
 	progopt_overlast
 } ;
 
@@ -508,7 +527,7 @@ static int pcsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	}
 
 	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
-	proginfo_setbanner(pip,cp) ;
+	rs = proginfo_setbanner(pip,cp) ;
 
 /* initialize */
 
@@ -869,7 +888,7 @@ static int pcsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    }
 	                    break ;
 
-	                case argopt_intconfig:
+	                case argopt_intconf:
 			    vp = NULL ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
@@ -890,9 +909,9 @@ static int pcsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            rs = SR_INVALID ;
 	                    }
 	                    if ((rs >= 0) && (vp != NULL) && (vl > 0)) {
-	                        lip->final.intconfig = TRUE ;
+	                        lip->final.intconf = TRUE ;
 	                        rs = cfdecti(vp,vl,&v) ;
-	                        lip->intconfig = v ;
+	                        lip->intconf = v ;
 	                    }
 	                    break ;
 
@@ -1087,6 +1106,11 @@ static int pcsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        }
 	                        break ;
 
+			    case 'm':
+				lip->final.maint = TRUE ;
+				lip->f.maint = TRUE ;
+				break ;
+
 /* MS-node */
 	                    case 'n':
 	                        if (argr > 0) {
@@ -1189,8 +1213,16 @@ static int pcsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (rs < 0)
-	    goto badarg ;
+	if (rs < 0) goto badarg ;
+
+	if (pip->debuglevel == 0) {
+	    if ((cp = getourenv(envv,VARDEBUGLEVEL)) != NULL) {
+	        if (hasnonwhite(cp,-1)) {
+		    rs = optvalue(cp,-1) ;
+		    pip->debuglevel = rs ;
+	        }
+	    }
+	} /* end if */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -1244,6 +1276,10 @@ static int pcsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	debugprintf("pcsmain: pid=%d\n",pip->pid) ;
 #endif
 
+	if ((ai_pos < 0) || (ai_max < 0)) { /* lint */
+	    rs = SR_BUGCHECK ;
+	}
+
 	rs1 = securefile(pip->pr,pip->euid,pip->egid) ;
 	lip->f.sec_root = (rs1 > 0) ;
 
@@ -1276,7 +1312,6 @@ static int pcsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 		USERINFO	u ;
 		if ((rs = userinfo_start(&u,NULL)) >= 0) {
 	            if ((rs = procuserinfo_begin(pip,&u)) >= 0) {
-	                if ((rs = procfindconf(pip)) >= 0) {
 	                    if ((rs = procourconf_begin(pip)) >= 0) {
 	                        if ((rs = procdefconf(pip)) >= 0) {
 	                            if ((rs = logbegin(pip,&u)) >= 0) {
@@ -1291,7 +1326,6 @@ static int pcsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        rs1 = procourconf_end(pip) ;
 	                        if (rs >= 0) rs = rs1 ;
 	                    } /* end if (procourconf) */
-	                } /* end if (procfindconf) */
 	                rs1 = procuserinfo_end(pip) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (procuserinfo) */
@@ -1343,13 +1377,15 @@ static int pcsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* early return thing */
 retearly:
 	if (pip->debuglevel > 0) {
+	    cchar	*pn = pip->progname ;
+	    cchar	*fmt ;
 	    if (pip->f.background || pip->f.daemon) {
 	        cchar	*w = ((pip->f.daemon) ? "child" : "parent") ;
-	        shio_printf(pip->efp,"%s: (%s) exiting ex=%u (%d)\n",
-	            pip->progname,w,ex,rs) ;
+		fmt = "%s: (%s) exiting ex=%u (%d)\n" ;
+	        shio_printf(pip->efp,fmt,pn,w,ex,rs) ;
 	    } else {
-	        shio_printf(pip->efp,"%s: exiting ex=%u (%d)\n",
-	            pip->progname,ex,rs) ;
+		fmt = "%s: exiting ex=%u (%d)\n" ;
+	        shio_printf(pip->efp,fmt,pn,ex,rs) ;
 	    }
 	} /* end if */
 
@@ -1497,49 +1533,114 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        }
 	                    }
 	                    break ;
+	                case progopt_intrun:
+	                case progopt_intidle:
+	                case progopt_intpoll:
+	                case progopt_intconf:
+	                case progopt_intsvcs:
+	                case progopt_intcache:
+	                case progopt_intwait:
+	                case progopt_intmaint:
+	                case progopt_intspeed:
+	                case progopt_intdirmaint:
+	                case progopt_intclient:
+	                    {
+	                        if (vl > 0) {
+	                            rs = cfdecti(vp,vl,&v) ;
+	                        }
+	                        if ((rs >= 0) && (vl > 0)) {
+	                            switch(oi) {
+	                            case progopt_intrun:
+	                                if (! pip->final.intrun) {
+	                                    c += 1 ;
+	                                    pip->final.intrun = TRUE ;
+	                                    pip->have.intrun = TRUE ;
+	                                    pip->intrun = v ;
+	                                }
+	                                break ;
+	                            case progopt_intidle:
+	                                if (! pip->final.intidle) {
+	                                    c += 1 ;
+	                                    pip->final.intidle = TRUE ;
+	                                    pip->have.intidle = TRUE ;
+	                                    pip->intidle = v ;
+	                                }
+	                                break ;
+	                            case progopt_intpoll:
+	                                if (! pip->final.intpoll) {
+	                                    c += 1 ;
+	                                    pip->final.intpoll = TRUE ;
+	                                    pip->have.intpoll = TRUE ;
+	                                    pip->intpoll = v ;
+	                                }
+	                                break ;
+	                            case progopt_intconf:
+	                                if (! lip->final.intconf) {
+	                                    c += 1 ;
+	                                    lip->final.intconf = TRUE ;
+	                                    lip->have.intconf = TRUE ;
+	                                    lip->intconf = v ;
+	                                }
+	                                break ;
+	                            case progopt_intsvcs:
+	                                if (! lip->final.intsvcs) {
+	                                    c += 1 ;
+	                                    lip->final.intsvcs = TRUE ;
+	                                    lip->have.intsvcs = TRUE ;
+	                                    lip->intsvcs = v ;
+	                                }
+	                                break ;
+	                            case progopt_intcache:
+	                                if (! lip->final.intcache) {
+	                                    c += 1 ;
+	                                    lip->final.intcache = TRUE ;
+	                                    lip->have.intcache = TRUE ;
+	                                    lip->intcache = v ;
+	                                }
+	                                break ;
+	                            case progopt_intwait:
+	                                if (! lip->final.intwait) {
+	                                    c += 1 ;
+	                                    lip->final.intwait = TRUE ;
+	                                    lip->have.intwait = TRUE ;
+	                                    lip->intwait = v ;
+	                                }
+	                                break ;
+	                            case progopt_intmaint:
+	                                if (! lip->final.intmaint) {
+	                                    c += 1 ;
+	                                    lip->final.intmaint = TRUE ;
+	                                    lip->have.intmaint = TRUE ;
+	                                    lip->intmaint = v ;
+	                                }
+	                                break ;
 	                case progopt_intspeed:
 	                    if (! lip->final.intspeed) {
 	                        c += 1 ;
 	                        lip->final.intspeed = TRUE ;
 	                        lip->have.intspeed = TRUE ;
-	                        if (vl > 0) {
-	                            rs = cfdecti(vp,vl,&v) ;
-	                            lip->intspeed = v ;
-	                        }
+	                        lip->intspeed = v ;
 	                    }
 	                    break ;
-	                case progopt_intconfig:
-	                    if (! lip->final.intconfig) {
+	                case progopt_intdirmaint:
+	                    if (! lip->final.intdirmaint) {
 	                        c += 1 ;
-	                        lip->final.intconfig = TRUE ;
-	                        lip->have.intconfig = TRUE ;
-	                        if (vl > 0) {
-	                            rs = cfdecti(vp,vl,&v) ;
-	                            lip->intconfig = v ;
-	                        }
+	                        lip->final.intdirmaint = TRUE ;
+	                        lip->have.intdirmaint = TRUE ;
+	                        lip->intdirmaint = v ;
 	                    }
 	                    break ;
-	                case progopt_intrun:
-	                    if (! pip->final.intrun) {
+	                case progopt_intclient:
+	                    if (! lip->final.intclient) {
 	                        c += 1 ;
-	                        pip->final.intrun = TRUE ;
-	                        pip->have.intrun = TRUE ;
-	                        if (vl > 0) {
-	                            rs = cfdecti(vp,vl,&v) ;
-	                            pip->intrun = v ;
-	                        }
+	                        lip->final.intclient = TRUE ;
+	                        lip->have.intclient = TRUE ;
+	                        lip->intclient = v ;
 	                    }
 	                    break ;
-	                case progopt_intpoll:
-	                    if (! pip->final.intpoll) {
-	                        c += 1 ;
-	                        pip->final.intpoll = TRUE ;
-	                        pip->have.intpoll = TRUE ;
-	                        if (vl > 0) {
-	                            rs = cfdecti(vp,vl,&v) ;
-	                            pip->intpoll = v ;
-	                        }
-	                    }
+	                            } /* end switch */
+	                        } /* end if (have) */
+	                    } /* end block */
 	                    break ;
 	                case progopt_lockinfo:
 	                    if (! lip->final.lockinfo) {
@@ -1645,6 +1746,16 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        }
 	                    }
 	                    break ;
+	                case progopt_maint:
+	                    if (! lip->final.maint) {
+	                            lip->final.maint = TRUE ;
+	                            lip->f.maint = TRUE ;
+	                        if ((vl > 0) && (! lip->final.intclient)) {
+	                            rs = cfdecti(vp,vl,&v) ;
+				    lip->intclient = v ;
+	                        }
+	                    }
+	                    break ;
 	                } /* end switch */
 
 	            } else
@@ -1745,8 +1856,8 @@ static int procfindconf(PROGINFO *pip)
 	} /* end if (specified) */
 
 	if ((pip->debuglevel > 0) && (pip->cfname != NULL)) {
-	    shio_printf(pip->efp,"%s: conf=%s\n",
-	        pip->progname,pip->cfname) ;
+	    cchar	*pn = pip->progname ;
+	    shio_printf(pip->efp,"%s: conf=%s\n",pn,pip->cfname) ;
 	}
 
 #if	CF_DEBUG
@@ -1779,19 +1890,10 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->gid = uip->gid ;
 	pip->egid = uip->egid ;
 
-	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
-	    char	hbuf[MAXHOSTNAMELEN+1] ;
-	    cchar	*nn = pip->nodename ;
-	    cchar	*dn = pip->domainname ;
-	    if ((rs = snsds(hbuf,hlen,nn,dn)) >= 0) {
-	        cchar	**vpp = &pip->hostname ;
-	        rs = proginfo_setentry(pip,vpp,hbuf,rs) ;
+	if ((rs = proginfo_rootname(pip)) >= 0) {
+	    if ((rs = procuserinfo_hostname(pip)) >= 0) {
+	        rs = procuserinfo_logid(pip) ;
 	    }
-	}
-
-	if (rs >= 0) {
-	    rs = procuserinfo_logid(pip) ;
 	} /* end if (ok) */
 
 #ifdef	COMMENT
@@ -1815,6 +1917,22 @@ static int procuserinfo_end(PROGINFO *pip)
 	return rs ;
 }
 /* end subroutine (procuserinfo_end) */
+
+
+static int procuserinfo_hostname(PROGINFO *pip)
+{
+	const int	hlen = MAXHOSTNAMELEN ;
+	int		rs ;
+	char		hbuf[MAXHOSTNAMELEN+1] ;
+	cchar		*nn = pip->nodename ;
+	cchar		*dn = pip->domainname ;
+	if ((rs = snsds(hbuf,hlen,nn,dn)) >= 0) {
+	    cchar	**vpp = &pip->hostname ;
+	    rs = proginfo_setentry(pip,vpp,hbuf,rs) ;
+	}
+	return rs ;
+}
+/* end subroutine (procuserinfo_hostname) */
 
 
 static int procuserinfo_logid(PROGINFO *pip)
@@ -1858,11 +1976,11 @@ static int procourconf_begin(PROGINFO *pip)
 	    debugprintf("pcsmain/procourconf_begin: ent\n") ;
 #endif
 
-	if (pip->cfname != NULL) {
+	if ((rs = procfindconf(pip)) > 0) {
 	    const int	size = sizeof(CONFIG) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
-	        const int	ic = lip->intconfig ;
+	        const int	ic = lip->intconf ;
 	        cchar		*cfname = pip->cfname ;
 	        pip->config = p ;
 	        if ((rs = config_start(pip->config,pip,cfname,ic)) >= 0) {
@@ -1873,7 +1991,7 @@ static int procourconf_begin(PROGINFO *pip)
 	            pip->config = NULL ;
 	        }
 	    } /* end if (m-a) */
-	} /* end if (non-null) */
+	} /* end if (procfindconf) */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -1905,8 +2023,8 @@ static int procourconf_end(PROGINFO *pip)
 	if (DEBUGLEVEL(3))
 	    debugprintf("pcsmain/procourconf_end: ret rs=%d\n",rs) ;
 #endif
-	return rs ;
 
+	return rs ;
 }
 /* end subroutine (procourconf_end) */
 
@@ -2185,8 +2303,8 @@ static int procback(PROGINFO *pip)
 	}
 
 	if (pip->debuglevel > 0) {
-	    bprintf(pip->efp,"%s: mode=background\n",pip->progname) ;
-	    bflush(pip->efp) ;
+	    shio_printf(pip->efp,"%s: mode=background\n",pip->progname) ;
+	    shio_flush(pip->efp) ;
 	}
 
 	if ((rs = procbackcheck(pip)) >= 0) {
@@ -2407,8 +2525,8 @@ static int procbackenv(PROGINFO *pip,SPAWNER *srp)
 	            if (v > 0) np = "intpoll" ;
 	            break ;
 	        case 3:
-	            v = lip->intconfig ;
-	            if (v > 0) np = "intconfig" ;
+	            v = lip->intconf ;
+	            if (v > 0) np = "intconf" ;
 	            break ;
 	        case 4:
 	            v = lip->intspeed ;
@@ -2504,7 +2622,7 @@ static int procdaemon(PROGINFO *pip)
 	    logprintf(pip,"mode=daemon") ;
 	}
 	if (pip->debuglevel > 0) {
-	    bprintf(pip->efp,"%s: mode=daemon\n",pn) ;
+	    shio_printf(pip->efp,"%s: mode=daemon\n",pn) ;
 	}
 
 	if ((rs = procdaemondefs(pip)) >= 0) {
@@ -2580,12 +2698,19 @@ static int procregular(PROGINFO *pip)
 	int		rs ;
 	int		c = 0 ;
 #if	CF_DEBUG
-	if (DEBUGLEVEL(4))
+	if (DEBUGLEVEL(4)) {
 	    debugprintf("pcsmain/procregular: ent\n") ;
+	    debugprintf("pcsmain/procregular: f_main=%u\n",lip->f.maint) ;
+	    debugprintf("pcsmain/procregular: intmain=%u\n",lip->intmaint) ;
+	    debugprintf("pcsmain/procregular: intclient=%u\n",lip->intclient) ;
+	}
 #endif
 
 	if ((rs = locinfo_defreg(lip)) >= 0) {
-	    c = 1 ;
+	    if ((rs = locinfo_tmpourdir(lip)) >= 0) {
+	        rs = locinfo_dirmaint(lip) ;
+	        c = 1 ;
+	    }
 	}
 
 #if	CF_DEBUG

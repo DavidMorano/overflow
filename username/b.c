@@ -188,8 +188,10 @@ struct locinfo_flags {
 	uint		linebuf:1 ;
 	uint		all:1 ;
 	uint		realname:1 ;
-	uint		name:1 ;
-	uint		fullname:1 ;
+	uint		name:1 ;		/* mode */
+	uint		fullname:1 ;		/* mode */
+	uint		org:1 ;			/* mode */
+	uint		projinfo:1 ;		/* mode */
 	uint		gm:1 ;
 	uint		rn:1 ;
 	uint		sysuser:1 ;
@@ -253,7 +255,7 @@ static int	getname(PROGINFO *,struct passwd *,char *,int,cchar *) ;
 
 /* local variables */
 
-static cchar *argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -324,6 +326,8 @@ static cchar *akonames[] = {
 	"pcsname",
 	"name",
 	"fullname",
+	"org",
+	"projinfo",
 	"sysuser",
 	"reguser",
 	"speuser",
@@ -337,6 +341,8 @@ enum akonames {
 	akoname_pcsname,
 	akoname_name,
 	akoname_fullname,
+	akoname_org,
+	akoname_projinfo,
 	akoname_sysuser,
 	akoname_reguser,
 	akoname_speuser,
@@ -855,8 +861,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (rs < 0)
-	    goto badarg ;
+	if (rs < 0) goto badarg ;
 
 #if	CF_DEBUGS
 	pip->debuglevel = 5 ;
@@ -870,23 +875,25 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #endif
 
 	if (f_version) {
-	    shio_printf(pip->efp,"%s: version %s\n",
-	        pip->progname,VERSION) ;
+	    shio_printf(pip->efp,"%s: version %s\n",pip->progname,VERSION) ;
 	}
 
-/* figure out a program mode */
+/* get our program mode */
 
 	if (pm == NULL) pm = pip->progname ;
 
-	{
-	    int	progmode = matostr(progmodes,1,pm,-1) ;
-	    if (progmode < 0) progmode = progmode_username ;
-	    if (sn == NULL) sn = progmodes[progmode] ;
-	    pip->progmode = progmode ;
+	if ((pip->progmode = matstr(progmodes,pm,-1)) >= 0) {
 	    if (pip->debuglevel > 0) {
-	        shio_printf(pip->efp,"%s: pm=%s(%u)\n",
-	            pip->progname,progmodes[progmode],progmode) ;
+	        cchar	*pn = pip->progname ;
+	        cchar	*fmt = "%s: pm=%s (%u)\n" ;
+	        shio_printf(pip->efp,fmt,pn,pm,pip->progmode) ;
 	    }
+	} else {
+	    cchar	*pn = pip->progname ;
+	    cchar	*fmt = "%s: invalid program-mode (%s)\n" ;
+	    shio_printf(pip->efp,fmt,pn,pm) ;
+	    ex = EX_USAGE ;
+	    rs = SR_INVALID ;
 	}
 
 /* set program-root */
@@ -1162,6 +1169,28 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->f.fullname = (rs > 0) ;
+	                        }
+	                    }
+	                    break ;
+	                case akoname_org:
+	                    if (! lip->final.org) {
+	                        lip->have.org = TRUE ;
+	                        lip->final.org = TRUE ;
+	                        lip->f.org = TRUE ;
+	                        if (vl > 0) {
+	                            rs = optbool(vp,vl) ;
+	                            lip->f.org = (rs > 0) ;
+	                        }
+	                    }
+	                    break ;
+	                case akoname_projinfo:
+	                    if (! lip->final.projinfo) {
+	                        lip->have.projinfo = TRUE ;
+	                        lip->final.projinfo = TRUE ;
+	                        lip->f.projinfo = TRUE ;
+	                        if (vl > 0) {
+	                            rs = optbool(vp,vl) ;
+	                            lip->f.projinfo = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1620,6 +1649,21 @@ static int procout(PROGINFO *pip,SHIO *ofp,struct passwd *pwp,cchar *pp)
 	    if (rs >= 0) {
 	        rs = shio_printf(ofp,fmt,un,nbuf,nl) ;
 	        wlen += rs ;
+	    }
+	} else if (lip->f.org || lip->f.projinfo) {
+	    const int	nlen = REALNAMELEN ;
+	    int		nl = 0 ;
+	    cchar	*un = pwp->pw_name ;
+	    char	nbuf[REALNAMELEN+1] ;
+	    fmt = "%-16s %s\n" ;
+	    int 	w = pcsnsreq_pcsorg ;
+	    if (lip->f.projinfo) w = pcsnsreq_projinfo ;
+	    if ((rs = locinfo_prpcs(lip)) >= 0) {
+	        if ((rs = procgetns(pip,nbuf,nlen,un,w)) >= 0) {
+	            nl = rs ;
+	            rs = shio_printf(ofp,fmt,un,nbuf,nl) ;
+	            wlen += rs ;
+		}
 	    }
 	} else {
 	    cchar	*un = ((pp != NULL) ? pp : "") ;

@@ -1,5 +1,7 @@
 /* defs */
 
+/* last modified %G% version %I% */
+
 
 /* revision history:
 
@@ -133,8 +135,12 @@
 #define	ORGLEN		MAXNAMELEN
 #endif
 
-#ifndef	ORGLEN
-#define	ORGLEN		80
+#ifndef	ORGCODELEN
+#define	ORGCODELEN	80
+#endif
+
+#ifndef	TIMEBUFLEN
+#define	TIMEBUFLEN	80
 #endif
 
 #ifndef	NULLDEV
@@ -143,10 +149,6 @@
 
 #ifndef	TTYDEV
 #define	TTYDEV		"/dev/tty"
-#endif
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
 #endif
 
 #ifndef	STDINFNAME
@@ -250,13 +252,15 @@ struct proginfo {
 	cchar		*searchname ;
 	cchar		*version ;
 	cchar		*banner ;
-	cchar		*usysname ;	/* UNAME OS system-name */
 	cchar		*umachine ;	/* UNAME machine name */
+	cchar		*usysname ;	/* UNAME OS system-name */
 	cchar		*urelease ;	/* UNAME OS release */
 	cchar		*uversion ;	/* UNAME OS version */
 	cchar		*architecture ;	/* UAUX machine architecture */
 	cchar		*platform ;	/* UAUX machine platform */
 	cchar		*provider ;	/* UAUX machine provider */
+	cchar		*hwserial ;	/* UAUX machine hwserial */
+	cchar		*nisdomain ;	/* UAUX machine nisdomain */
 	cchar		*hz ;		/* OS HZ */
 	cchar		*nodename ;	/* USERINFO */
 	cchar		*domainname ;	/* USERINFO */
@@ -272,6 +276,7 @@ struct proginfo {
 	cchar		*tz ;		/* USERINFO */
 	cchar		*maildname ;	/* USERINFO */
 	cchar		*logid ;	/* USERINFO ID for logging purposes */
+	cchar		*orgcode ;
 	cchar		*groupname ;
 	cchar		*hostname ;
 	cchar		*tmpdname ;
@@ -303,6 +308,7 @@ struct proginfo {
 	int		debuglevel ;
 	int		verboselevel ;
 	int		quietlevel ;
+	int		ncpu ;
 	int		to ;		/* general time-out */
 	int		to_open ;	/* open time-out */
 	int		to_read ;	/* read time-out */

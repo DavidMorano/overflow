@@ -109,6 +109,7 @@ extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecstr_adduniqs(vecstr *,cchar *,int) ;
 extern int	field_wordphrase(FIELD *,const uchar *,char *,int) ;
+extern int	hasnonwhite(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
 extern int	isNotPresent(int) ;
@@ -1217,11 +1218,13 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	                f = f || ((ai > aip->ai_pos) && (argv[ai] != NULL)) ;
 	                if (f) {
 	                    cp = argv[ai] ;
-	                    pan += 1 ;
-	                    if (lip->f.clump) {
-	                        rs = vecstr_adduniqs(&qstr,cp,-1) ;
-	                    } else {
-	                        rs = vecstr_adduniq(&qstr,cp,-1) ;
+			    if (cp[0] != '\0') {
+	                        pan += 1 ;
+	                        if (lip->f.clump) {
+	                            rs = vecstr_adduniqs(&qstr,cp,-1) ;
+	                        } else {
+	                            rs = vecstr_adduniq(&qstr,cp,-1) ;
+				}
 	                    }
 	                } /* end if (non-zero) */
 	                if (rs >= 0) rs = lib_sigterm() ;
@@ -1642,7 +1645,7 @@ static int locinfo_deflinelen(LOCINFO *lip)
 	    if (isStrEmpty(cp,-1)) {
 		cp = getourenv(pip->envv,VARCOLUMNS) ;
 	    }
-	    if (! isStrEmpty(cp,-1)) {
+	    if (hasnonwhite(cp,-1)) {
 	        if ((rs = optvalue(cp,-1)) >= 0) {
 		    if (rs >= def) {
 	                lip->have.linelen = TRUE ;

@@ -45,7 +45,6 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
 
@@ -61,7 +60,7 @@
 /* external subroutines */
 
 #if	CF_DEBUGS
-extern int	debugprintf(char *,int,const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
 #if	CF_DEBUGS

@@ -724,6 +724,16 @@ int sbuf_getlen(SBUF *sbp)
 /* end subroutine (sbuf_getlen) */
 
 
+/* get the length filled so far */
+int sbuf_getbuf(SBUF *sbp,cchar **rpp)
+{
+	if (sbp == NULL) return SR_FAULT ;
+	if (rpp != NULL) *rpp = sbp->rbuf ;
+	return SBUF_INDEX ;
+}
+/* end subroutine (sbuf_getbuf) */
+
+
 /* get the pointer in the buffer to the next character */
 int sbuf_getpoint(SBUF *sbp,cchar **rpp)
 {
@@ -780,7 +790,6 @@ static int sbuf_addstrw(SBUF *sbp,cchar *sp,int sl)
 
 	bp = (SBUF_RBUF + SBUF_INDEX) ;
 	if (SBUF_RLEN < 0) {
-
 	    if (sl < 0) {
 	        while (*sp) {
 	            *bp++ = *sp++ ;
@@ -791,9 +800,7 @@ static int sbuf_addstrw(SBUF *sbp,cchar *sp,int sl)
 	            sl -= 1 ;
 	        }
 	    } /* end if */
-
 	} else {
-
 	    if (sl < 0) {
 	        while (*sp && (bp < (SBUF_RBUF + SBUF_RLEN))) {
 	            *bp++ = *sp++ ;
@@ -806,7 +813,6 @@ static int sbuf_addstrw(SBUF *sbp,cchar *sp,int sl)
 	        }
 	        if (*sp && (sl > 0)) rs = SR_OVERFLOW ;
 	    } /* end if */
-
 	} /* end if */
 
 	*bp = '\0' ;

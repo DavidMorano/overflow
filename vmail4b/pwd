@@ -1,0 +1,15 @@
+total 241040
+-rw-rw---- 1 dam      mail     234408391 May 22 03:48 dam
+-rw-rw---- 1 root     mail         29905 May 21 21:17 root
+-rw-rw---- 1 pcs      mail        102631 May 21 16:16 users
+-rw-rw---- 1 pcs      mail       2000345 May 20 14:53 info
+-rw-rw---- 1 dam      mail        488979 May 17 12:04 morano
+-rw-rw---- 1 pcs      mail       1101765 May 17 10:06 webmaster
+-rw-rw---- 1 local    mail         92908 May 17 05:03 local
+-rw-rw---- 1 admin    mail       3907238 May 16 14:28 admin
+-rw-rw---- 1 backup   mail       4459725 May 10 07:09 backup
+-rw-rw---- 1 pcs      mail         13747 May  8 18:39 pcs
+-rw-rw---- 1 gnu      mail          6772 May  8 14:17 gnu
+-rw-rw---- 1 adm      mail          3453 May  2 04:02 adm
+-rw-rw---- 1 pcs      mail          1353 Apr  2 17:24 sales
+drwxrwsr-x 2 pcs      mail           512 Feb  8 03:02 :saved

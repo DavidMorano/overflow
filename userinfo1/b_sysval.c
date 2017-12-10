@@ -159,6 +159,8 @@ extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	statvfsdir(cchar *,struct statvfs *) ;
+extern int	getproviderid(cchar *,int) ;
+extern int	getvendor(char *,int) ;
 extern int	getnprocessors(cchar **,int) ;
 extern int	getrunlevel(cchar *) ;
 extern int	getmjd(int,int,int) ;
@@ -174,6 +176,7 @@ extern int	gethz(int) ;
 extern int	getngroups(void) ;
 extern int	getmaxpid(int) ;
 extern int	getsysdomain(char *,int) ;
+extern int	getnfile(int) ;
 extern int	localsetsystat(cchar *,cchar *,int) ;
 extern int	localsetnetload(cchar *,cchar *,int) ;
 extern int	localgetorg(cchar *,char *,int,cchar *) ;
@@ -311,6 +314,7 @@ static int	procfs(PROGINFO *,char *,int,int,cchar *,int) ;
 static int	procacc(PROGINFO *,char *,int,cchar *,int) ;
 static int	procsystat(PROGINFO *,char *,int,cchar *,int) ;
 static int	procla(PROGINFO *,SHIO *,char *,int,int) ;
+static int	procnfile(PROGINFO *,cchar *,int) ;
 static int	procout(PROGINFO *,SHIO *,cchar *,int) ;
 
 static int	getla(PROGINFO *) ;
@@ -361,7 +365,7 @@ static int	getam(cchar *,int) ;
 
 /* local variables */
 
-static cchar *argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -415,7 +419,7 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static cchar *akonames[] = {
+static cchar	*akonames[] = {
 	"utf",
 	"db",
 	"ttl",
@@ -450,7 +454,7 @@ enum timeforms {
 } ;
 
 /* define the configuration keywords */
-static cchar *qopts[] = {
+static cchar	*qopts[] = {
 	"sysname",
 	"nodename",
 	"release",
@@ -533,6 +537,9 @@ static cchar *qopts[] = {
 	"maxpid",
 	"maxtzname",
 	"kserial",
+	"nofiles",
+	"providerid",
+	"vendor",
 	NULL
 } ;
 
@@ -619,6 +626,9 @@ enum qopts {
 	qopt_maxpid,
 	qopt_maxtzname,
 	qopt_kserial,
+	qopt_nofiles,
+	qopt_providerid,
+	qopt_vendor,
 	qopt_overlast
 } ;
 
@@ -1748,15 +1758,23 @@ static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 	    cbl = 0 ;
 	    break ;
 	case qopt_lax:
-	    {
+	    if ((rs = getla(pip)) >= 0) {
+		int	blen = cvtlen ;
 	        int	i ;
-	        int	ris[3] = { qopt_la1min, qopt_la5min, qopt_la15min } ; 
+		char	*bp = cvtbuf ;
 		for (i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
-	            rs = procla(pip,ofp,cvtbuf,cvtlen,ris[i]) ;
-	            wlen += rs ;
+	            const double	v = lip->fla[i] ;
+		    if (i > 0) {
+			*bp++ = ' ' ;
+			blen -= 1 ;
+		    }
+	            rs = ctdecf(bp,blen,v,'f',7,3,-1) ;
+		    bp += rs ;
+		    blen -= rs ;
 	        } /* end for */
-	    }
-	    cbl = 0 ;
+		cbp = cvtbuf ;
+		cbl = (bp-cvtbuf) ;
+	    } /* end if (getla) */
 	    break ;
 	case qopt_nusers:
 	    if ((rs = getnusers(pip)) >= 0) {
@@ -1767,32 +1785,31 @@ static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 	    break ;
 	case qopt_nprocs:
 	case qopt_naprocs:
-	    if ((rs = getnprocs(pip,0)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
 	case qopt_nsprocs:
-	    if ((rs = getnprocs(pip,1)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
 	case qopt_nuprocs:
-	    if ((rs = getnprocs(pip,2)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
 	case qopt_ntprocs:
-	    if ((rs = getnprocs(pip,3)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
+	    {
+		int	w = 0 ;
+		switch (ri) {
+		case qopt_nprocs:
+		case qopt_naprocs: /* all */
+		    break ;
+		case qopt_nsprocs: /* system */
+		    w = 1 ;
+		    break ;
+		case qopt_nuprocs: /* user */
+		    w = 2 ;
+		    break ;
+		case qopt_ntprocs: /* session */
+		    w = 3 ;
+		    break ;
+		} /* end switch */
+	        if ((rs = getnprocs(pip,w)) >= 0) {
+	            rs = ctdeci(cvtbuf,cvtlen,rs) ;
+	            cbp = cvtbuf ;
+	            cbl = rs ;
+	        }
+	    } /* end block */
 	    break ;
 	case qopt_ncpus:
 	    if ((rs = getncpus(pip)) >= 0) {
@@ -2131,11 +2148,35 @@ static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 	        cbl = rs ;
 	    }
 	    break ;
+	case qopt_nofiles:
+	    if ((rs = procnfile(pip,vp,vl)) >= 0) {
+	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
+	        cbp = cvtbuf ;
+	        cbl = rs ;
+	    }
+	    break ;
+	case qopt_providerid:
+	    if ((rs = locinfo_uaux(lip)) >= 0) {
+		cchar	*s = lip->uaux.provider ;
+		if ((rs = getproviderid(s,-1)) >= 0) {
+		    const int	id = rs ;
+		    const int	vlen = MAXNAMELEN ;
+		    char	vbuf[MAXNAMELEN+1] ;
+		    if ((rs = getvendor(vbuf,vlen)) >= 0) {
+		        rs = bufprintf(cvtbuf,cvtlen,"%2u %t",id,vbuf,rs) ;
+	                cbp = cvtbuf ;
+	                cbl = rs ;
+		    }
+		}
+	    }
+	    break ;
+	case qopt_vendor:
+	    if ((rs = getvendor(cvtbuf,cvtlen)) >= 0) {
+	            cbp = cvtbuf ;
+	            cbl = rs ;
+	    }
+	    break ;
 	default:
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(3))
-	        debugprintf("b_sysval/procqueryer: default ri=%d\n",ri) ;
-#endif
 	    rs = SR_INVALID ;
 	    break ;
 	} /* end switch */
@@ -2292,24 +2333,37 @@ static int procacc(PROGINFO *pip,char *cbuf,int clen,cchar *vp,int vl)
 static int procsystat(PROGINFO *pip,char *cbuf,int clen,cchar *vp,int vl)
 {
 	LOCINFO		*lip = pip->lip ;
-	int		rs ;
+	int		rs = SR_OK ;
 	if (lip->f.set) {
 	    rs = localsetsystat(pip->pr,vp,vl) ;
 	} else {
-	    rs = localgetsystat(pip->pr,cbuf,clen) ;
+	    cbuf[0] = '\0' ;
+#if	CF_PERCACHE
+	    if (lip->f.percache) {
+		const time_t	dt = pip->daytime ;
+		cchar		*pr = pip->pr ;
+		cchar		*cp ;
+		if ((rs = percache_systat(&pc,dt,pr,&cp)) > 0) {
+	            rs = sncpy1(cbuf,clen,cp) ;
+	        }
+	    }
+#endif /* CF_PERCACHE */
+	    if ((rs >= 0) && (cbuf[0] == '\0')) {
+	        rs = localgetsystat(pip->pr,cbuf,clen) ;
+	    }
 	}
 	return rs ;
 }
 /* end subroutine (procsystat) */
 
 
-static int procla(PROGINFO *pip,SHIO *ofp,char *cvtbuf,int cvtlen,int ri)
+static int procla(PROGINFO *pip,SHIO *ofp,char *rbuf,int rlen,int ri)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		wlen = 0 ;
 
-	cvtbuf[0] = '\0' ;
+	rbuf[0] = '\0' ;
 	if ((rs = getla(pip)) >= 0) {
 	    double	v = -1.0 ;
 
@@ -2326,8 +2380,8 @@ static int procla(PROGINFO *pip,SHIO *ofp,char *cvtbuf,int cvtlen,int ri)
 	    } /* end switch */
 
 	    if (v > -0.5) {
-	        if ((rs = ctdecf(cvtbuf,cvtlen,v,'f',7,3,-1)) >= 0) {
-	            rs = procout(pip,ofp,cvtbuf,rs) ;
+	        if ((rs = ctdecf(rbuf,rlen,v,'f',7,3,-1)) >= 0) {
+	            rs = procout(pip,ofp,rbuf,rs) ;
 	            wlen += rs ;
 		}
 	    } /* end if */
@@ -2337,6 +2391,23 @@ static int procla(PROGINFO *pip,SHIO *ofp,char *cvtbuf,int cvtlen,int ri)
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procla) */
+
+
+static int procnfile(PROGINFO *pip,cchar *vp,int vl) 
+{
+	int		rs = SR_OK ;
+	int		w = 0 ;
+	if ((vp != NULL) && (vl != 0)) {
+	    if (vp[0] != '\0') {
+	        rs = cfdeci(vp,vl,&w) ;
+	    }
+	}
+	if (rs >= 0) {
+	    rs = getnfile(w) ;
+	}
+	return rs ;
+}
+/* end subroutine (procnfile) */
 
 
 static int procout(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
@@ -2934,11 +3005,24 @@ static int locinfo_fsdir(LOCINFO *lip)
 static int locinfo_netload(LOCINFO *lip,char *cbuf,int clen,cchar *vp,int vl)
 {
 	PROGINFO	*pip = lip->pip ;
-	int		rs ;
+	int		rs = SR_OK ;
 	if (lip->f.set) {
 	    rs = localsetnetload(pip->pr,vp,vl) ;
 	} else {
-	    rs = localgetnetload(pip->pr,cbuf,clen) ;
+	    cbuf[0] = '\0' ;
+#if	CF_PERCACHE
+	    if (lip->f.percache) {
+		const time_t	dt = pip->daytime ;
+		cchar		*pr = pip->pr ;
+		cchar		*cp ;
+		if ((rs = percache_netload(&pc,dt,pr,&cp)) > 0) {
+	            rs = sncpy1(cbuf,clen,cp) ;
+	        }
+	    }
+#endif /* CF_PERCACHE */
+	    if ((rs >= 0) && (cbuf[0] == '\0')) {
+	        rs = localgetnetload(pip->pr,cbuf,clen) ;
+	    }
 	}
 	return rs ;
 }

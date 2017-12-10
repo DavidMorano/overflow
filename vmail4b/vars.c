@@ -98,14 +98,17 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	getpwd(char *,int) ;
 extern int	hasuc(const char *,int) ;
 
+#if	CF_DEBUGS
+extern int	debugprintf(const char *,...) ;
+#endif
+
 extern char	*strwcpy(char *,const char *,int) ;
 extern char	*strwcpylc(char *,const char *,int) ;
 extern char	*strnchr(const char *,int,int) ;
 extern char	*strnpbrk(const char *,int,const char *) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	timestr_log(time_t,char *) ;
+extern char	*timestr_log(time_t,char *) ;
 #endif
 
 
@@ -600,8 +603,8 @@ static int vars_filemapcreate(VARS *op,VARS_FM *fip,cchar *fname,time_t dt)
 	if (op == NULL) return SR_FAULT ;
 
 	if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
-	    struct ustat	sb ;
-	    int			fd = rs ;
+	    USTAT	sb ;
+	    const int	fd = rs ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
 	  	if (sb.st_size <= MAXMAPSIZE) {
 	            size_t	ms = (size_t) sb.st_size ;

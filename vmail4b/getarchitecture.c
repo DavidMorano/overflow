@@ -52,12 +52,16 @@
 #define	VARARCHITECTURE		"ARCHITECTURE"
 #endif
 
+#ifndef	ARCHITECTURE
+#define	ARCHITECTURE		"RNS"	/* Rightcore-Network-Services */
+#endif
+
 
 /* external subroutines */
 
 extern int	sncpy1(char *,int,cchar *) ;
 extern int	sncpy1w(char *,int,cchar *,int) ;
-extern int	shsjrink(cchar *,int,cchar **) ;
+extern int	shshrink(cchar *,int,cchar **) ;
 
 
 /* local structures */
@@ -92,6 +96,10 @@ int getarchitecture(char *rbuf,int rlen)
 	    rs = u_sysinfo(cmd,rbuf,rlen) ;
 	}
 #endif /* SI_ARCHITECTURE */
+
+	if ((rs >= 0) && (rbuf[0] == '\0')) {
+	    rs = sncpy1(rbuf,rlen,ARCHITECTURE) ;
+	}
 
 	return rs ;
 }

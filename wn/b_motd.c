@@ -213,8 +213,6 @@ typedef const char	cchar ;
 #define	LOCINFO_GMCUR	struct locinfo_gmcur
 #define	LOCINFO_RNCUR	struct locinfo_rncur
 
-#define	NDF		"motd.deb"
-
 
 /* external subroutines */
 
@@ -258,11 +256,13 @@ extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,
 extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	hasalldig(cchar *,int) ;
+extern int	hasnonwhite(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	hasMeAlone(cchar *,int) ;
 extern int	isFailOpen(int) ;
 extern int	isNotPresent(int) ;
 extern int	isIOError(int) ;
+extern int	isStrEmpty(cchar *,int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
@@ -271,11 +271,9 @@ extern int	proginfo_rootname(PROGINFO *) ;
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
-#endif
-#if	CF_DEBUGN
-extern int	nprintf(cchar *,...) ;
 #endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
@@ -447,7 +445,7 @@ static int	locinfo_jobdname(LOCINFO *) ;
 
 /* local variables */
 
-static cchar *argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -508,7 +506,7 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static cchar *akonames[] = {
+static cchar	*akonames[] = {
 	"quiet",
 	"intrun",
 	"termout",
@@ -606,8 +604,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	cchar		*afname = NULL ;
 	cchar		*ofname = NULL ;
 	cchar		*efname = NULL ;
-	cchar		*cp ;
-
+	cchar		*cp = NULL ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -1107,10 +1104,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (pip->debuglevel == 0) {
 	    if ((cp = getourenv(envv,VARDEBUGLEVEL)) != NULL) {
-	        rs = optvalue(cp,-1) ;
-	        pip->debuglevel = rs ;
+	        if (hasnonwhite(cp,-1)) {
+		    rs = optvalue(cp,-1) ;
+		    pip->debuglevel = rs ;
+	        }
 	    }
-	}
+	} /* end if */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -1438,7 +1437,6 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 			vl = keyopt_fetch(kop,kp,NULL,&vp) ;
 
 	                switch (oi) {
-
 	                case akoname_quiet:
 	                    if (! pip->final.quiet) {
 	                        pip->have.quiet = TRUE ;
@@ -1450,7 +1448,6 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        }
 	                    }
 	                    break ;
-
 	                case akoname_termout:
 	                    if (! lip->final.termout) {
 	                        lip->have.termout = TRUE ;
@@ -1462,7 +1459,6 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        }
 	                    }
 	                    break ;
-
 	                case akoname_maint:
 	                    if (! lip->final.maint) {
 	                        lip->have.maint = TRUE ;
@@ -1474,7 +1470,6 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        }
 	                    }
 	                    break ;
-
 	                case akoname_daemon:
 	                    if (! pip->final.daemon) {
 	                        pip->have.daemon = TRUE ;
@@ -1486,7 +1481,6 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        }
 	                    }
 	                    break ;
-
 	                case akoname_pidfile:
 	                    if (! pip->final.pidfname) {
 	                        if (vl > 0) {
@@ -1497,7 +1491,6 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        }
 	                    }
 	                    break ;
-
 	                case akoname_mntfile:
 	                    if (! lip->final.mntfname) {
 	                        lip->have.mntfname = TRUE ;
@@ -1508,7 +1501,6 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        }
 	                    }
 	                    break ;
-
 	                case akoname_reuseaddr:
 	                    if (! pip->final.reuseaddr) {
 	                        pip->have.reuseaddr = TRUE ;
@@ -1520,7 +1512,6 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        }
 	                    }
 	                    break ;
-
 	                case akoname_intrun:
 	                    if (! pip->final.intrun) {
 	                        pip->have.intrun = TRUE ;
@@ -1532,7 +1523,6 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        }
 	                    }
 	                    break ;
-
 	                } /* end switch */
 
 	                c += 1 ;
@@ -2270,10 +2260,10 @@ static int procserver(PROGINFO *pip,LFM *plp,int sfd)
 	if ((rs = gncache_start(&g,211,to_gid)) >= 0) {
 	    MOTD	m ;
 	    if ((rs = motd_open(&m,pip->pr)) >= 0) {
-	        struct pollfd	fds[2] ;
-	        int		pto ;
-	        int		i = 0 ;
-	        int		f = FALSE ;
+	        POLLFD	fds[2] ;
+	        int	pto ;
+	        int	i = 0 ;
+	        int	f = FALSE ;
 
 	        fds[i].fd = sfd ;
 	        fds[i].events = (POLLIN | POLLPRI) ;
@@ -2290,7 +2280,6 @@ static int procserver(PROGINFO *pip,LFM *plp,int sfd)
 
 	                if ((re & POLLIN) || (re & POLLPRI)) {
 	                    struct strrecvfd	passer ;
-
 	                    if ((rs = acceptpass(sfd,&passer,-1)) >= 0) {
 	                        const uid_t	uid = passer.uid ;
 	                        const gid_t	gid = passer.gid ;
@@ -2299,7 +2288,6 @@ static int procserver(PROGINFO *pip,LFM *plp,int sfd)
 	                        rs = prochandle(pip,&g,&m,uid,gid,pfd) ;
 	                        u_close(pfd) ;
 	                    } /* end if */
-
 	                } else if (re & POLLHUP) {
 	                    rs = SR_HANGUP ;
 	                } else if (re & POLLERR) {
@@ -2517,10 +2505,7 @@ static int procpidfname(PROGINFO *pip)
 /* end subroutine (procpidfname) */
 
 
-static int procregout(pip,app,ofp)
-PROGINFO	*pip ;
-PARAMOPT	*app ;
-SHIO		*ofp ;
+static int procregout(PROGINFO	*pip,PARAMOPT *app,SHIO *ofp)
 {
 	vecpstr		admins ;
 	int		rs ;
@@ -2625,6 +2610,16 @@ static int procregouterterm(PROGINFO *pip,void *ofp,int fd)
 	    char	lbuf[LINEBUFLEN+1] ;
 	    while ((rs = filebuf_readlines(&b,lbuf,llen,to,NULL)) > 0) {
 	        len = rs ;
+#if	CF_DEBUG
+	if (DEBUGLEVEL(4))
+	debugprintf("b_motd/procregouterterm: l=>%t<\n",
+		lbuf,strlinelen(lbuf,len,40)) ;
+#endif
+		if (pip->debuglevel > 0) {
+		    cchar	*pn = pip->progname ;
+		    cchar	*fmt = "%s: term l=>%t<\n" ;
+		    shio_printf(pip->efp,fmt,pn,lbuf,strlinelen(lbuf,len,60)) ;
+		}
 	        if (rs >= 0) rs = lib_sigterm() ;
 	        if (rs >= 0) rs = lib_sigintr() ;
 	        if (rs >= 0) {
@@ -2651,6 +2646,11 @@ static int procregouterfile(PROGINFO *pip,void *ofp,int fd)
 	char		lbuf[LINEBUFLEN+1] ;
 	while ((rs = uc_reade(fd,lbuf,llen,to,FM_TIMED)) > 0) {
 	    len = rs ;
+		if (pip->debuglevel > 0) {
+		    cchar	*pn = pip->progname ;
+		    cchar	*fmt = "%s: file l=>%t<\n" ;
+		    shio_printf(pip->efp,fmt,pn,lbuf,strlinelen(lbuf,len,60)) ;
+		}
 	    if (rs >= 0) rs = lib_sigterm() ;
 	    if (rs >= 0) rs = lib_sigintr() ;
 	    if (rs >= 0) {
@@ -2990,8 +2990,6 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	lip->to_lock = -1 ;
 	lip->termtype = getourenv(pip->envv,varterm) ;
 
-	lip->f.termout = FALSE ;
-
 	{
 	    PROGINFO	*pip = lip->pip ;
 	    pip->uid = lip->uid ;
@@ -3207,7 +3205,7 @@ static int locinfo_tmpcheck(LOCINFO *lip)
 	if (lip->jobdname != NULL) {
 	    TMTIME	t ;
 	    if ((rs = tmtime_localtime(&t,pip->daytime)) >= 0) {
-	        if ((t.hour >= HOUR_MAINT) && lip->f.maint) {
+	        if ((t.hour >= HOUR_MAINT) || lip->f.maint) {
 		    uptsub_t	thr = (uptsub_t) locinfo_tmpmaint ;
 	            pthread_t	tid ;
 	            if ((rs = uptcreate(&tid,NULL,thr,lip)) >= 0) {
@@ -3371,14 +3369,15 @@ static int locinfo_chgrp(LOCINFO *lip,cchar fname[])
 	if (fname[0] == '\0') return SR_INVALID ;
 
 	if ((rs = locinfo_getgid(lip)) >= 0) {
-	    struct ustat	usb ;
-	    uid_t		cuid = -1 ;
+	    USTAT	usb ;
+	    uid_t	cuid = -1 ;
 	    if (lip->euid != lip->uid_prog) {
 	        cuid = lip->uid_prog ;
 	    }
 	    if ((rs = u_stat(fname,&usb)) >= 0) {
-	        if (usb.st_gid != lip->gid_prog)
+	        if (usb.st_gid != lip->gid_prog) {
 	            u_chown(fname,cuid,lip->gid_prog) ;
+		}
 	    }
 	}
 

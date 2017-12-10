@@ -230,6 +230,14 @@
 #define	POLLFD		struct pollfd
 #endif
 
+#ifndef	STRRECVFD
+#define	STRRECVFD	struct strrecvfd
+#endif
+
+#ifndef	IOVCEC
+#define	IOVCEC		struct iovec
+#endif
+
 
 /* for missing MAXNAMELEN */
 
@@ -916,6 +924,9 @@ extern "C" {
 
 extern LONG	unixtime(LONG *) ;
 
+extern int	u_brk(const void *) ;
+extern int	u_sbrk(int,void **) ;
+
 extern int	u_uname(struct utsname *) ;
 extern int	u_unixtime(LONG *) ;
 extern int	u_getloadavg(unsigned int *,int) ;
@@ -1142,6 +1153,7 @@ extern int	uc_openex(const char *,int,mode_t,int,int) ;
 extern int	uc_openenv(const char *,int,mode_t,const char **,int) ;
 extern int	uc_openinfo(struct ucopeninfo *) ;
 extern int	uc_create(cchar *,mode_t) ;
+extern int	uc_fpassfd(int,int) ;
 extern int	uc_ftruncate(int,offset_t) ;
 extern int	uc_ftat(int,struct ustat *) ;
 extern int	uc_stat(const char *,struct ustat *) ;
