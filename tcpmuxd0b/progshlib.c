@@ -115,18 +115,20 @@ int		enl ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
-	    int	i ;
-	    const char	*cp ;
+	    int		i ;
+	    cchar	*cp ;
 	    debugprintf("progshlib: shlibfname=%s\n",shlibfname) ;
 	    debugprintf("progshlib: en=>%t<\n",enp,enl) ;
 	    debugprintf("progshlib: argz=%s\n",argz) ;
 	    debugprintf("progshlib: &environ=%p\n",&environ) ;
-	    for (i = 0 ; vecstr_get(alp,i,&cp) >= 0 ; i += 1)
+	    for (i = 0 ; vecstr_get(alp,i,&cp) >= 0 ; i += 1) {
 	        debugprintf("progshlib: arg%u=>%t<\n",i,
 			cp,strnnlen(cp,-1,40)) ;
-	    for (i = 0 ; vecstr_get(elp,i,&cp) >= 0 ; i += 1)
+	    }
+	    for (i = 0 ; vecstr_get(elp,i,&cp) >= 0 ; i += 1) {
 	        debugprintf("progshlib: env%u=>%t<\n",i,
 			cp,strnnlen(cp,-1,40)) ;
+	    }
 	}
 #endif /* CF_DEBUG */
 
@@ -220,7 +222,7 @@ int		enl ;
 #if	CF_DEBUG && 0
 	if (DEBUGLEVEL(5)) {
 	    int		i ;
-	    const char	*ep ;
+	    cchar	*ep ;
 	    debugprintf("progshlib: env¬\n") ;
 	    for (i = 0 ; ev[i] != NULL ; i += 1) {
 	      ep = ev[i] ;

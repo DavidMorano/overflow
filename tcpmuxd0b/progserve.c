@@ -170,6 +170,7 @@ extern int	debugprintf(const char *,...) ;
 
 extern cchar	*getourenv(cchar **,cchar *) ;
 
+extern char	*strdcpy1(char *,int,cchar *,int) ;
 extern char	*strwcpy(char *,const char *,int) ;
 extern char	*strwcpylc(char *,const char *,int) ;
 extern char	*strnchr(const char *,int,int) ;
@@ -803,6 +804,7 @@ PROCSE		*sep ;
 VECSTR		*alp ;
 const char	*argz ;
 {
+	const int	nlen = MAXNAMELEN ;
 	int		rs = SR_OK ;
 	int		pnl ;
 	int		enl ;
@@ -918,10 +920,12 @@ const char	*argz ;
 
 	if (rs < 0) {
 	    cp = "SHLIB server not found" ;
-	    if (pip->open.logprog)
+	    if (pip->open.logprog) {
 	        proglog_printf(pip,cp) ;
-	    if (pip->debuglevel > 0)
+	    }
+	    if (pip->debuglevel > 0) {
 	        bprintf(pip->efp,"%s: %s\n",pip->progname,cp) ;
+	    }
 	    goto badnoprog ;
 	} /* end if (could not find program) */
 
@@ -937,6 +941,7 @@ const char	*argz ;
 	if (argz != NULL) {
 	    if ((argz[0] == '+') && (argz[1] == '\0')) {
 	        argz = argzbuf ;
+		if (enl > nlen) enl = nlen ; /* prevent buffer overflow */
 	        strwcpy(argzbuf,enp,enl) ;
 	        if ((rs = vecstr_del(alp,0)) >= 0) {
 	            rs = vecstr_insert(alp,0,argz,-1) ;
@@ -944,6 +949,7 @@ const char	*argz ;
 	    }
 	} else {
 	    argz = argzbuf ;
+	    if (enl > nlen) enl = nlen ; /* prevent buffer overflow */
 	    strwcpy(argzbuf,enp,enl) ;
 	    if (vecstr_count(alp) < 1) {
 	        rs = vecstr_add(alp,argz,-1) ;
@@ -988,8 +994,9 @@ const char	*argz ;
 
 	pip->daytime = time(NULL) ;
 
-	if (pip->open.logprog)
+	if (pip->open.logprog) {
 	    proglog_end(pip) ;
+	}
 
 	{
 	    PROGINFO_IPC	*ipp = &pip->ipc ;
