@@ -787,7 +787,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int ach = MKCHAR(argp[1]) ;
+	        const int	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -2172,8 +2172,8 @@ static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 	    break ;
 	case qopt_vendor:
 	    if ((rs = getvendor(cvtbuf,cvtlen)) >= 0) {
-	            cbp = cvtbuf ;
-	            cbl = rs ;
+	        cbp = cvtbuf ;
+	        cbl = rs ;
 	    }
 	    break ;
 	default:
