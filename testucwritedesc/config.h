@@ -4,17 +4,18 @@
 
 
 #define	VERSION		"0"
-#define	WHATINFO	"@(#)TESTUCCOPY "
-
-#define	VARPROGRAMROOT1	"TESTUCCOPY_PROGRAMROOT"
-#define	VARPROGRAMROOT2	"LOCAL"
-#define	VARPROGRAMROOT3	"PROGRAMROOT"
+#define	WHATINFO	"@(#)TESTUCWRIYEDESC "
+#define	SEARCHNAME	"testucwritedesc"
 
 #ifndef	PROGRAMROOT
 #define	PROGRAMROOT	"/usr/add-on/local"
 #endif
 
-#define	SEARCHNAME	"testuccopy"
+#define	VARPROGRAMROOT1	"TESTUCWRIYEDESC_PROGRAMROOT"
+#define	VARPROGRAMROOT2	"LOCAL"
+#define	VARPROGRAMROOT3	"PROGRAMROOT"
+
+#define	VARDEBUGFNAME	"TESTUCWRITEDESC_DEBUGFILE"
 
 #define	CONFFNAME	"conf"
 #define	SRVFNAME	"srvtab"
@@ -22,10 +23,6 @@
 #define	PATHSFNAME	"paths"
 #define	REQFNAME	"req"
 #define	MSGQFNAME	"msgq"
-
-#define	LOGFNAME	"log/testuccopy"		/* activity log */
-#define	PIDFNAME	"spool/run/testuccopy"		/* mutex PID file */
-#define	LOCKFNAME	"spool/locks/testuccopy"	/* lock mutex file */
 
 #define	STAMPDIR	"spool/timestamps"	/* timestamp directory */
 #define	WORKDIR		"/tmp"
@@ -43,9 +40,5 @@
 #define	MAXJOBS		5			/* maximum jobs at once */
 
 #define	ECHOPORT	517
-
-#define	VARDEBUGFD1	"TESTUCCOPY_DEBUGFD"
-#define	VARDEBUGFD2	"DEBUGFD"
-
 
 

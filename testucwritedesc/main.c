@@ -1,46 +1,46 @@
 /* main (testuccopy) */
 
 
-#define	CF_DEBUGS	1
-#define	F_WRITE		1
-#define	F_LITTLE	1		/* do the little output */
-#define	F_ERRSUM	0		/* error summary */
-#define	F_READLINE	1		/* breadline() ? */
+#define	CF_DEBUGS	1		/* compile-time debugging */
+#define	CF_WRITE	1		/* ? */
+#define	CF_LITTLE	1		/* do the little output */
+#define	CF_ERRSUM	0		/* error summary */
+#define	CF_READLINE	1		/* breadline() ? */
 
 
 /* revision history:
 
-	= 88/02/01, David A­D­ Morano
-
-	This subroutine was originally written to do some testing
-	on the BIO package.
-
+	= 1988-02-01, David A­D­ Morano
+        This subroutine was originally written to do some testing on the BIO
+        package.
 
 */
 
+/* Copyright © 1988 David A­D­ Morano.  All rights reserved. */
 
-/************************************************************************
+/*******************************************************************************
 
 	This is a test program for the BIO package.
 
 
+*******************************************************************************/
 
-*************************************************************************/
 
+#include	<envstandards.h>
 
 #include	<sys/types.h>
-#include	<sys/stat.h>
 #include	<sys/param.h>
-#include	<time.h>
+#include	<sys/stat.h>
 #include	<stdlib.h>
-#include	<ctype.h>
+#include	<time.h>
 
+#include	<vsystem.h>
+#include	<bfile.h>
 #include	<exitcodes.h>
+#include	<localmisc.h>
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
-
 
 
 /* local defines */
@@ -48,30 +48,38 @@
 #define	NPARG		2
 
 #ifndef	BUFLEN
-#define	BUFLEN	200
+#define	BUFLEN		200
 #endif
 
 
-
 /* external subroutines */
+
+#if	CF_DEBUGS || CF_DEBUG
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugclose() ;
+extern int	strlinelen(cchar *,int,int) ;
+#endif
+
+extern cchar	*getourenv(cchar **,cchar *) ;
+
+extern char	*strdcpy1(char *,int,cchar *) ;
 
 
 /* external variables */
 
 
+/* exported subroutines */
 
 
-
-
-int main(argc,argv,envv)
-int	argc ;
-char	*argv[] ;
-char	*envv[] ;
+/* ARGSUSED */
+int main(int argc,cchar **argv,cchar **envv)
 {
 	bfile	errfile, *efp ;
 	bfile	outfile, *ofp = &outfile ;
 
-	int	rs, pan, i ;
+	int		rs = SR_OK ;
+	int		pan, i ;
 	int	argl, aol ;
 	int	ex = EX_INFO ;
 	int	len ;
@@ -81,19 +89,17 @@ char	*envv[] ;
 	int	fd_output ;
 	int	f_usage = FALSE ;
 
-	char	*progname, *argp, *aop ;
+	cchar	*progname, *argp, *aop ;
+	cchar	*cp ;
 	char	buf[BUFLEN + 1], *bp ;
-	char	*cp ;
 
 
-	if ((cp = getenv(VARDEBUGFD1)) == NULL)
-		cp = getenv(VARDEBUGFD2) ;
-
-	if ((cp != NULL) &&
-	    (cfdeci(cp,-1,&fd_debug) >= 0))
-	    debugsetfd(fd_debug) ;
-
-
+#if	CF_DEBUGS || CF_DEBUG
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	    rs = debugopen(cp) ;
+	    debugprintf("main: starting DFD=%d\n",rs) ;
+	}
+#endif /* CF_DEBUGS */
 
 #if	CF_DEBUGS
 	debugprintf("main: about to open error\n") ;
@@ -103,26 +109,20 @@ char	*envv[] ;
 
 	efp = NULL ;
 	if (bopen(&errfile,BFILE_STDERR,"dwca",0666) >= 0) {
-
 	    efp = &errfile ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
-
 	}
 
 #if	CF_DEBUGS
 	debugprintf("main: about to open input\n") ;
 #endif
 
-	rs = SR_OK ;
 	fd_input = FD_STDIN ;
 	if ((argc >= 2) && (argv[1][0] != '\0')) {
-
 	    rs = uc_open(argv[1],O_RDONLY,0666) ;
-
 #if	CF_DEBUGS
 	debugprintf("main: uc_open() rs=%d\n",rs) ;
 #endif
-
 		fd_input = rs ;
 	}
 	
@@ -170,11 +170,9 @@ char	*envv[] ;
 	debugprintf("main: after loop\n") ;
 #endif
 
-
 	uc_close(fd_output) ;
 
 	uc_close(fd_input) ;
-
 
 	if (len < 0) {
 
@@ -194,17 +192,13 @@ char	*envv[] ;
 	    goto baddone ;
 	}
 
-
-
 done:
-ret2:
 	ex = EX_OK ;
 
 retearly:
 ret1:
 	bclose(efp) ;
 
-ret0:
 	return ex ;
 
 /* usage */
@@ -222,13 +216,6 @@ not_enough:
 	    progname) ;
 
 	goto badret ;
-
-badarg:
-	ex = EX_USAGE ;
-	bprintf(efp,"%s: bad argument value specified\n",
-	    progname) ;
-
-	goto retearly ;
 
 badin:
 	ex = EX_NOINPUT ;
