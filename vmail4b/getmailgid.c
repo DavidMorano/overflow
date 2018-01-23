@@ -1,6 +1,6 @@
-/* getmailgid */
+/* getgid_def */
 
-/* get the GID for the group 'mail' or the mail-spool area */
+/* get the GID for a named group or default to a specified value on failure */
 
 
 /* revision history:
@@ -18,7 +18,7 @@
 	is returned if the groupname does not exist.
 
 	Synopsis:
-	int getmailgid(cchar *gname,gid_t gid)
+	int getgid_def(cchar *gname,gid_t gid)
 
 	Arguments:
 	gname		groupname to lookup
@@ -50,7 +50,7 @@ extern int	getgid_group(cchar *,int) ;
 /* exported subroutines */
 
 
-int getmailgid(cchar *gname,gid_t gid)
+int getgid_def(cchar *gname,gid_t gid)
 {
 	const int	rsn = SR_NOTFOUND ;
 	int		rs ;
@@ -64,6 +64,6 @@ int getmailgid(cchar *gname,gid_t gid)
 	}
 	return rs ;
 }
-/* end subroutine (getmailgid) */
+/* end subroutine (getgid_def) */
 
 

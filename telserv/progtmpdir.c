@@ -1,10 +1,10 @@
-/* progtmpdir */
+/* progjobdir */
 
-/* make the program-specific temporary directory */
+/* make the program-specific job directory */
 /* version %I% last modified %G% */
 
 
-#define	CF_DEBUG	0		/* switchable debug print-outs */
+#define	CF_DEBUG	0		/* run-time debug print-outs */
 
 
 /* revision history:
@@ -12,13 +12,17 @@
 	= 2008-09-01, David A­D­ Morano
 	This subroutine was adopted from the DWD program.
 
+	= 2018-01-20, David A­D­ Morano
+	I changed the name of this subroutine (and the file it is in) from
+	|progtmpdir()| to |progjobdir()|.
+
 */
 
-/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2008,2017 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-        This subroutine checks/makes the program-specific temporary directory.
+        This subroutine checks/makes the program-specific job directory.
 
 
 *******************************************************************************/
@@ -30,15 +34,12 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<fcntl.h>
 #include	<limits.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<time.h>
-#include	<grp.h>
 
 #include	<vsystem.h>
-#include	<getax.h>
+#include	<estrings.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -54,7 +55,7 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
+extern int	mkdirs(cchar *,mode_t) ;
 extern int	getgid_group(cchar *,int) ;
 extern int	isNotPresent(int) ;
 
@@ -62,6 +63,7 @@ extern int	isNotPresent(int) ;
 /* forward references */
 
 static int	procdircheck(PROGINFO *,const char *,mode_t) ;
+static int	procdirmk(PROGINFO *,cchar *,mode_t) ;
 static int	procdirgroup(PROGINFO *) ;
 
 
@@ -71,78 +73,87 @@ static int	procdirgroup(PROGINFO *) ;
 /* exported subroutines */
 
 
-int progtmpdir(PROGINFO *pip,char *jobdname)
+int progjobdir(PROGINFO *pip,char *jobdname)
 {
-	const mode_t	cmode = (IPCDIRMODE | S_ISVTX) ;
 	int		rs ;
 	int		len = 0 ;
-	char		buf[MAXPATHLEN + 1] ;
-	char		tmpfname[MAXPATHLEN + 1] ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("progtmpdir: ent\n") ;
+	    debugprintf("progjobdir: ent\n") ;
 #endif
 
-	if (jobdname == NULL)
-	    jobdname = buf ;
+	if (jobdname == NULL) return SR_FAULT ;
 
 /* this first one should be open permissions! */
 
-	rs = mkpath2(tmpfname,pip->tmpdname,pip->rootname) ;
-	if (rs >= 0)
-	    rs = procdircheck(pip,tmpfname,cmode) ;
-
-	if (rs < 0)
-	    goto ret0 ;
-
-/* this second one can be open (permissions-wise) or not */
-
-	rs = mkpath2(jobdname,tmpfname,pip->searchname) ;
-	len = rs ;
-	if (rs >= 0)
-	    rs = procdircheck(pip,jobdname,cmode) ;
-
-ret0:
+	if (pip->jobdname == NULL) {
+	    char	tbuf[MAXPATHLEN + 1] ;
+	    if ((rs = mkpath2(tbuf,pip->tmpdname,pip->rootname)) >= 0) {
+	        const mode_t	dm = (IPCDIRMODE | S_ISVTX) ;
+	        if ((rs = procdircheck(pip,tbuf,dm)) >= 0) {
+		    cchar	*sn = pip->searchname ;
+		    if ((rs = mkpath2(jobdname,tbuf,sn)) >= 0) {
+		        len = rs ;
+	    	        if ((rs = procdircheck(pip,jobdname,dm)) >= 0) {
+			    cchar	**vpp = &pip->jobdname ;
+			    rs = proginfo_setentry(pip,vpp,jobdname,len) ;
+			}
+		    }
+	        }
+	    }
+	} else {
+	    rs = mkpath1(jobdname,pip->jobdname) ;
+	    len = rs ;
+	}
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("progtmpdir: ret rs=%d len=%d\n",rs,len) ;
+	    debugprintf("progjobdir: ret rs=%d len=%d\n",rs,len) ;
 #endif
 
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (progtmpdir) */
+/* end subroutine (progjobdir) */
 
 
 /* local subroutines */
 
 
 /* check if a directory exists and has the correct permissions */
-static int procdircheck(PROGINFO *pip,cchar *dname,mode_t operms)
+static int procdircheck(PROGINFO *pip,cchar *dname,mode_t dm)
 {
 	struct ustat	sb ;
 	int		rs ;
 
-	rs = u_stat(dname,&sb) ;
-
-	if ((rs < 0) || ((sb.st_mode & operms) != operms)) {
-
-	    if (rs < 0)
-	        rs = u_mkdir(dname,operms) ;
-
-	    if (rs >= 0) {
-	        u_chmod(dname,operms) ;
-		procdirgroup(pip) ;
-		if (pip->gid_rootname > 0)
-		    u_chown(dname,-1,pip->gid_rootname) ;
+	if ((rs = u_stat(dname,&sb)) >= 0) {
+	    if ((sb.st_mode & dm) != dm) {
+	        rs = procdirmk(pip,dname,dm) ;
 	    }
-
-	} /* end if */
+	} else if (rs == SR_NOENT) {
+	    rs = procdirmk(pip,dname,dm) ;
+	}
 
 	return rs ;
 }
 /* end subroutine (procdircheck) */
+
+
+static int procdirmk(PROGINFO *pip,cchar *dname,mode_t dm)
+{
+	int		rs ;
+	if ((rs = mkdirs(dname,dm)) >= 0) {
+	    if ((rs = u_chmod(dname,dm)) >= 0) {
+	        if ((rs = procdirgroup(pip)) >= 0) {
+		    if (pip->gid_rootname > 0) {
+		        u_chown(dname,-1,pip->gid_rootname) ;
+		    }
+		}
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (procdirmk) */
 
 
 static int procdirgroup(PROGINFO *pip)
@@ -153,7 +164,7 @@ static int procdirgroup(PROGINFO *pip)
 	    if (pip->rootname != NULL) {
 		if ((rs = getgid_group(pip->rootname,-1)) >= 0) {
 	            pip->gid_rootname = rs ;
-		} else if (isNotPresent(rs)) {
+		} else if (rs == SR_NOTFOUND) {
 	            pip->gid_rootname = 0 ;
 		    rs = SR_OK ;
 		}
