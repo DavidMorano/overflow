@@ -145,11 +145,15 @@ public:
 	    return (*this) ;
 	} ;
 	bstree_iterator<T,Comp> &operator = (bstree_iterator<T,Comp> &it) {
-	    n = it.n ;
+	    if (this != &it) {
+	        n = it.n ;
+	    }
 	    return (*this) ;
 	} ;
 	bstree_iterator<T,Comp> &operator = (bstree_iterator<T,Comp> *ip) {
-	    n = ip->n ;
+	    if (this != ip) {
+	        n = ip->n ;
+	    }
 	    return (*this) ;
 	} ;
 	bstree_iterator<T,Comp> &operator = (bstree_node<T,Comp> *nn) {
@@ -221,7 +225,7 @@ bstree_iterator<T,Comp> &bstree_iterator<T,Comp>::findnext(int inc) {
 	    } /* end if (inc) */
         } /* end if (not-NULL) */
  	return (*this) ;
-} /* end method (findnext) */
+} /* end method (fstree_iterator::findnext) */
 
 struct bstree_depth {
 	int		min = INT_MAX ;
@@ -328,11 +332,13 @@ public:
 	bstree() { 
 	} ;
 	bstree(const bstree<T,Comp> &al) {
-	    bstree_node<T,Comp>	*an = al.root ;
-	    if (root != NULL) clear() ;
-	    while (an != NULL) {
-		add(an->val) ;
-	        an = an->next ;
+	    if (this != &al) {
+	        bstree_node<T,Comp>	*an = al.root ;
+	        if (root != NULL) clear() ;
+	        while (an != NULL) {
+		    add(an->val) ;
+	            an = an->next ;
+	        }
 	    }
 	} ;
 	bstree(const bstree<T,Comp> &&al) {
@@ -343,11 +349,13 @@ public:
 	    al.c = 0 ;
 	} ;
 	bstree &operator = (const bstree<T,Comp> &al) {
-	    bstree_node<T,Comp>	*an = al.root ;
-	    if (root != NULL) clear() ;
-	    while (an != NULL) {
-		add(an->val) ;
-	        an = an->next ;
+	    if (this != &al) {
+	        bstree_node<T,Comp>	*an = al.root ;
+	        if (root != NULL) clear() ;
+	        while (an != NULL) {
+		    add(an->val) ;
+	            an = an->next ;
+	        }
 	    }
 	} ;
 	bstree &operator = (const bstree<T,Comp> &&al) {

@@ -22,10 +22,10 @@
 
         This is a conainer object (elements are stored within it). This also is
         implemented as a single-linked list of nodes. This object is very useful
-        for normal queue operations (insert at tail, remove at head). The follow
-        operations are supported:
+        for normal queue operations (insert at tail, remove at head). The 
+	following operations are supported:
 
-	+ instail		inserr at tail
+	+ instail		insert at tail
 	+ inshead		insert at head
 	+ remhead		remove from head
 
@@ -79,7 +79,7 @@ class singlist_node {
 	} ;
  	friend singlist<T> ;
  	friend singlist_iterator<T> ;
-} ;
+} ; /* end class (singlist_node) */
 
 template <typename T>
 class singlist_iterator {
@@ -93,11 +93,15 @@ public:
 	    return (*this) ;
 	} ;
 	singlist_iterator &operator = (singlist_iterator<T> &it) {
-	    n = it.n ;
+	    if (this != &it) {
+	        n = it.n ;
+	    }
 	    return (*this) ;
 	} ;
 	singlist_iterator &operator = (singlist_iterator<T> *ip) {
-	    n = ip->n ;
+	    if (this != ip) {
+	        n = ip->n ;
+	    }
 	    return (*this) ;
 	} ;
 	~singlist_iterator() {
@@ -144,7 +148,7 @@ public:
 	operator bool() {
 	    return (n != NULL) ;
 	} ;
-} ;
+} ; /* end class (singlist_iterator) */
 
 template <typename T>
 class singlist {
@@ -156,11 +160,13 @@ public:
 	typedef		T value_type ;
 	singlist() = default ;
 	singlist(const singlist<T> &al) {
-	    singlist_node<T>	*an = al.head ;
-	    if (head != NULL) clear() ;
-	    while (an != NULL) {
-		instail(an->val) ;
-	        an = an->next ;
+	    if (this != &al) {
+	        singlist_node<T>	*an = al.head ;
+	        if (head != NULL) clear() ;
+	        while (an != NULL) {
+		    instail(an->val) ;
+	            an = an->next ;
+	        }
 	    }
 	} ;
 	singlist(singlist<T> &&al) {
@@ -173,11 +179,13 @@ public:
 	    al.c = 0 ;
 	} ;
 	singlist &operator = (const singlist<T> &al) {
-	    singlist_node<T>	*an = al.head ;
-	    if (head != NULL) clear() ;
-	    while (an != NULL) {
-		instail(an->val) ;
-	        an = an->next ;
+	    if (this != &al) {
+	        singlist_node<T>	*an = al.head ;
+	        if (head != NULL) clear() ;
+	        while (an != NULL) {
+		    instail(an->val) ;
+	            an = an->next ;
+	        }
 	    }
 	} ;
 	singlist &operator = (singlist<T> &&al) {
@@ -276,7 +284,7 @@ public:
 	        }
 	        head = nn ;
 	        rc = c++ ;		/* return previous value */
-	    }
+	    } /* end if */
 	    return rc ;
 	} ;
 	int insfront(const T &v) {
@@ -330,7 +338,7 @@ public:
 	    iterator it ;
 	    return it ;
 	} ;
-} ;
+} ; /* end class (singlist) */
 
 #endif /* SINGLIST_INCLUDE */
 
