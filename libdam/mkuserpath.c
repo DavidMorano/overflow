@@ -24,7 +24,7 @@
 
 	int mkuserpath(rbuf,pp,pl) ;
 	char		rbuf[] ;
-	cchar	*pp ;
+	cchar		*pp ;
 	int		pl ;
 
 	Arguments:
@@ -132,8 +132,8 @@ int mkuserpath(char *rbuf,cchar *un,cchar *pp,int pl)
 	} /* end if */
 
 #if	CF_DEBUGS
-	debugprintf("mkuserpath: ret rs=%d\n",rs) ;
 	debugprintf("mkuserpath: ret rbuf=%s\n",rbuf) ;
+	debugprintf("mkuserpath: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
@@ -234,11 +234,13 @@ static int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl)
 {
 	const int	ulen = USERNAMELEN ;
 	int		rs = SR_OK ;
+	int		rs1 ;
+	int		rl = 0 ;
 	cchar		*un = up ;
 	char		ubuf[USERNAMELEN+1] ;
 
 #if	CF_DEBUGS
-	debugprintf("mkpathusername: ul=%d u=%t s=%t\n",ul,up,ul,sp,sl) ;
+	debugprintf("mkpathusername: ent ul=%d u=%t s=%t\n",ul,up,ul,sp,sl) ;
 #endif
 
 	if (ul >= 0) {
@@ -251,32 +253,37 @@ static int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl)
 #endif
 
 	if (rs >= 0) {
-	    struct passwd	pw ;
-	    const int		pwlen = getbufsize(getbufsize_pw) ;
-	    char		*pwbuf ;
-	    if ((rs = uc_libmalloc((pwlen+1),&pwbuf)) >= 0) {
-	        if ((un[0] == '\0') || (un[0] == '-')) {
-	            rs = getpwusername(&pw,pwbuf,pwlen,-1) ;
-	        } else {
-	            rs = GETPW_NAME(&pw,pwbuf,pwlen,un) ;
-	        }
-	        if (rs >= 0) {
-		    cchar	*dir = pw.pw_dir ;
-	            if (sl > 0) {
-	                rs = mkpath2w(rbuf,dir,sp,sl) ;
+	    if ((rs = getbufsize(getbufsize_pw)) >= 0) {
+	        struct passwd	pw ;
+	        const int	pwlen = rs ;
+	        char		*pwbuf ;
+	        if ((rs = uc_libmalloc((pwlen+1),&pwbuf)) >= 0) {
+	            if ((un[0] == '\0') || (un[0] == '-')) {
+	                rs = getpwusername(&pw,pwbuf,pwlen,-1) ;
 	            } else {
-	                rs = mkpath1(rbuf,dir) ;
+	                rs = GETPW_NAME(&pw,pwbuf,pwlen,un) ;
 	            }
-	        }
-	        uc_libfree(pwbuf) ;
-	    } /* end if (memory-allocation) */
+	            if (rs >= 0) {
+		        cchar	*dir = pw.pw_dir ;
+	                if (sl > 0) {
+	                    rs = mkpath2w(rbuf,dir,sp,sl) ;
+			    rl = rs ;
+	                } else {
+	                    rs = mkpath1(rbuf,dir) ;
+			    rl = rs ;
+	                }
+	            }
+	            rs1 = uc_libfree(pwbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (memory-allocation) */
+	    } /* end if (getbufsize) */
 	} /* end if (ok) */
 
 #if	CF_DEBUGS
-	debugprintf("mkpathusername: ret rs=%d\n",rs) ;
+	debugprintf("mkpathusername: ret rs=%d rl=%u\n",rs,rl) ;
 #endif
 
-	return rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (mkpathusername) */
 
