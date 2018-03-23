@@ -235,7 +235,10 @@ static int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl)
 	const int	ulen = USERNAMELEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
+<<<<<<< HEAD
 	int		rl = 0 ;
+=======
+>>>>>>> 9a5a4f0d39102c8677ed301de4c4f56f6781e1df
 	cchar		*un = up ;
 	char		ubuf[USERNAMELEN+1] ;
 
@@ -267,10 +270,15 @@ static int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl)
 		        cchar	*dir = pw.pw_dir ;
 	                if (sl > 0) {
 	                    rs = mkpath2w(rbuf,dir,sp,sl) ;
+<<<<<<< HEAD
 			    rl = rs ;
 	                } else {
 	                    rs = mkpath1(rbuf,dir) ;
 			    rl = rs ;
+=======
+	                } else {
+	                    rs = mkpath1(rbuf,dir) ;
+>>>>>>> 9a5a4f0d39102c8677ed301de4c4f56f6781e1df
 	                }
 	            }
 	            rs1 = uc_libfree(pwbuf) ;

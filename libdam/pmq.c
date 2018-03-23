@@ -512,6 +512,7 @@ static int getpmquid(void)
 	    const int		pwlen = rs ;
 	    char		*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
+<<<<<<< HEAD
 	        const int	rsn = SR_NOTFOUND ;
 	        cchar		*un = PMQ_USERNAME1 ;
 	        if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) >= 0) {
@@ -524,6 +525,20 @@ static int getpmquid(void)
 		        rs = SR_OK ;
 		        uid = PMQ_UID ;
 		    }
+=======
+	        const int	nrs = SR_NOTFOUND ;
+	        cchar		*un = PMQ_USERNAME1 ;
+	        if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) == nrs) {
+	    	    un = PMQ_USERNAME2 ;
+	            if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) == nrs) {
+		        rs = SR_OK ;
+		        uid = PMQ_UID ;
+		    } else {
+	    	        uid = pw.pw_uid ;
+		    }
+	        } else {
+	            uid = pw.pw_uid ;
+>>>>>>> 9a5a4f0d39102c8677ed301de4c4f56f6781e1df
 	        }
 	        rs1 = uc_free(pwbuf) ;
 		if (rs >= 0) rs = rs1 ;
