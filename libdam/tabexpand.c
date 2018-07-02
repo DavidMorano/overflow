@@ -11,6 +11,9 @@
 	= 1998-08-10 David A.D. Morano
 	This was written from scratch.
 
+	= 2018-07-02 David A D Morano
+	I added a variable to better reflect the error exit strategy.
+
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
@@ -90,15 +93,15 @@ int tabexpand(char *dbuf,int dlen,cchar *sbuf,int slen)
 
 	if ((rs = dstore_start(&d,dbuf,dlen)) >= 0) {
 
-	    while ((dcol >= 0) && sl && sp[0]) {
+	    while ((rs >= 0) && sl && sp[0]) {
 
 	        if (*sp == '\t') {
 	            n = tabcols(NTABCOLS,dcol) ;
 	            for (j = 0 ; (dcol >= 0) && (j < n) ; j += 1) {
-	                dcol = dstore_add(&d,' ') ;
+	                rs = dstore_add(&d,' ') ;
 		    } /* end for */
 	        } else {
-	            dcol = dstore_add(&d,*sp) ;
+	            rs = dstore_add(&d,*sp) ;
 	        }
 
 	        sp += 1 ;
