@@ -9,12 +9,15 @@
 
 /* revision history:
 
-	= 1998-03-01, David A­D­ Morano
+	= 1998-03-01, David AÂ­DÂ­ Morano
 	This subroutine was written for Rightcore Network Services (RNS).
+
+	= 2018-07-02 David A.D. Morano
+	Enhanced for slightly better error checking on PID values.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -449,11 +452,11 @@ static int isNotRunning(cchar *np,int nl)
 	nprintf(NDF,"isNotRunning: n=%t\n",np,nl) ;
 #endif
 	if ((nl > 1) && ((sch == 'p') || (sch == 's'))) {
-	    uint	uv ;
+	    int		v ;
 	    np += 1 ;
 	    nl -= 1 ;
-	    if ((rs = cfdecui(np,nl,&uv)) >= 0) {
-	        const pid_t	pid = uv ;
+	    if ((rs = cfdeci(np,nl,&v)) >= 0) {
+	        const pid_t	pid = v ;
 	        if ((rs = isproc(pid)) == 0) {
 	            f = TRUE ;
 	        }
