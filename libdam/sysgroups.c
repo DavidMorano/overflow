@@ -8,18 +8,18 @@
 
 /* revision history:
 
-	= 1998-03-24, David A­D­ Morano
+	= 1998-03-24, David AÂ­DÂ­ Morano
         This object module was morphed from some previous one. I do not remember
         what the previous one was.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	We enumerate (reentrantly and thread safely) group names from the
-	system GROUP database.
+	We enumerate (reentrantly and thread safely) system GROUP entries from 
+	the system GROUP database.
 
 
 *******************************************************************************/
