@@ -13,7 +13,7 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -27,11 +27,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
 
 #include	<vsystem.h>
 #include	<ascii.h>
@@ -51,35 +46,12 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	sncpylc(char *,int,const char *) ;
-extern int	sncpyuc(char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	isprintlatin(int) ;
 extern int	tabcols(int,int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
-
-extern char	*strdcpy1(char *,int,const char *) ;
-extern char	*strdcpy2(char *,int,const char *,const char *) ;
-extern char	*strdcpy3(char *,int,const char *,const char *,const char *) ;
-extern char	*strdcpy4(char *,int,const char *,const char *,
-			const char *,const char *) ;
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strwcpyuc(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strnrpbrk(const char *,int,const char *) ;
-extern char	*strwcpyblanks(char *,int) ;	/* NUL-terminaed */
-extern char	*strncpyblanks(char *,int) ;	/* not NUL-terminated */
-extern char	*strwset(char *,int,int) ;
-extern char	*strnset(char *,int,int) ;
 
 
 /* external variables */
@@ -109,7 +81,7 @@ static int	dstore_finish(DSTORE *) ;
 
 int tabexpand(char *dbuf,int dlen,cchar *sbuf,int slen)
 {
-	DSTORE	d ;
+	DSTORE		d ;
 	int		rs ;
 	int		n, j ;
 	int		sl = slen ;
@@ -122,8 +94,9 @@ int tabexpand(char *dbuf,int dlen,cchar *sbuf,int slen)
 
 	        if (*sp == '\t') {
 	            n = tabcols(NTABCOLS,dcol) ;
-	            for (j = 0 ; (dcol >= 0) && (j < n) ; j += 1)
+	            for (j = 0 ; (dcol >= 0) && (j < n) ; j += 1) {
 	                dcol = dstore_add(&d,' ') ;
+		    } /* end for */
 	        } else {
 	            dcol = dstore_add(&d,*sp) ;
 	        }
