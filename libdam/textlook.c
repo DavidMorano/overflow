@@ -1613,6 +1613,7 @@ static int disp_worker(DISP *dop)
 	                    } /* end if (found a key) */
 
 	            	    if (dop->f_exit) break ;
+			    if (rs < 0) break ;
 	                } /* end while (work) */
 
 	                rs1 = disp_setstate(dop,dtp,FALSE) ;
@@ -1794,7 +1795,7 @@ static int tagq_rem(TAGQ *tqp,TXTINDEX_TAG *tagp)
 {
 	TAGQ_THING	*ttp ;
 	int		rs ;
-	int		rc = 0 ;
+	int		len = 0 ;
 
 #if	CF_DEBUGS && 0
 	debugprintf("tagq_rem: ent\n") ;
@@ -1803,7 +1804,7 @@ static int tagq_rem(TAGQ *tqp,TXTINDEX_TAG *tagp)
 	if ((rs = ciq_rem(&tqp->q,&ttp)) >= 0) {
 	    tagp->recoff = ttp->recoff ;
 	    tagp->reclen = ttp->reclen ;
-	    rc = strwcpy(tagp->fname,ttp->fname,MAXPATHLEN) - tagp->fname ;
+	    len = strwcpy(tagp->fname,ttp->fname,MAXPATHLEN) - tagp->fname ;
 	    uc_free(ttp) ;
 	    rs = psem_post(&tqp->wsem) ;
 	} else if (rs == SR_NOTFOUND) {
@@ -1811,10 +1812,10 @@ static int tagq_rem(TAGQ *tqp,TXTINDEX_TAG *tagp)
 	} /* end if (ciq_rem) */
 
 #if	CF_DEBUGS
-	debugprintf("tagq_rem: ret rs=%d rc=%d\n",rs,rc) ;
+	debugprintf("tagq_rem: ret rs=%d len=%d\n",rs,len) ;
 #endif
 
-	return (rs >= 0) ? rc : rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (tagq_rem) */
 
