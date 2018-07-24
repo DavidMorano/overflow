@@ -11,12 +11,12 @@
 
 /* revision history:
 
-	- 2008-10-01, David A­D­ Morano
+	- 2008-10-01, David AÂ­DÂ­ Morano
 	This object module was originally written.
 
 */
 
-/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2008 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -506,7 +506,7 @@ int textlook_lookup(TEXTLOOK *op,TEXTLOOK_CUR *curp,int qo,cchar **qsp)
 #if	CF_DEBUGS
 	{
 	    int	i ;
-	    debugprintf("textlook_lookup: qs¬\n") ;
+	    debugprintf("textlook_lookup: qsÂ¬\n") ;
 	    for (i = 0 ; qsp[i] != NULL ; i += 1) {
 	        debugprintf("textlook_lookup: q=>%s<\n",qsp[i]) ;
 	    }
@@ -532,7 +532,7 @@ int textlook_lookup(TEXTLOOK *op,TEXTLOOK_CUR *curp,int qo,cchar **qsp)
 #if	CF_DEBUGS
 	                    {
 	                        int	i ;
-	                        debugprintf("textlook_lookup: hkeys=%u¬\n",rs) ;
+	                        debugprintf("textlook_lookup: hkeys=%uÂ¬\n",rs) ;
 	                        for (i = 0 ; hkeya[i] != NULL ; i += 1) {
 	                            debugprintf("textlook_lookup: hkey=>%s<\n",
 	                                hkeya[i]) ;
@@ -922,7 +922,7 @@ int		ll ;
 	int		f = FALSE ;
 
 #if	CF_DEBUGS
-	debugprintf("textlook_havekeysline: line¬\n") ;
+	debugprintf("textlook_havekeysline: lineÂ¬\n") ;
 	debugprintf(">%t<\n",lp,ll) ;
 #endif
 
@@ -1086,26 +1086,18 @@ static int textlook_mkhkeys(TEXTLOOK *op,vecstr *hkp,SEARCHKEYS *skp)
 	    int		kl ;
 	    cchar	*kp ;
 
-	    while (rs >= 0) {
-
-	        kl = searchkeys_enum(skp,&cur,&kp) ;
-	        if (kl < 0) break ;
-
-	        if (kp == NULL) continue ;
-
-	        if (kl < op->minwlen) continue ;
-
-	        rs1 = SR_NOTFOUND ;
-
-	        if (rs1 == SR_NOTFOUND) {
+	    while ((rs1 = searchkeys_enum(skp,&cur,&kp)) >= 0) {
+	        kl = rs1 ;
+	        if ((kp != NULL) && (kl >= op->minwlen)) {
 	            rs = vecstr_adduniq(hkp,kp,kl) ;
 	            if (rs < INT_MAX) nkeys += 1 ;
 	        }
-
 	        if (rs < 0) break ;
 	    } /* end while (enumerating search-keys) */
+	    if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 
-	    searchkeys_curend(skp,&cur) ;
+	    rs1 = searchkeys_curend(skp,&cur) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cursor) */
 
 #if	CF_DEBUGS
@@ -1133,7 +1125,7 @@ const char	**hkeya ;
 	debugprintf("textlook_lookup: ent\n") ;
 	{
 	    int	i ;
-	    debugprintf("textlook_lookup: keys¬\n") ;
+	    debugprintf("textlook_lookup: keysÂ¬\n") ;
 	    for (i = 0 ; hkeya[i] != NULL ; i += 1) {
 	        debugprintf("textlook_lookup: k=>%s<\n",hkeya[i]) ;
 	    }
@@ -1844,32 +1836,4 @@ static int mkfieldterms(uchar *wterms)
 	return i ;
 }
 /* end subroutine (mkfieldterms) */
-
-
-#ifdef	COMMENT
-static int vcmpthreads(DISP_THR **e1pp,DISP_THR **e2pp)
-{
-	int		rc = 0 ;
-
-	if ((*e1pp != NULL) || (*e2pp != NULL)) {
-	    if (*e1pp != NULL) {
-	        if (*e2pp != NULL) {
-	            DISP_THR	*e1p = *e1pp ;
-	            DISP_THR	*e2p = *e2pp ;
-	            if ((rc = uptequal(e1p->tid,e2p->tid)) == 0) {
-	                int t1 = (int) e1p->tid ;
-	                int t2 = (int) e2p->tid ;
-	                rc = (int) (t1-t2) ;
-	            }
-	        } else
-	            rc = -1 ;
-	    } else
-	        rc = 1 ;
-	}
-
-	return rc ;
-}
-/* end subroutine (vcmpthread) */
-#endif /* COMMENT */
-
 
