@@ -7,7 +7,7 @@
 #define	CF_SAFE		0		/* some safety */
 #define	CF_ASSERT	0		/* use some assertions */
 #define	CF_REGPROC	0		/* compile regular processing */
-#define	CF_BUILDREDUCE	1		/* try '_buildreduce()' */
+#define	CF_BUILDREDUCE	1		/* try |_buildreduce()| */
 #define	CF_SHORTCUT	1		/* use short-cut */
 #define	CF_KPHRASE	0		/* debug |kphrase_xxx()| */
 #define	CF_CHECKIT	0		/* debug |_checkit()| */
@@ -15,12 +15,12 @@
 
 /* revision history:
 
-	= 2009-04-10, David A­D­ Morano
+	= 2009-04-10, David AÂ­DÂ­ Morano
 	This subroutine was originally written.
 
 */
 
-/* Copyright © 2009 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2009 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -152,7 +152,7 @@ int searchkeys_start(SEARCHKEYS *op,cchar**qsp)
 #if	CF_DEBUGS
 	{
 	    int	i ;
-	    debugprintf("searchkeys_start: qs¬\n") ;
+	    debugprintf("searchkeys_start: qsÂ¬\n") ;
 	    for (i = 0 ; qsp[i] != NULL ; i += 1) {
 	        debugprintf("searchkeys_start: qs=>%s<\n",qsp[i]) ;
 	    }
@@ -299,7 +299,7 @@ int searchkeys_process(SEARCHKEYS *op,SEARCHKEYS_POP *pop,cchar *sp,int sl)
 	    int		ki ;
 	    int		i ;
 	    int		f_prefix = pop->f_prefix ;
-	    for (i = 0 ; i < op->nphrases ; i += 1) {
+	    for (i = 0 ; (rs >= 0) && (i < op->nphrases) ; i += 1) {
 	        pep = (op->kphrases + i) ;
 	        ki = pop->nmatch[i] ;
 	        if (ki < pep->nwords) {
@@ -618,14 +618,16 @@ static int searchkeys_buildphrasemat(SEARCHKEYS *op,BUILD *bip,BUILDPHRASE *bpp)
 	    BUILDPHRASE	*ptp ;
 	    int		kl = rs ;
 	    int		i ;
-	    for (i = 0 ; vecobj_get(&bip->phrases,i,&ptp) >= 0 ; i += 1) {
+	    for (i = 0 ; (rs1 = vecobj_get(&bip->phrases,i,&ptp)) >= 0 ; i += 1) {
 	        if (ptp != NULL) {
-	            if ((rs1 = buildphrase_havekey(ptp,kp,kl)) > 0) {
+	            if ((rs = buildphrase_havekey(ptp,kp,kl)) > 0) {
 	                f_match = TRUE ;
 	                break ;
 	            }
 		}
+		if (rs < 0) break ;
 	    } /* end for */
+	    if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	} /* end if */
 
 	return (rs >= 0) ? f_match : rs ;
@@ -637,29 +639,27 @@ static int searchkeys_buildreduce(SEARCHKEYS *op,BUILD *bip)
 {
 	BUILDPHRASE	*bpp ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		i ;
-	int		wc ;
 
 #if	CF_DEBUGS
 	debugprintf("searchkeys_buildreduce: ent\n") ;
 #endif
 
-	for (i = 0 ; vecobj_get(&bip->phrases,i,&bpp) >= 0 ; i += 1) {
+	for (i = 0 ; (rs1 = vecobj_get(&bip->phrases,i,&bpp)) >= 0 ; i += 1) {
 	    if (bpp != NULL) {
-	        if ((rs = buildphrase_count(bpp)) >= 0) {
-	            wc = rs ;
-	            if (wc == 1) {
+	        if ((rs = buildphrase_count(bpp)) == 1) {
 			const int	n = (i+1) ;
 	                if ((rs = searchkeys_buildmatone(op,bip,n,bpp)) > 0) {
-	                    buildphrase_finish(bpp) ;
-	                    vecobj_del(&bip->phrases,i--) ;
+	                    (void) buildphrase_finish(bpp) ;
+	                    (void) vecobj_del(&bip->phrases,i--) ;
 	                    if (op->nphrases > 0) op->nphrases -=1 ;
 		        }
-	            }
 	        } /* end if */
 	    }
 	    if (rs < 0) break ;
 	} /* end for */
+	if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 
 #if	CF_ASSERT
 	if ((rs = vecobj_count(&bip->phrases)) != op->nphrases) {
@@ -722,17 +722,20 @@ static int searchkeys_buildmatone(SEARCHKEYS *op,BUILD *bip,int si,
 	    return SR_INVALID ;
 
 	if ((rs = buildphrase_getkey(bpp,0,&kp)) > 0) {
+	    VECOBJ	*pop = &bip->phrases ;
 	    BUILDPHRASE	*ptp ;
 	    int		kl = rs ;
 	    int		i ;
-	    for (i = si ; vecobj_get(&bip->phrases,i,&ptp) >= 0 ; i += 1) {
+	    for (i = si ; (rs1 = vecobj_get(pop,i,&ptp)) >= 0 ; i += 1) {
 	        if (ptp != NULL) {
-	            if ((rs1 = buildphrase_havekey(ptp,kp,kl)) > 0) {
-	                f_match = (rs1 > 0) ;
+	            if ((rs = buildphrase_havekey(ptp,kp,kl)) > 0) {
+	                f_match = TRUE ;
 	                break ;
 		    }
 	        }
+		if (rs < 0) break ;
 	    } /* end for */
+	    if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	} /* end if */
 
 #if	CF_DEBUGS
@@ -967,8 +970,9 @@ static int buildphrase_getkey(BUILDPHRASE *bpp,int i,cchar **rpp)
 
 	if ((rs = vecobj_get(&bpp->words,i,&kep)) >= 0) {
 	    kl = kep->kl ;
-	    if (rpp != NULL)
+	    if (rpp != NULL) {
 	        *rpp = (cchar *) kep->kp ;
+	    }
 	}
 
 	return (rs >= 0) ? kl : rs ;
@@ -979,6 +983,8 @@ static int buildphrase_getkey(BUILDPHRASE *bpp,int i,cchar **rpp)
 static int buildphrase_havekey(BUILDPHRASE *bpp,cchar *kp,int kl)
 {
 	SKWORD		*kep ;
+	int		rs = SR_OK ;
+	int		rs1 ;
 	int		i ;
 	int		f = FALSE ;
 
@@ -989,7 +995,7 @@ static int buildphrase_havekey(BUILDPHRASE *bpp,cchar *kp,int kl)
 	if (kl < 0)
 	    kl = strlen(kp) ;
 
-	for (i = 0 ; vecobj_get(&bpp->words,i,&kep) >= 0 ; i += 1) {
+	for (i = 0 ; (rs1 = vecobj_get(&bpp->words,i,&kep)) >= 0 ; i += 1) {
 	    if (kep != NULL) {
 	        f = (kl == kep->kl) ;
 	        f = f && (kep->kp[0] == kp[0]) ;
@@ -997,20 +1003,16 @@ static int buildphrase_havekey(BUILDPHRASE *bpp,cchar *kp,int kl)
 	        if (f) break ;
 	    }
 	} /* end for */
+	if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 
-	return f ;
+	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (buildphrase_havekey) */
 
 
 #if	CF_REGPROC
 
-static int kphrase_process(pep,f_prefix,ki,wp,wl)
-SKPHRASE	*pep ;
-int		f_prefix ;
-int		ki ;
-cchar		*wp ;
-int		wl ;
+static int kphrase_process(SKPHRASE pep,int f_prefix,int ki,cchar *wp,int wl)
 {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
@@ -1021,8 +1023,7 @@ int		wl ;
 
 	if (ki <= pep->nwords) {
 	    if (ki < pep->nwords) {
-	        SKWORD		*kep ;
-	        kep = (pep->kwords + ki) ;
+	        SKWORD		*kep = (pep->kwords + ki) ;
 	        if (kep != NULL) {
 	            f = (kep->kp[0] == wp[0]) ;
 	            if (f) {
@@ -1064,8 +1065,7 @@ static int kphrase_processxw(SKPHRASE *pep,int f_prefix,int ki,XWORDS *xwp)
 
 	if (ki <= pep->nwords) {
 	    if (ki < pep->nwords) {
-	        SKWORD		*kep ;
-	        kep = (pep->kwords + ki) ;
+	        SKWORD		*kep = (pep->kwords + ki) ;
 	        if (kep != NULL) {
 		    int		i = 0 ;
 		    int		m ;
@@ -1103,5 +1103,4 @@ static int kphrase_processxw(SKPHRASE *pep,int f_prefix,int ki,XWORDS *xwp)
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (kphrase_processxw) */
-
 
