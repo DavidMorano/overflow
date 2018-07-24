@@ -1,6 +1,6 @@
 /* textlook */
 
-/* text look-up manager (we use the index and verify speculative resutls) */
+/* text look-up manager (we use the index and verify speculative results) */
 
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
@@ -42,11 +42,11 @@
 	thread can easily produce thousands of such tags since they represent
 	files or pieces of files to be verified for queue-key content.  So if
 	we multiply up what is possible, we can easily get something like (2048
-	* MAXPATHLEN) amount of data just in the work queue FIFO!  This will
-	blow the memory limit on most systems with only a 4-GB memory address
-	space to start with.  So my limiting the number of items in the work
-	queue to some reasonable maximum we avoid this problem while still
-	maintaining maximum concurrency.
+	* MAXPATHLEN) amount of data just in the work queue FIFO!  This could
+	get a little bit big and maybe problematic on some systems with only a 
+	4-GB memory address space to start with.  So by limiting the number of 
+	items in the work queue to some reasonable maximum we avoid this problem
+	while still maintaining maximum concurrency.
 
 
 *******************************************************************************/
