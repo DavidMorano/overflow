@@ -1,6 +1,6 @@
 /* wsncols */
 
-/* calculate number the of columns used by a wide-string */
+/* calculate the number of columns used by a wide-string */
 
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2009-04-10, David A­D­ Morano
+	= 2009-04-10, David AÂ­DÂ­ Morano
 	This subroutine was originally written.
 
 */
 
-/* Copyright © 2009 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2009 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
