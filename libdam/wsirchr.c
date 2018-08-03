@@ -8,16 +8,17 @@
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
+	= 2000-05-14, David AÂ­DÂ­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2000 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	Reverse search for a character in a wide-string.
+	Reverse search for a character in a wide-string returning an index into
+	string of location found, otherwise returns negative.
 
 	Synopsis:
 
@@ -31,7 +32,8 @@
 
 	Returns:
 
-	-	the character pointer to the end of the destination
+	<0	character not found in given string
+	>=0	character was found and this in the string index where
 
 
 *******************************************************************************/
