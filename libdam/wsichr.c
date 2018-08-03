@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
+	= 2000-05-14, David AÂ­DÂ­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2000 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -32,7 +32,7 @@
 
 	Returns:
 
-	>=0	the character pointer to the end of the destination
+	>=0	the index into the given string where character was found
 	<0	character was not found
 
 
