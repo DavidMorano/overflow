@@ -10,17 +10,17 @@
 
 /* revision history:
 
-	= 1998-07-10, David A­D­ Morano
+	= 1998-07-10, David AÂ­DÂ­ Morano
 	This subroutine was originally written.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	This subroutine creates and opens a POSIX® shared-memory temporary
-	object.  The POSIX® SHM-type name of the object created is returned to
+	This subroutine creates and opens a POSIXÂ® shared-memory temporary
+	object.  The POSIXÂ® SHM-type name of the object created is returned to
 	the caller.
 
 	Synopsis:
@@ -68,7 +68,7 @@
 #define	SHMNAMELEN	MAXNAMELEN
 #endif
 
-#define	EBUFLEN		(2*sizeof(ULONG))
+#define	EBUFLEN		(2*sizeof(ULONG)) /* buffer for int64_t in HEX */
 
 #define	NTRIES		1000
 
@@ -80,9 +80,6 @@
 extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	vstrkeycmp(const void **,const void **) ;
-extern int	strkeycmp(const char *,const char *) ;
 
 #if	CF_DEBUGN
 extern int	nprintf(cchar *,cchar *,...) ;
@@ -107,6 +104,7 @@ static int	mkshmname(char *,int,ULONG) ;
 int openshmtmp(char *rbuf,int rlen,mode_t om)
 {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		fd_shm = -1 ;
 	int		f_bufalloc = FALSE ;
 
@@ -131,17 +129,17 @@ int openshmtmp(char *rbuf,int rlen,mode_t om)
 	    ULONG	rv ;
 	    if ((rs = randinit(&rv)) >= 0) {
 	        SIGBLOCK	b ;
+		rbuf[0] = '\0' ;
 	        if ((rs = sigblock_start(&b,NULL)) >= 0) {
-	            const int	oflags = (O_CREAT | O_EXCL | O_RDWR) ;
+	            const int	of = (O_CREAT | O_EXCL | O_RDWR) ;
 	            const int	ntries = NTRIES ;
 		    int		i ;
 
 	            for (i = 0 ; i < ntries ; i += 1) {
-	                if ((rs = mkshmname(rbuf,rlen,rv)) >= 0) {
-	                    rs = uc_openshm(rbuf,oflags,om) ;
+	                if ((rs = mkshmname(rbuf,rlen,rv++)) >= 0) {
+	                    rs = uc_openshm(rbuf,of,om) ;
 	                    fd_shm = rs ;
 	                }
-		        rv += 1 ;
 		        if (rs != SR_EXISTS) break ;
 	            } /* end for */
 
@@ -151,16 +149,27 @@ int openshmtmp(char *rbuf,int rlen,mode_t om)
 
 	            if ((rs >= 0) && f_bufalloc) {
 		        uc_unlinkshm(rbuf) ;
+			rbuf[0] = '\0' ;
 	 	    }
 
-	            sigblock_finish(&b) ;
+	            rs1 = sigblock_finish(&b) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigblock) */
+		if ((rs < 0) && (fd_shm >= 0) && (rbuf[0] != '\0')) {
+		    uc_unlinkshm(rbuf) ;
+		    rbuf[0] = '\0' ;
+		}
 	    } /* end if (randinit) */
 	} /* end if (ok) */
 
 	if (f_bufalloc && (rbuf != NULL)) {
-	    uc_free(rbuf) ;
+	    rs1 = uc_free(rbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (buffer was not supplied by the caller) */
+
+	if ((rs < 0) && (fd_shm >= 0)) {
+	    u_closse(fd_shm) ;
+	}
 
 #if	CF_DEBUGN
 	nprintf(NDF,"openshmtmp: ret rs=%d fd=%d\n",rs,fd_shm) ;
@@ -197,7 +206,7 @@ static int mkshmname(char *rbuf,int rlen,ULONG rv)
 	char		ebuf[EBUFLEN+1] ;
 
 	if ((rs = cthexull(ebuf,elen,rv)) >= 0) {
-	    int	i = (rs >= 16) ? ((rs-16)+6) : 0 ;
+	    int	i = (rs >= 10) ? (rs-10) : 0 ;
 	    rs = sncpy2(rbuf,rlen,"/tmp",(ebuf+i)) ;
 	}
 
