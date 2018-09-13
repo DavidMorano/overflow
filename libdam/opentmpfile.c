@@ -9,12 +9,12 @@
 
 /* revision history:
 
-	= 1998-07-01, David A­D­ Morano
+	= 1998-07-01, David AÂ­DÂ­ Morano
 	This subroutine was originally written.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -81,7 +81,7 @@
 #endif
 
 #undef	RANDBUFLEN
-#define	RANDBUFLEN	(sizeof(ULONG)*2)
+#define	RANDBUFLEN	(2*sizeof(ULONG))
 
 
 /* external subroutines */
@@ -183,6 +183,7 @@ static int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf)
 {
 	const int	plen = MAXPATHLEN ;
 	int		rs ;
+	int		rs1 ;
 	int		fd = -1 ;
 	char		*pbuf ;
 	if ((rs = uc_malloc((plen+1),&pbuf)) >= 0) {
@@ -193,8 +194,14 @@ static int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf)
 		rs = opentmpxer(inname,of,om,opt,obuf) ;
 		fd = rs ;
 	    }
-	    uc_free(pbuf) ;
+	    rs1 = uc_free(pbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
+	if ((rs < 0) && (fd >= 0)) {
+	    u_close(fd) ;
+	    if (obuf != NULL) uc_unlink(obuf) ;
+	    obuf[0] = '\0' ;
+	}
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (opentmpx) */
@@ -217,7 +224,6 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf)
 #endif
 
 	if (inname == NULL) return SR_FAULT ;
-	if (obuf == NULL) return SR_FAULT ;
 
 	if (inname[0] == '\0') return SR_INVALID ;
 
@@ -234,8 +240,9 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf)
 		stype = SOCK_DGRAM ;
 	    } else if (opt & OTM_STREAM) {
 		stype = SOCK_STREAM ;
-	    } else
+	    } else {
 		rs = SR_INVALID ;
+	    }
 	}
 
 	if ((rs >= 0) && (obuf == NULL)) {
@@ -387,11 +394,13 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf)
 
 static int randload(ULONG *rvp)
 {
+	struct timeval	tod ;
 	const pid_t	pid = ugetpid() ;
 	const pid_t	sid = getsid(0) ;
 	const uid_t	uid = getuid() ;
 	ULONG		rv = 0 ;
 	ULONG		v ;
+	int		rs ;
 
 	if (rvp == NULL) return SR_FAULT ;
 
@@ -409,9 +418,7 @@ static int randload(ULONG *rvp)
 	v = uid ;
 	rv += (v << 16) ;
 
-	{
-	    struct timeval	tod ;
-	    uc_gettimeofday(&tod,NULL) ; /* cannot fail?! */
+	if ((rs = uc_gettimeofday(&tod,NULL)) >= 0) {
 	        v = tod.tv_sec ;
 	        rv += (v << 32) ;
 	        rv += (v << 12) ;
@@ -426,8 +433,7 @@ static int randload(ULONG *rvp)
 #endif /* SYSHAS_GRTIME */
 
 	*rvp = rv ;
-
-	return SR_OK ;
+	return rs ;
 }
 /* end subroutine (randload) */
 
@@ -456,5 +462,4 @@ static int mktmpname(char *obuf,ULONG rv,cchar *inname)
 	return rs ;
 }
 /* end subroutine (mktmpname) */
-
 
