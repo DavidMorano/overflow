@@ -20,8 +20,13 @@
 /*******************************************************************************
 
 	This subroutine creates and opens a POSIX® shared-memory temporary
-	object.  The POSIX® SHM-type name of the object created is returned to
-	the caller.
+	object.  If a non-NULL result buffer is supplied by the caller,
+	then the POSIX® SHM-type name of the object created is returned to
+	the caller in that result buffer, and the associated SHM object remains
+	available for future access by the name.  If a NULL result
+	result buffer is supplied, then the SHM object name that is created is
+	deleted from further possible access, but the SHM object itself
+	remains open (captured by the returned FD).
 
 	Synopsis:
 
@@ -41,6 +46,15 @@
 	>=0		file descriptor to program STDIN and STDOUT
 	<0		error
 
+	Notes on SHM object names:
+	The resulting SHM object names (whether returned or deleted) take the
+	form of:
+		/tmpXXXXXXXXXX
+	where the X's represent hexadeciaml digits. Since ten hexadecial digits
+	are used, we use a random ULONG (64-bit integer) value to create them.
+	The resulting name is 14 character long and meets the most restrictive
+	POSIX requirements for POSIX SHM named objects.
+
 
 *******************************************************************************/
 
@@ -49,6 +63,7 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<sys/time.h>		/* for |gettimeofday(3c)| */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
@@ -185,16 +200,21 @@ int openshmtmp(char *rbuf,int rlen,mode_t om)
 
 static int randinit(ULONG *rvp)
 {
-	const pid_t	pid = ugetpid() ;
-	const time_t	dt = time(NULL) ;
+	struct timeval	now ;
 	ULONG		rv = 0 ;
-	ULONG		sv ;
-	sv = (ULONG) dt ;
-	rv += (sv << 8) ;
-	sv = (ULONG) pid ;
-	rv += sv ;
+	int		rs ;
+	if ((rs = uc_gettimeofday(&now,NULL)) >= 0) {
+	    ULONG	sv ;
+	    const pid_t	pid = ugetpid() ;
+	    sv = (ULONG) now.tv_sec ;
+	    rv += (sv << 8) ;
+	    sv = (ULONG) now.tv_usec ;
+	    rv += sv ;
+	    sv = (ULONG) pid ;
+	    rv += sv ;
+	}
 	*rvp = rv ;
-	return SR_OK ;
+	return rs ;
 }
 /* end subroutine (randinit) */
 
@@ -213,5 +233,4 @@ static int mkshmname(char *rbuf,int rlen,ULONG rv)
 	return rs ;
 }
 /* end subroutine (mkshmname) */
-
 
