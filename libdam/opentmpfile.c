@@ -199,8 +199,9 @@ static int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf)
 	} /* end if (m-a) */
 	if ((rs < 0) && (fd >= 0)) {
 	    u_close(fd) ;
-	    if (obuf != NULL) uc_unlink(obuf) ;
-	    obuf[0] = '\0' ;
+	    if ((obuf != NULL) && (obuf[0] != '\0')) {
+		uc_unlink(obuf) ;
+	        obuf[0] = '\0' ;
 	}
 	return (rs >= 0) ? fd : rs ;
 }
@@ -447,11 +448,10 @@ static int mktmpname(char *obuf,ULONG rv,cchar *inname)
 /* load buffer w/ random HEX digits (16 bytes) from random variable (8 bytes) */
 
 	if ((rs = cthexull(randbuf,randlen,rv)) >= 0) {
+	    int 	i = rs ;
 	    if ((rs = mkpath1(obuf,inname)) >= 0) {
 	        int	j = rs ;
-	        int	i = randlen ;
-	        while (j > 0) {
-		    j -= 1 ;
+	        while (j-- > 0) {
 	            if (i > 0) {
 		        if (obuf[j] == 'X') obuf[j] = randbuf[--i] ;
 	            }
