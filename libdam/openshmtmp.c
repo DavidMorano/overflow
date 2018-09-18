@@ -13,6 +13,11 @@
 	= 1998-07-10, David A­D­ Morano
 	This subroutine was originally written.
 
+	= 2018-09-13, David A.D. Morano
+	Changed the construction of random numbers from using just seconds to
+	instead using both seconds and microseconds. We did this by replacing a
+	a call to |time(2)| with |gettimeofday(3c)|.
+	
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
