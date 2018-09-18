@@ -23,10 +23,10 @@
 	object.  If a non-NULL result buffer is supplied by the caller,
 	then the POSIX® SHM-type name of the object created is returned to
 	the caller in that result buffer, and the associated SHM object remains
-	available for future access by the name.  If a NULL result
-	result buffer is supplied, then the SHM object name that is created is
-	deleted from further possible access, but the SHM object itself
-	remains open (captured by the returned FD).
+	available for future access by the name.  If a NULL result buffer is 
+	supplied, then the SHM object name that is created is deleted from 
+	further possible access, but the SHM object itself remains open 
+	(captured by the returned FD).
 
 	Synopsis:
 
