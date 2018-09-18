@@ -52,7 +52,7 @@
 		/tmpXXXXXXXXXX
 	where the X's represent hexadeciaml digits. Since ten hexadecial digits
 	are used, we use a random ULONG (64-bit integer) value to create them.
-	The resulting name is 14 character long and meets the most restrictive
+	The resulting name is 14 characters long and meets the most restrictive
 	POSIX requirements for POSIX SHM named objects.
 
 
