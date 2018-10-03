@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-06-01, David A­D­ Morano
+	= 1998-06-01, David AÂ­DÂ­ Morano
 	This subroutine was originally written.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -209,23 +209,22 @@ static int deftmpdir(char *rbuf,int rlen)
 
 static int chownpcs(cchar *dname)
 {
+	const int	dnlen = MAXHOSTNAMELEN ;
 	int		rs ;
-	char		domain[MAXHOSTNAMELEN+1] ;
+	char		dnbuf[MAXHOSTNAMELEN+1] ;
 #if	CF_DEBUGS
 	debugprintf("tmpmailboxes/chownpcs: ent\n") ;
 #endif
-	if ((rs = getnodedomain(NULL,domain)) >= 0) {
+	if ((rs = getdomainname(dnbuf,dnlen)) >= 0) {
 	    const int	prlen = MAXPATHLEN ;
 	    cchar	*prname = PRNAME ;
 	    char	prbuf[MAXPATHLEN+1] ;
-	    if ((rs = mkpr(prbuf,prlen,prname,dname)) >= 0) {
+	    if ((rs = mkpr(prbuf,prlen,prname,dnbuf)) >= 0) {
 	 	USTAT	sb ;
 		if ((rs = uc_stat(prbuf,&sb)) >= 0) {
-		    {
 		        const uid_t	uid_pcs = sb.st_uid ;
 		        const gid_t	gid_pcs = sb.st_gid ;
 		        rs = uc_chown(dname,uid_pcs,gid_pcs) ;
-		    }
 		} /* end if (uc_stat) */
 	    } /* end if (mkpr) */
 	} /* end if (getnodedomain) */
@@ -235,5 +234,4 @@ static int chownpcs(cchar *dname)
 	return rs ;
 }
 /* end subroutine (chownpcs) */
-
 
