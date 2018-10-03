@@ -17,10 +17,20 @@
 	Changed the construction of random numbers from using just seconds to
 	instead using both seconds and microseconds. We did this by replacing a
 	a call to |time(2)| with |gettimeofday(3c)|.
-	
+
+	= 2018-10-02, David A.D. Morano
+	I changed the minimum required buffer to hold the temporary SHM name
+	(including the leading '/' character) to what is specified as the 
+	minimum by POSIX. This (POSIX) value is 14. Yes, it is mostly a magic
+	number, but it is also the maximum filename length in the very old days
+	of AT&T UNIX. The former minimum was MAXNAMELEN, which was generally
+	the value 256 (way overkill compared with 14), hence the reduction.
+	This change is transparently backwards compaticle, so it should not
+	actually be noticed at all.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2018 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -85,7 +95,7 @@
 /* local defines */
 
 #ifndef	SHMNAMELEN
-#define	SHMNAMELEN	MAXNAMELEN
+#define	SHMNAMELEN	14		/* POSIX minimum length */
 #endif
 
 #define	EBUFLEN		(2*sizeof(ULONG)) /* buffer for int64_t in HEX */
@@ -139,8 +149,8 @@ int openshmtmp(char *rbuf,int rlen,mode_t om)
 #endif
 
 	if (rbuf == NULL) {
-	    rlen = (SHMNAMELEN + 1) ;
-	    if ((rs = uc_malloc(rlen,&rbuf)) >= 0) {
+	    rlen = SHMNAMELEN ;
+	    if ((rs = uc_malloc((rlen+1),&rbuf)) >= 0) {
 	    	f_bufalloc = TRUE ;
 	    }
 	}
