@@ -1,4 +1,4 @@
-/* mailtrailing */
+/* maintrailing */
 /* lang=C++11 */
 
 
@@ -7,12 +7,12 @@
 
 /* revision history:
 
-	= 2013-07-11, David A­D­ Morano
+	= 2013-07-11, David AÂ­DÂ­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2013 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2013 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -55,10 +55,6 @@ using namespace std ;
 
 /* external subroutines */
 
-extern "C" uint	factorial(uint) ;
-
-extern "C" int	sisub(cchar *,int,cchar *) ;
-
 
 /* global variables */
 
@@ -68,7 +64,7 @@ extern "C" int	sisub(cchar *,int,cchar *) ;
 
 /* forward references */
 
-static int trailing(longlong_t) ;
+static int	trailing(longlong_t) ;
 
 
 /* local variables */
@@ -112,5 +108,4 @@ static int trailing(longlong_t n)
 	return c ;
 }
 /* end subroutine (trailing) */
-
 
