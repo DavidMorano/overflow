@@ -7,12 +7,16 @@
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
+	= 2013-05-23, David AÂ­DÂ­ Morano
 	Originally written for Rightcore Network Services.
+
+	= 2018-10-10, David A.D. Morano
+	I made the memory allocations in a constructor a little more
+	exception-safe. Yes, (there was a question) this code requires C++11.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2013,2018 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -42,18 +46,13 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstring>
 #include	<new>
 #include	<initializer_list>
 #include	<utility>
 #include	<functional>
 #include	<algorithm>
-#include	<vector>
-#include	<list>
-#include	<array>
-#include	<iostream>
-#include	<iomanip>
 #include	<vsystem.h>
 #include	<localmisc.h>
 
@@ -83,11 +82,8 @@ extern "C" int	debugprintf(cchar *,...) ;
 extern "C" int	strlinelen(cchar *,cchar *,int) ;
 #endif
 
-extern "C" cchar	*getourenv(cchar **,cchar *) ;
-
 
 /* local structures */
-
 
 struct msort_data {
 	char		*base = NULL ;
@@ -96,14 +92,21 @@ struct msort_data {
 	int		(*cmpfun)(const void *,const void *) ;
 	char		*tmp = NULL ;
 	char		*pvp = NULL ;
+	char		*a = NULL ;
 	msort_data(char *baser,int nelem,int esize,sortcmp_t cmp) 
-		: base(baser), n(ne), es(esize), cmpfun(cmp) { 
-	    tmp = new(nothrow) char[esize+1] ;
-	    pvp = new(nothrow) char[esize+1] ;
+		: base(baser), n(ne), es(esize), cmpfun(cmp) {
+	    const int	tsize = (esize+1) ;
+	    const int	psize = (esize+1) ;
+	    int		asize = (tsize + psize) ;
+	    a = new char[asize] ;
+	    tmp = (a + 0) ;
+	    pvp = (a + tsize) ;
 	} ;
 	~msort_data() {
-	    delete [] tmp ;
-	    delete [] pvp ;
+	    if (a) {
+		delete [] a ;
+		a = NULL ;
+	    }
 	}
 	void swap(int i1,int i2) {
 	    char	*i1p = (base+(i1*es)) ;
@@ -138,10 +141,7 @@ static int	partpred2(int,int) ;
 int msort(void *base,int n,int es,sortcmp_t *cmp)
 {
 	msort_data	data(base,n,es,cmp) ;
-	int		rs = SR_OK ;
-	data.dosort(0,n) ;
-
-	return rs ;
+	return data.dosort(0,n) ;
 }
 /* end subroutine (msort) */
 
@@ -202,5 +202,4 @@ static int partpred2(int e,int pv)
 {
 	return (e <= pv) ;
 }
-
 
