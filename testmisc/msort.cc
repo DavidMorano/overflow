@@ -26,8 +26,8 @@
 
 	Synopsis:
 
-	typedef int	(*sortcmp_t)(const void *,const void *) ;
-	void msort(void *base,int nelem,int esize,sortcmp_t *cmp)
+	typedef int	(*msortcmp)(const void *,const void *) ;
+	void msort(void *base,int nelem,int esize,msortcmp cmp)
 
 	Arguments:
 
@@ -67,15 +67,15 @@ using namespace	std ;
 
 /* type-defs */
 
-typedef "C" int	(*sortcmp_t)(const void *,const void *) ;
-typedef "C" int	(*partpred_t)(const void *,const void *) ;
+typedef "C" int	(*msortcmp)(const void *,const void *) ;
+typedef "C" int	(*partpred)(const void *,const void *) ;
 
 
 /* external subroutines */
 
-extern "C" int	msort(void *base,int n,int es,sortcmp_t *cmp)
+extern "C" int	msort(void *,int,int,msortcmp) ;
 
-extern "C" int	partitionai(int *,int,partpred_t,int) ;
+extern "C" int	partitionai(int *,int,partpred,int) ;
 
 #if	CF_DEBUGS
 extern "C" int	debugprintf(cchar *,...) ;
@@ -93,7 +93,7 @@ struct msort_data {
 	char		*tmp = NULL ;
 	char		*pvp = NULL ;
 	char		*a = NULL ;
-	msort_data(char *baser,int nelem,int esize,sortcmp_t cmp) 
+	msort_data(char *baser,int nelem,int esize,msortcmp cmp) 
 		: base(baser), n(ne), es(esize), cmpfun(cmp) {
 	    const int	tsize = (esize+1) ;
 	    const int	psize = (esize+1) ;
@@ -111,21 +111,21 @@ struct msort_data {
 	void swap(int i1,int i2) {
 	    char	*i1p = (base+(i1*es)) ;
 	    char	*i2p = (base+(i2*es)) ;
- 	    memcpy(tmp,i1p) ;
- 	    memcpy(i1p,i2p) ;
- 	    memcpy(i2p,tmp) ;
+ 	    memcpy(tmp,i1p,es) ;
+ 	    memcpy(i1p,i2p,es) ;
+ 	    memcpy(i2p,tmp,es) ;
 	} ;
 	int dosort(int,int) ;
 	int docmp(int i1,int i2) {
-	    *i1p = (base+(i1*es)) ;
-	    *i2p = (base+(i2*es)) ;
+	    const void	*i1p = (base+(i1*es)) ;
+	    const void	*i2p = (base+(i2*es)) ;
 	    return (*cmpfun)(i1p,i2p) ;
 	} ;
 	void loadpivot(int i) {
-	    *ip = (base+(i*es)) ;
+	    const char	*ip = (base+(i*es)) ;
 	    memcpy(pvp,ip,es) ;
 	} ;
-	void getpivot(int,int) ;
+	int getpivot(int,int) ;
 } ;
 
 
@@ -138,7 +138,7 @@ static int	partpred2(int,int) ;
 /* exported subroutines */
 
 
-int msort(void *base,int n,int es,sortcmp_t *cmp)
+int msort(void *base,int n,int es,msortcmp cmp)
 {
 	msort_data	data(base,n,es,cmp) ;
 	return data.dosort(0,n) ;
@@ -159,14 +159,15 @@ msort_data::int dosort(int first,int last)
 	    if (docmp(first,last-1) > 0) swap(first,(last-1)) ;
 	    ff = TRUE ;
 	} else if ((last-first) > 2) {
-	    int	m1, m2 ;
+	    int		m1, m2 ;
+	    int		pvi ;
 	    ff = TRUE ;
 #if	CF_DEBUGS
 	    debugprintf("msort_data::dosort: pv=%u\n",pv) ;
 #endif
-	    pv = getpivot(first,(last-first)) ;
-	    m1 = partitionai(a+first,(last-first),partpred1,pv) + first ;
-	    m2 = partitionai(a+m1,(last-m1),partpred2,pv) + m1 ;
+	    pvi = getpivot(first,(last-first)) ;
+	    m1 = partitionai(a+first,(last-first),partpred1,a[pv]) + first ;
+	    m2 = partitionai(a+m1,(last-m1),partpred2,a[pv]) + m1 ;
 #if	CF_DEBUGS
 	    debugprintf("msort_data::dosort: m1=%u m2=%u\n",m1,m2) ;
 #endif
@@ -188,6 +189,7 @@ int msort_data::getpivot(int first,int al)
 	    if (al > 1) pvi = 1 ;
 	}
 	loadpivot(first+pvi) ;
+	return pvi ;
 }
 /* end method (msort_data::getpivot) */
 
