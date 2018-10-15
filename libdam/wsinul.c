@@ -11,6 +11,9 @@
 	= 2000-05-14, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
+	= 2018-10-15, David A.D. Morano
+	Refactoed to call |wsichr(3dam)| instead.
+
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
@@ -21,11 +24,12 @@
 
 	Synopsis:
 
-	int wsinul(const wchar_t *wsp)
+	int wsinul(const wchar_t *wsp,int wsl)
 
 	Arguments:
 
-	wsp	the source string that is to be copied
+	wsp	source string to be searched
+	wsl	length of source string
 
 	Returns:
 
@@ -41,15 +45,17 @@
 #include	<localmisc.h>
 
 
+/* external subroutines */
+
+int wsirchr(const wchar_t *,int,int) ;
+
+
 /* exported subroutines */
 
 
-int wsinul(const wchar_t *wsp)
+int wsinul(const wchar_t *wsp.int wsl)
 {
-	int	i = 0 ;
-	while (wsp[i]) i += 1 ;
-	return i ;
+	return wsirchr(wsp,wsl,0) ;
 }
 /* end subroutine (wsinul) */
-
 
