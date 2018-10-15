@@ -9,12 +9,12 @@
 
 /* revision history:
 
-	= 2001-10-04, David A­D­ Morano
+	= 2001-10-04, David AÂ­DÂ­ Morano
 	This was originally written.
 
 */
 
-/* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2001 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -22,14 +22,14 @@
 
 	Synopsis:
 
-	int partitionai(int *a,int al,partpred_t partpred,int)
+	int partitionai(int *a,int al,partpred pred,int pv)
 
 	Arguments:
 
 	a		array
 	al		array length
-	partpred	function to evaluate the predicate
-	int		value to pass to the predicate function
+	pred		function to evaluate the predicate
+	pv		value to pass to the predicate function
 
 	Returns:
 
@@ -57,7 +57,7 @@
 
 /* typedefs */
 
-typedef int	(*partpred_t)(int,int) ;
+typedef int	(*partpred)(int,int) ;
 
 
 /* external subroutines */
@@ -76,7 +76,7 @@ extern int	strlinelen(cchar *,cchar *,int) ;
 /* local variables */
 
 
-int partitionai(int *a,int al,partpred_t fn,int pv)
+int partitionai(int *a,int al,partpred fn,int pv)
 {
 	int		last = al ;
 	int		i ;
@@ -89,5 +89,4 @@ int partitionai(int *a,int al,partpred_t fn,int pv)
 	return last ;
 }
 /* end subroutine (partitionai) */
-
 
