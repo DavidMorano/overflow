@@ -11,12 +11,15 @@
 
 /* revision history:
 
-	- 2008-10-01, David A­D­ Morano
+	= 2008-10-01, David A­D­ Morano
 	This object module was originally written.
+
+	= 2018-07-15, David A.D. Morano
+	Small error check enhancement.
 
 */
 
-/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2008,2018 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
