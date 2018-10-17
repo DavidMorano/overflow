@@ -11,9 +11,12 @@
 	= 2000-05-14, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
+	= 2018-10-17, David A.D. Morano
+	Update for subordinate interface change.
+
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2000,2018 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -47,7 +50,7 @@
 
 /* external subroutines */
 
-extern int	wsinul(const wchar_t *) ;
+extern int	wsinul(const wchar_t *,int) ;
 
 
 /* exported subroutines */
@@ -57,7 +60,7 @@ int wsirchr(const wchar_t *wsp,int wsl,int sch)
 {
 	int		i ;
 	int		f = FALSE ;
-	if (wsl < 0) wsl = wsinul(wsp) ;
+	if (wsl < 0) wsl = wsinul(wsp,-1) ;
 	for (i = (wsl-1) ; i >= 0 ; i -= 1) {
 	    f = (wsp[i] == sch) ;
 	    if (f) break ;
