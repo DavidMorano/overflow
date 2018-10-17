@@ -11,9 +11,12 @@
 	= 2000-05-14, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
+	= 2018-10-17, David A.D. Morano
+	Update for subordinate interface change.
+
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2000,2018 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
