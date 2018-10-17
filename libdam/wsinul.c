@@ -55,7 +55,10 @@ int wsirchr(const wchar_t *,int,int) ;
 
 int wsinul(const wchar_t *wsp.int wsl)
 {
-	return wsirchr(wsp,wsl,0) ;
+
+	int		i ;
+	for (i = 0 ; wsl-- && wsp[i] ; i += 1) ; /* no loop action */
+	return i ;
 }
 /* end subroutine (wsinul) */
 
