@@ -14,6 +14,10 @@
 	= 2018-10-17, David A.D. Morano
 	Update for subordinate interface change.
 
+	= 2018-10-18, David A.D. Morano
+	Maybe starting to get my head screwed on! There is no need to get the
+	wstring length first.
+
 */
 
 /* Copyright © 2000,2018 David A­D­ Morano.  All rights reserved. */
@@ -50,8 +54,6 @@
 
 /* external subroutines */
 
-extern int	wsinul(const wchar_t *,int) ;
-
 
 /* exported subroutines */
 
@@ -60,7 +62,6 @@ int wsichr(const wchar_t *wsp,int wsl,int sch)
 {
 	int		i ;
 	int		f = FALSE ;
-	if (wsl < 0) wsl = wsinul(wsp,-1) ;
 	for (i = 0 ; wsl-- && wsp[i] ; i += 1) {
 	    f = (wsp[i] == sch) ;
 	    if (f) break ;
