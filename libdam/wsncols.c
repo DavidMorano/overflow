@@ -11,9 +11,12 @@
 	= 2009-04-10, David A­D­ Morano
 	This subroutine was originally written.
 
+	= 2018-10-18, David A.D. Morano
+	Fix for proper current column.
+
 */
 
-/* Copyright © 2009 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2009,2018 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -22,12 +25,12 @@
 
 	Synopsis:
 
-	int wsncols(int ntab,int ccol,const wchar_t *wsp,int wsl)
+	int wsncols(int ntab,int scol,const wchar_t *wsp,int wsl)
 
 	Arguments:
 
 	ntab		maximum number of columns in a TAB character
-	ccol		current column number
+	scol		starting current column number
 	wsp		wide-string pointer
 	wsl		wide-string length (in characters)
 
@@ -69,25 +72,24 @@ extern int	tabcols(int,int) ;
 /* exported subroutines */
 
 
-int wsncols(int ntab,int ccol,const wchar_t *wsp,int wsl)
+int wsncols(int ntab,int scol,const wchar_t *wsp,int wsl)
 {
-	int		cols = 0 ;
+	int		col = scol ;
 	while (wsl-- && *wsp) {
 	    if (*wsp == CH_TAB) {
-	        cols += tabcols(ntab,ccol) ;
+		col += tabcols(ntab,col) ;
 	    } else {
-		cols += 1 ;
+		col += 1 ;
 	    }
 	} /* end while */
-	return cols ;
+	return (col-scol) ;
 }
 /* end subroutine (wsncols) */
 
 
-int wscols(int ntab,int ccol,const wchar_t *wsp)
+int wscols(int ntab,int scol,const wchar_t *wsp)
 {
-	return wsncols(ntab,ccol,wsp,-1) ;
+	return wsncols(ntab,scol,wsp,-1) ;
 }
 /* end subroutine (wscols) */
-
 
