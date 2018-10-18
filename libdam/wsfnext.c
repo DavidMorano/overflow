@@ -8,12 +8,15 @@
 
 /* revision history:
 
-	= 1998-03-01, David A­D­ Morano
+	= 1998-03-01, David AÂ­DÂ­ Morano
 	This subroutine was originally written.
+
+	= 2018-10-18, David A.D. Morano
+	Enhance to be similar to |sfnext(3dam)|.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998,2018 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -93,7 +96,7 @@ int wsfnext(const wchar_t *wsp,int wsl,const wchar_t **spp)
 {
 	int		ch ;
 
-	while (wsl) {
+	while (wsl && *wsp) {
 	    ch = (int) *wsp ;
 	    if (! WCHAR_ISWHITE(ch)) break ;
 	    wsp += 1 ;
@@ -114,5 +117,4 @@ int wsfnext(const wchar_t *wsp,int wsl,const wchar_t **spp)
 	return (wsp - (*spp)) ;
 }
 /* end subroutine (wsfnext) */
-
 
