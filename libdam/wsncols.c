@@ -76,7 +76,7 @@ int wsncols(int ntab,int scol,const wchar_t *wsp,int wsl)
 {
 	int		col = scol ;
 	while (wsl-- && *wsp) {
-	    if (*wsp == CH_TAB) {
+	    if (*wsp++ == CH_TAB) {
 		col += tabcols(ntab,col) ;
 	    } else {
 		col += 1 ;
