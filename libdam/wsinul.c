@@ -12,7 +12,7 @@
 	Originally written for Rightcore Network Services.
 
 	= 2018-10-15, David A.D. Morano
-	Refactoed to call |wsichr(3dam)| instead.
+	Refactored.
 
 */
 
@@ -55,7 +55,6 @@ int wsirchr(const wchar_t *,int,int) ;
 
 int wsinul(const wchar_t *wsp.int wsl)
 {
-
 	int		i ;
 	for (i = 0 ; wsl-- && wsp[i] ; i += 1) ; /* no loop action */
 	return i ;
