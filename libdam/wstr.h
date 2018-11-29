@@ -3,7 +3,7 @@
 
 /* revision history:
 
-	= 2018-1127, David A­D­ Morano
+	= 2018-11-27, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 	
 */
