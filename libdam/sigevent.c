@@ -1,7 +1,7 @@
 /* sigevent */
 /* lang=C99 */
 
-/* UNIX® signal-event initialization */
+/* UNIXÂ® signal-event initialization */
 
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
@@ -9,12 +9,12 @@
 
 /* revision history:
 
-	= 2014-04-04, David A­D­ Morano
+	= 2014-04-04, David AÂ­DÂ­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2014 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2014 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -33,8 +33,8 @@
 
 	Returns:
 
-	<0		error
 	>=0		OK
+	<0		error
 
 
 *******************************************************************************/
@@ -78,6 +78,5 @@ int sigevent_load(SIGEVENT *sep,int notify,int signo,int val)
 	sep->sigev_value.sival_int = val ;
 	return SR_OK ;
 }
-/* end subroutine (sigevent_init) */
-
+/* end subroutine (sigevent_load) */
 
