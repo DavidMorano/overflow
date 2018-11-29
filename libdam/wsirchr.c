@@ -35,8 +35,8 @@
 
 	Returns:
 
-	<0	character not found in given string
-	>=0	character was found and this in the string index where
+	>=0	wide-string index of found character
+	<0	character was not found
 
 
 *******************************************************************************/
