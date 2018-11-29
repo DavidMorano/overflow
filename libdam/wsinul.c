@@ -49,15 +49,19 @@
 
 /* external subroutines */
 
-extern int	wsichr(const wchar_t *,int,int) ;
-
 
 /* exported subroutines */
 
 
 int wsinul(const wchar_t *wsp.int wsl)
 {
-	return wsichr(wsp,wsl,0) ;
+	int		i ;
+	int		f = FALSE ;
+	for (i = 0 ; wsl-- ; i += 1) {
+	    f = (wsp[i] == '\0') ;
+	    if (f) break ;
+	} /* end for */
+	return (f) ? i : -1 ;
 }
 /* end subroutine (wsinul) */
 
