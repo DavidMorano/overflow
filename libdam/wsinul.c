@@ -47,7 +47,7 @@
 
 /* external subroutines */
 
-int wsirchr(const wchar_t *,int,int) ;
+int wsichr(const wchar_t *,int,int) ;
 
 
 /* exported subroutines */
@@ -55,9 +55,7 @@ int wsirchr(const wchar_t *,int,int) ;
 
 int wsinul(const wchar_t *wsp.int wsl)
 {
-	int		i ;
-	for (i = 0 ; wsl-- && wsp[i] ; i += 1) ; /* no loop action */
-	return i ;
+	return wsichr(wsp,wsl,0) ;
 }
 /* end subroutine (wsinul) */
 
