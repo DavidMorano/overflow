@@ -1,6 +1,6 @@
 /* wsinul */
 
-/* get length of a wide-string */
+/* find the wide-string-index to a NUL character */
 
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
@@ -20,7 +20,8 @@
 
 /*******************************************************************************
 
-	Calculate the length of a wide-string.
+	We search for a NUL character and return the wide-string-index to it 
+	(if it is present), otherwise we return -1.
 
 	Synopsis:
 
@@ -28,12 +29,13 @@
 
 	Arguments:
 
-	wsp	source string to be searched
-	wsl	length of source string
+	wsp	source wide-string to be searched
+	wsl	length of source wide-string
 
 	Returns:
 
-	-	the length of the given wide-string (also index to NUL)
+	>=0	wide-string-index to the NUL character
+	<0	there was no NUL character found
 
 
 *******************************************************************************/
@@ -47,7 +49,7 @@
 
 /* external subroutines */
 
-int wsichr(const wchar_t *,int,int) ;
+extern int	wsichr(const wchar_t *,int,int) ;
 
 
 /* exported subroutines */
