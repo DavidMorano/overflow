@@ -62,10 +62,17 @@ int wsichr(const wchar_t *wsp,int wsl,int sch)
 {
 	int		i ;
 	int		f = FALSE ;
-	for (i = 0 ; wsl-- && wsp[i] ; i += 1) {
-	    f = (wsp[i] == sch) ;
-	    if (f) break ;
-	} /* end for */
+	if (wsl >= 0) {
+	    for (i = 0 ; wsl-- && wsp[i] ; i += 1) {
+	        f = (wsp[i] == sch) ;
+	       if (f) break ;
+	   } /* end for */
+	} else {
+	    for (i = 0 ; wsp[i] ; i += 1) {
+	        f = (wsp[i] == sch) ;
+	       if (f) break ;
+	   } /* end for */
+	}
 	return (f) ? i : -1 ;
 }
 /* end subroutine (wsichr) */
