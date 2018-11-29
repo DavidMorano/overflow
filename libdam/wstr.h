@@ -28,7 +28,7 @@ extern int wslen(const wchar_t *) ;
 extern int wsnlen(const wchar_t *,int) ;
 extern int wsncols(const wchar_t *,int) ;
 
-extern int wsfnext(const wchar_t *,int) ;
+extern int wsfnext(const wchar_t *,int,const wchar_t **) ;
 
 extern int wsinul(const wchar_t *,int) ;
 extern int wsichar(const wchar_t *,int) ;
