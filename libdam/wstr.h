@@ -24,16 +24,17 @@
 extern "C" {
 #endif
 
-extern int wslen(wchar_t *) ;
-extern int wsnlen(wchar_t *,int) ;
-extern int wsncols(wchar_t *,int) ;
-extern int wsnwcpynarrow(wchar_t *,int,char *,int) ;
+extern int wslen(const wchar_t *) ;
+extern int wsnlen(const wchar_t *,int) ;
+extern int wsncols(const wchar_t *,int) ;
 
-extern int wsfnext(wchar_t *,int) ;
+extern int wsfnext(const wchar_t *,int) ;
 
-extern int wsinul(wchar_t *,int) ;
-extern int wsichar(wchar_t *,int) ;
-extern int wsirchar(wchar_t *,int) ;
+extern int wsinul(const wchar_t *,int) ;
+extern int wsichar(const wchar_t *,int) ;
+extern int wsirchar(const wchar_t *,int) ;
+
+extern int wsnwcpynarrow(wchar_t *,int,const char *,int) ;
 
 #ifdef	__cplusplus
 }
