@@ -50,7 +50,7 @@
 
 /* external subroutines */
 
-extern int	wsinul(const wchar_t *,int) ;
+extern int	wsnlen(const wchar_t *,int) ;
 
 
 /* exported subroutines */
@@ -60,7 +60,7 @@ int wsirchr(const wchar_t *wsp,int wsl,int sch)
 {
 	int		i ;
 	int		f = FALSE ;
-	if (wsl < 0) wsl = wsinul(wsp,-1) ;
+	if (wsl < 0) wsl = wsnlen(wsp,-1) ;
 	for (i = (wsl-1) ; i >= 0 ; i -= 1) {
 	    f = (wsp[i] == sch) ;
 	    if (f) break ;
@@ -68,5 +68,4 @@ int wsirchr(const wchar_t *wsp,int wsl,int sch)
 	return (f) ? i : -1 ;
 }
 /* end subroutine (wsirchr) */
-
 
