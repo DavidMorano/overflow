@@ -21,13 +21,17 @@
 
 /* revision history:
 
-	= 2009-01-20, David A­D­ Morano
+	= 2009-01-20, David AÂ­DÂ­ Morano
         This is a complete rewrite of the (utter) trash that performed
         this function previously.
 
+	= 2018-11-30. David A.D. Morano
+	Fixed handling escape sequences during cooked-read responses
+	(rare but possible. I am pretty sure that this did work once.
+
 */
 
-/* Copyright © 2009 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2009,2018 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -364,7 +368,7 @@ static cchar	*cmds[] = {
 	"bodywrite", /* B */
 	"pagewrite", /* b */
 	"msgpipe", /* | */
-	"bodypipe", /* ¦ */
+	"bodypipe", /* Â¦ */
 	"pagebody", /* v */
 	"shell",
 	"msgmove", /* m */
@@ -412,7 +416,7 @@ enum cmds {
 	cmd_bodywrite, /* B */
 	cmd_pagewrite, /* b */
 	cmd_msgpipe, /* | */
-	cmd_bodypipe , /* ¦ */
+	cmd_bodypipe , /* Â¦ */
 	cmd_pagebody, /* v */
 	cmd_shell,
 	cmd_msgmove, /* m */
@@ -1627,7 +1631,7 @@ static int inter_cmdhandle(INTER *iap,int key)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
 	    int ch = (isprintlatin(key)) ? key : ' ' ;
-	    debugprintf("inter_cmdhandle: key=»%c« (\\x%04X)\n",
+	    debugprintf("inter_cmdhandle: key=Â»%cÂ« (\\x%04X)\n",
 	        ch,key) ;
 	}
 #endif
@@ -1964,7 +1968,7 @@ static int inter_cmdhandle(INTER *iap,int key)
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3)) {
 	        int ch = (isprintlatin(cmd)) ? key : ' ' ;
-	        debugprintf("inter_cmdhandle: unknown key=»%c« (\\x%04X)\n",
+	        debugprintf("inter_cmdhandle: unknown key=Â»%cÂ« (\\x%04X)\n",
 	            ch,key) ;
 	    }
 #endif
@@ -2948,7 +2952,7 @@ static int inter_msgnum(INTER *iap)
 	    const int	mi = MAX(iap->miscanpoint,0) ;
 	    rs = inter_info(iap,FALSE,fmt,iap->mbname,(mi+1),iap->nmsgs) ;
 	} else {
-	    rs = inter_info(iap,TRUE,"÷ no current mailbox\v") ;
+	    rs = inter_info(iap,TRUE,"Ã· no current mailbox\v") ;
 	}
 
 	return rs ;
@@ -3220,7 +3224,7 @@ static int inter_msgargvalid(INTER *iap,int argnum)
 	}
 
 	if (rs == SR_NOMSG) {
-	    const char	*fmt = "msg#%u ÷ %s\v" ;
+	    const char	*fmt = "msg#%u Ã· %s\v" ;
 	    const char	*ccp = "no such message in mailbox" ;
 	    inter_info(iap,FALSE,fmt,(mi+1),ccp) ;
 	}
@@ -3254,7 +3258,7 @@ static int inter_cmdmarkspam(INTER *iap,int argnum)
 	                rs = inter_cmdmarkspamer(iap,mi,mbname,cmd) ;
 	            }
 	        } else {
-	            const char	*fmt = "msg#%u ÷ %s\v" ;
+	            const char	*fmt = "msg#%u Ã· %s\v" ;
 	            const char	*ccp = "already spam-processed" ;
 	            rs = inter_info(iap,FALSE,fmt,(mi+1),ccp) ;
 	        } /* end if (msg spammed or not) */
@@ -3292,7 +3296,7 @@ static int inter_cmdmarkspamer(INTER *iap,int mi,cchar *mbname,cchar *cmd)
 	    if ((rs >= 0) && (cmd != NULL)) {
 	        if ((rs = inter_msgoutprog(iap,cmd,moff,mlen)) >= 0) {
 	            if ((rs = inter_msgdel(iap,mi,TRUE)) >= 0) {
-	                const char	*fmt = "msg#%u ÷ %s\v" ;
+	                const char	*fmt = "msg#%u Ã· %s\v" ;
 	                const char	*ccp = "processed as spam" ;
 	                rs = inter_info(iap,FALSE,fmt,(mi+1),ccp) ;
 	            }
@@ -3337,7 +3341,7 @@ static int inter_cmdpage(INTER *iap,int argnum)
 	            } /* end if (inter_msgviewfile) */
 
 	        } else {
-	            const char	*fmt = "msg#%u ÷ no msg-body\v" ;
+	            const char	*fmt = "msg#%u Ã· no msg-body\v" ;
 	            rs = inter_info(iap,FALSE,fmt,(mi+1)) ;
 	        }
 	    } /* end if (mbcache_msgscan) */
@@ -3409,7 +3413,7 @@ static int inter_cmdbodyer(INTER *iap,int mi,cchar *rp,int rl)
 	        } /* end if (inter_msgviewfile) */
 
 	    } else {
-		cchar	*fmt = "msg#%u ÷ no msg-body\v" ;
+		cchar	*fmt = "msg#%u Ã· no msg-body\v" ;
 		rs = inter_info(iap,FALSE,fmt,(mi+1)) ;
 	    }
 	} /* end if (mbcache_msgscan) */
@@ -3487,7 +3491,7 @@ static int inter_cmdmove(INTER *iap,int argnum)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		rl ;
-	int		cl = 0 ; /* ¥ GCC false complaint */
+	int		cl = 0 ; /* Â¥ GCC false complaint */
 	int		mi ;
 	int		m ;
 	int		mblen ;
@@ -3611,7 +3615,7 @@ static int inter_cmdmsgtrash(INTER *iap,int argnum)
 	        const int	w = MBCACHE_MFVTRASH ;
 	        int		f_delprev = FALSE ;
 	        const char	*ccp = NULL ;
-	        fmt = "msg#%u ÷ %s\v" ;
+	        fmt = "msg#%u Ã· %s\v" ;
 	        if ((rs = mbcache_msgsetflag(mcp,mi,w,TRUE)) == 0) {
 	            if ((rs = inter_msgappend(iap,mi,mbname)) >= 0) {
 	                if ((rs = inter_msgdel(iap,mi,f_del)) >= 0) {
@@ -3659,7 +3663,7 @@ static int inter_cmdmsgdel(INTER *iap,int f_del,int argnum)
 	    const int	mi = rs ;
 	    int		f_delprev = FALSE ;
 	    if ((rs = inter_msgdel(iap,mi,f_del)) >= 0) {
-	        const char	*fmt = "msg#%u ­ %s\v" ;
+	        const char	*fmt = "msg#%u Â­ %s\v" ;
 	        const char	*ccp ;
 	        f_delprev = (rs > 0) ;
 	        if (! LEQUIV(f_del,f_delprev)) {
@@ -3861,7 +3865,7 @@ static int inter_msgoutpipe(INTER *iap,cchar *cmd,offset_t outoff,int outlen)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
 	    debugprintf("inter_msgoutpipe: shell=>%s<\n",pip->prog_shell) ;
-	    debugprintf("inter_msgoutpipe: cmd=»%s«\n",cmd) ;
+	    debugprintf("inter_msgoutpipe: cmd=Â»%sÂ«\n",cmd) ;
 	}
 #endif
 
@@ -4530,12 +4534,14 @@ int inter_response(INTER *iap,char *lbuf,int llen,cchar *fmt,...)
 
 	if (rs >= 0) {
 	    if ((rs = uterm_read(iap->utp,lbuf,llen)) >= 0) {
-	        const int	cmd = MKCHAR(lbuf[rl-1]) ;
 	        rl = rs ;
-	        lbuf[rs] = '\0' ;
-	        if (iscmdstart(cmd)) {
-	            rl -= 1 ;
-	            rs = inter_cmdinesc(iap,cmd) ;
+	        lbuf[rl] = '\0' ;
+		if (rl > 0) {
+		    const int	cmd = MKCHAR(lbuf[rl-1]) ;
+	            if (iscmdstart(cmd)) {
+	                rl -= 1 ;
+	                rs = inter_cmdinesc(iap,cmd) ;
+		    }
 	        }
 	        if ((rs >= 0) && (rl > 0)) {
 		    int		cl ;
@@ -5515,7 +5521,7 @@ static int inter_pending(INTER *iap)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
 	    sigset_t	psm ;
-	    debugprintf("inter_pending: ¬\n") ;
+	    debugprintf("inter_pending: Â¬\n") ;
 	    uc_sigsetempty(&psm) ;
 	    if ((rs = u_sigpending(&psm)) >= 0) {
 	        int	i ;
