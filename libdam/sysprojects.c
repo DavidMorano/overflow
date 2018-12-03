@@ -8,13 +8,13 @@
 
 /* revision history:
 
-	= 1998-03-24, David A­D­ Morano
+	= 1998-03-24, David AÂ­DÂ­ Morano
         This object module was morphed from some previous one. I do not remember
         what the previous one was.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -44,6 +44,14 @@
 
 
 /* local defines */
+
+
+/* typedefs */
+
+#ifndef	TYPEDEF_PROJECT
+#define	TYPEDEF_PROJECT	1
+typedef struct project	project_t ;
+#endif
 
 
 /* external subroutines */
@@ -108,11 +116,7 @@ int sysprojects_close(SYSPROJECTS *op)
 /* end subroutine (sysprojects_close) */
 
 
-int sysprojects_readent(op,pjp,pjbuf,pjlen)
-SYSPROJECTS	*op ;
-struct project	*pjp ;
-char		pjbuf[] ;
-int		pjlen ;
+int sysprojects_readent(SYSPROJECTS *op,project_t *pjp,char *pjbuf,int pjlen)
 {
 	const int	plen = PROJNAMELEN ;
 	int		rs ;
@@ -143,8 +147,7 @@ int		pjlen ;
 /* end subroutine (sysprojects_readent) */
 
 
-int sysprojects_reset(op)
-SYSPROJECTS	*op ;
+int sysprojects_reset(SYSPROJECTS *op)
 {
 	int		rs ;
 
@@ -154,5 +157,4 @@ SYSPROJECTS	*op ;
 	return rs ;
 }
 /* end subroutine (sysprojects_reset) */
-
 
