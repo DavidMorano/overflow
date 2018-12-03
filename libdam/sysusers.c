@@ -20,7 +20,13 @@
 /*******************************************************************************
 
 	We enumerate (reentrantly and thread safely) PASSWD entries from the 
-	system PASSWD database.
+	system PASSWD database.  We do this by really enumerating system
+	usernames and then calling the system to return PASSWD entries on these
+	usernames. 
+	
+	Implementation note:
+	Usernames not found within the system are ignored. Only PASSWD entries
+	from valid usernames are returned. This is transparent to the caller.
 
 
 *******************************************************************************/
@@ -119,11 +125,11 @@ int sysusers_close(SYSUSERS *op)
 
 int sysusers_readent(SYSUSERS *op,struct passwd *pwp,char *pwbuf,int pwlen)
 {
-	const int	ulen = (USERNAMELEN+1) ;
+	const int	ulen = USERNAMELEN ;
 	int		rs ;
 	int		ll ;
 	const char	*lp ;
-	char		ubuf[(USERNAMELEN+1)+1] = { 0 } ;
+	char		ubuf[USERNAMELEN+1] = { 0 } ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (pwp == NULL) return SR_FAULT ;
@@ -163,5 +169,4 @@ int sysusers_reset(SYSUSERS *op)
 	return rs ;
 }
 /* end subroutine (sysusers_reset) */
-
 
