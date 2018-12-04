@@ -12,12 +12,12 @@
 
 /* revision history:
 
-	= 2017-10-12, David A­D­ Morano
+	= 2017-10-12, David AÂ­DÂ­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2017 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -77,17 +77,9 @@ using namespace		std ;		/* yes, we want punishment! */
 
 extern "C" int	uc_safesleep(int) ;
 
-extern "C" int	snwcpy(char *,int,const char *,int) ;
-extern "C" int	sncpy2(char *,int,const char *,const char *) ;
-extern "C" int	sncpy2w(char *,int,const char *,const char *,int) ;
-extern "C" int	sncpylc(char *,int,const char *) ;
-extern "C" int	sncpyuc(char *,int,const char *) ;
-extern "C" int	sfbasename(cchar *,int,cchar **) ;
 extern "C" int	ucontext_rtn(ucontext_t *,long *) ;
 extern "C" int	bufprintf(char *,int,cchar *,...) ;
 extern "C" int	msleep(int) ;
-extern "C" int	haslc(cchar *,int) ;
-extern "C" int	hasuc(cchar *,int) ;
 
 #if	CF_DEBUGS
 extern "C" int	debugopen(cchar *) ;
@@ -101,10 +93,7 @@ extern "C" int	nprintf(cchar *,cchar *,...) ;
 #endif
 
 extern "C" cchar	*getourenv(cchar **,cchar *) ;
-extern "C" cchar	*getourenv(const char **,const char *) ;
 extern "C" cchar	*strsigabbr(int) ;
-
-extern "C" void		uctimeout_fini() ;
 
 
 /* local structures */
@@ -352,10 +341,10 @@ static int main_sigdump(siginfo_t *sip)
 	    as = abuf ;
 	    break ;
 	case SIGQUIT:
-	    scs = "¤na¤" ;
+	    scs = "Â¤naÂ¤" ;
 	    break ;
 	default:
-	    scs = "¤default¤" ;
+	    scs = "Â¤defaultÂ¤" ;
 	    break ;
 	} /* end switch */
 	fmt = "SIG=%s code=%d(%s) addr=%s\n" ;
