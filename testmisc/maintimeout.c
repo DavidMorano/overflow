@@ -13,12 +13,12 @@
 
 /* revision history:
 
-	= 2017-10-12, David A­D­ Morano
+	= 2017-10-12, David AÂ­DÂ­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2017 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -165,7 +165,6 @@ static const struct sigcode	sigcode_bus[] = {
 /* ARHSUSED */
 int main(int argc,cchar **argv,cchar **envv)
 {
-	TIMEOUT		to ;
 	time_t		dt = time(NULL) ;
 	const int	tval = 20 ;
 #if	CF_DEBUGS && CF_DEBUGMALL
@@ -195,8 +194,10 @@ int main(int argc,cchar **argv,cchar **envv)
 	    if ((rs = maininfo_start(mip,argc,argv)) >= 0) {
 		maininfohand_t	sh = main_sighand ;
 	        if ((rs = maininfo_sigbegin(mip,sh,sigcatches)) >= 0) {
+		    TIMEOUT		to ;
 	            const time_t	wake = (dt+(tval/2)) ;
 	            if ((rs = timeout_load(&to,wake,NULL,ourwake,42,1)) >= 0) {
+
 	                const int	cmd = timeoutcmd_set ;
 	                if ((rs = uc_timeout(cmd,&to)) >= 0) {
 	                    const int	id = rs ;
@@ -206,7 +207,7 @@ int main(int argc,cchar **argv,cchar **envv)
 #endif
 
 	                    printf("id=%d\n",id) ;
-	                    uc_safesleep(tval/2) ;
+	                    uc_safesleep(tval) ;
 
 #if	CF_DEBUGN
 	                    nprintf(NDF,"main: back rs=%d\n",rs) ;
@@ -325,10 +326,10 @@ static int main_sigdump(siginfo_t *sip)
 	    as = abuf ;
 	    break ;
 	case SIGQUIT:
-	    scs = "¤na¤" ;
+	    scs = "Â¤naÂ¤" ;
 	    break ;
 	default:
-	    scs = "¤default¤" ;
+	    scs = "Â¤defaultÂ¤" ;
 	    break ;
 	} /* end switch */
 	fmt = "SIG=%s code=%d(%s) addr=%s\n" ;
