@@ -1,7 +1,6 @@
 WSCONSKEYS
 
-This program loads default keys for the WorkStation-Conole device.
+This program loads default keys for the WorkStation-Console device.
 
 Synopsis:
 $ wsconskeys
-
