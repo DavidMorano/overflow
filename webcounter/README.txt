@@ -12,14 +12,13 @@ $ webcounter [-b <basedir>] [-qs <rs>] [-db <database>] [<name(s)>[=<v>]]
 	[-i[=<b>]] [-p[=<b>]] [-a[=<b>]] [-D] [-Q] [-V]
 
 Arguments:
--b <basedir>	base-directory
+-b <basedir>	base DB directory
 -qs <qs>	query-string
 -db <database>	the database file
 <name(s)>[=<v>]	name of counter to print or increment w/ optional new value
 -af <afile>	argument-list file of <name(s)>
 -l		list all counters in a database (one per line)
 -h		add a header when using the list option
--b <basedb>	base DB directory
 -o <opt(s)>	options: log=<b>, basedb=<dir>, logsize=<n>
 -i[=<b>]	increment the named counter (default)
 -p[=<b>]	print the previous value of the named counter
@@ -28,4 +27,3 @@ Arguments:
 -C <conf>	configuration file
 -Q		do not report some non-fatal errors
 -V		print command version to standard-error and then exit
-
