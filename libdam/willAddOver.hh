@@ -1,5 +1,7 @@
 /* willAddOver */
 
+/* will an addition (generic) overflow? */
+
 
 /* revision history:
 
@@ -8,7 +10,7 @@
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2012 David A­D­ Morano.  All rights reserved. */
 
 /******************************************************************************
 
