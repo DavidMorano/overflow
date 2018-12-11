@@ -1,7 +1,7 @@
 /* willAddOver */
 /* lang=C98 */
 
-/* will an addition (generic) overflow? */
+/* will an addition (long integer) overflow? */
 
 
 /* revision history:
@@ -19,7 +19,7 @@
 	This generic subroutine will determine is an addition will overflow.
 
 	Synopsis:
-	int willAddOver(T n1, T n2)
+	int willAddOver(long int n1,long int n2)
 
 	Arguments:
 	n1		first number to add
