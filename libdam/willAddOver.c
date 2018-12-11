@@ -1,14 +1,36 @@
 /* willAddOver */
+/* lang=C98 */
+
+/* will an addition (generic) overflow? */
 
 
 /* revision history:
 
-	= 2012-11-21, David A­D­ Morano
+	= 2012-11-21, David AÂ­DÂ­ Morano
 	I took this from some of my previous code.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2011 David AÂ­DÂ­ Morano.  All rights reserved. */
+
+
+/******************************************************************************
+
+	This generic subroutine will determine is an addition will overflow.
+
+	Synopsis:
+	int willAddOver(T n1, T n2)
+
+	Arguments:
+	n1		first number to add
+	n2		second number to add
+
+	Returns:
+	0 (false)	will not overflow
+	1 (true)	will overflow
+
+
+******************************************************************************/
 
 
 #include	<envstandards.h>
