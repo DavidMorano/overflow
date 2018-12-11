@@ -8,13 +8,13 @@
 
 /* revision history:
 
-	= 1998-02-01, David A­D­ Morano
+	= 1998-02-01, David AÂ­DÂ­ Morano
         This object module was originally written to create a logging mechanism
         for PCS application programs.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /******************************************************************************
 
@@ -24,9 +24,6 @@
 
 
 ******************************************************************************/
-
-
-#define	TERMNOTE_MASTER	1
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -51,7 +48,7 @@
 #define	POLLMULT	1000
 #endif
 
-#define	TO_POLL		2
+#define	TO_POLL		2		/* poll timeout in secs */
 
 
 /* external subroutines */
@@ -75,10 +72,8 @@
 int writeto(int wfd,cchar *wbuf,int wlen,int wto)
 {
 	struct pollfd	fds[2] ;
-
 	time_t		daytime = time(NULL) ;
 	time_t		ti_write ;
-
 	int		rs = SR_OK ;
 	int		i ;
 	int		pt = TO_POLL ;
