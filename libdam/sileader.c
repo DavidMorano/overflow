@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-03-24, David A­D­ Morano
+	= 1998-03-24, David AÂ­DÂ­ Morano
 	This object module was originally written.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -29,10 +29,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
-#include	<string.h>
 
 #include	<vsystem.h>
-#include	<ctdec.h>
 #include	<localmisc.h>
 
 
@@ -43,21 +41,16 @@
 
 extern int	siskipwhite(cchar *,int) ;
 extern int	sibreak(cchar *,int,cchar *) ;
-extern int	siskipwhite(cchar *,int) ;
-extern int	isdigitlatin(int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern int	isdigitlatin(int) ;
 
 
 /* exported subroutines */
 
 
-int sileader(sp,sl)
-const char	*sp ;
-int		sl ;
+int sileader(cchar *sp,int sl)
 {
 	int		si = 0 ;
-
 	if (sl > 0) {
 	    int	ch ;
 	    if ((si = siskipwhite(sp,sl)) > 0) {
@@ -70,11 +63,11 @@ int		sl ;
 	        if ((ci = sibreak(sp,sl," \t")) > 0) {
 	            si += ci ;
 	            si += siskipwhite((sp + ci),(sl - ci)) ;
-	        } else
+	        } else {
 	            si = 0 ;
+		}
 	    } /* end if (is-digit) */
 	} /* end if (positive) */
-
 	return si ;
 }
 /* end subroutine (sileader) */
