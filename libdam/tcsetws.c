@@ -1,20 +1,20 @@
 /* tcsetws */
 
-/* UNIX® terminal-control "set-lines" */
+/* UNIXÂ® terminal-control Set Window-Size */
 
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-11-01, David AÂ­DÂ­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	set the window size to the terminal.
+	Set the window size on the terminal.
 
 	Synopsis:
 
@@ -29,8 +29,8 @@
 
 	Returns:
 
-	<0		error
 	>=0		success (previous number of lines)
+	<0		error
 
 
 *******************************************************************************/
@@ -53,15 +53,15 @@
 int tcsetws(int fd,struct winsize *wsp)
 {
 	int		rs = SR_OK ;
-
 	if (wsp != NULL) {
 	    if (fd >= 0) {
 	        rs = u_ioctl(fd,TIOCSWINSZ,wsp) ;
-	    } else
+	    } else {
 	        rs = SR_NOTOPEN ;
-	} else
+	    }
+	} else {
 	    rs = SR_FAULT ;
-
+	}
 	return rs ;
 }
 /* end subroutine (tcsetws) */
