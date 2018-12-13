@@ -1,6 +1,6 @@
 /* uuname */
 
-/* vector string operations */
+/* caller interface to a UUNAME database */
 
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-02-01, David A­D­ Morano
+	= 1998-02-01, David AÂ­DÂ­ Morano
 	This module was originally written.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -57,21 +57,6 @@
 /* external subroutines */
 
 extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath4(char *,const char *,const char *,const char *,
-			const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mksofname(char *,const char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
-extern int	pathclean(char *,const char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* local structures */
