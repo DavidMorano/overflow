@@ -12,12 +12,12 @@
 
 /* revision history:
 
-	= 1998-02-01, David A­D­ Morano
+	= 1998-02-01, David AÂ­DÂ­ Morano
 	This subroutine was originally written.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /******************************************************************************
 
@@ -264,17 +264,11 @@ static int	uunames_indmk(UUNAMES *,const char *,time_t) ;
 static int	uunames_indlist(UUNAMES *) ;
 static int	uunames_indcheck(UUNAMES *,time_t) ;
 
-static int	checkdname(cchar *) ;
-
 static int	vecstr_defenvs(vecstr *,const char **) ;
 static int	vecstr_loadpath(vecstr *,const char *) ;
-static int	mkpathval(vecstr *,char *,int) ;
+static int	vecstr_mkpathval(vecstr *,char *,int) ;
 
-#ifdef	COMMENT
-static int	mkindfname(char *,const char *,const char *,const char *,
-			const char *) ;
-#endif
-
+static int	checkdname(cchar *) ;
 static int	vesrch(void *,void *) ;
 
 
@@ -573,11 +567,7 @@ ret0:
 /* end subroutine (uunames_exists) */
 
 
-int uunames_enum(op,curp,buf,buflen)
-UUNAMES		*op ;
-UUNAMES_CUR	*curp ;
-char		buf[] ;
-int		buflen ;
+int uunames_enum(UUNAMES *op,UUNAMES_CUR *curp,char *buf,int buflen)
 {
 	struct liner	*lep ;
 	int		rs = SR_OK ;
@@ -614,8 +604,7 @@ ret0:
 /* end subroutine (uunames_enum) */
 
 
-int uunames_count(op)
-UUNAMES		*op ;
+int uunames_count(UUNAMES *op)
 {
 	int		rs ;
 
@@ -635,10 +624,7 @@ UUNAMES		*op ;
 /* private subroutines */
 
 
-static int uunames_infoloadbegin(op,pr,dbname)
-UUNAMES		*op ;
-const char	pr[] ;
-const char	dbname[] ;
+static int uunames_infoloadbegin(UUNAMES *op,cchar *pr,cchar *dbname)
 {
 	int		rs = SR_OK ;
 
@@ -1027,27 +1013,20 @@ static int uunames_indclose(UUNAMES *op)
 
 
 /* make the index */
-static int uunames_mkuunamesi(op,dname)
-UUNAMES		*op ;
-const char	dname[] ;
+static int uunames_mkuunamesi(UUNAMES *op,cchar *dname)
 {
 	SPAWNPROC	ps ;
-
-	vecstr	envs ;
-
-	pid_t	cpid ;
-
-	int	rs ;
-	int	i, cstat, cex ;
-	int	prlen = 0 ;
-
+	vecstr		envs ;
+	pid_t		cpid ;
+	int		rs ;
+	int		i, cstat, cex ;
+	int		prlen = 0 ;
 	const char	*varprmkuu = VARPRMKUU ;
 	const char	*pn = PROG_MKUUNAMES ;
 	const char	*av[10] ;
 	const char	**ev ;
-
-	char	progfname[MAXPATHLEN + 1] ;
-	char	dbname[MAXPATHLEN + 1] ;
+	char		progfname[MAXPATHLEN + 1] ;
+	char		dbname[MAXPATHLEN + 1] ;
 
 
 #if	CF_DEBUGS
@@ -1084,8 +1063,9 @@ const char	dname[] ;
 #ifdef	COMMENT
 	if ((rs >= 0) && (prlen > 0)) {
 	    rs = vecstr_envadd(&envs,varprmkuu,progfname,prlen) ;
-	} else if (rs >= 0)
+	} else if (rs >= 0) {
 	    rs = vecstr_envadd(&envs,varprmkuu,op->pr,-1) ;
+	}
 #endif /* COMMENT */
 
 #else /* CF_GETPROGROOT */
@@ -1204,24 +1184,19 @@ ret0:
 /* end subroutine (uunames_mkuunamesi) */
 
 
-static int uunames_envpaths(op,elp)
-UUNAMES		*op ;
-vecstr		*elp ;
+static int uunames_envpaths(UUNAMES *op,vecstr *elp)
 {
-	vecstr	pathcomps ;
-
-	int	rs ;
-	int	i ;
-	int	opts ;
-	int	size ;
-	int	bl, pl ;
-
+	vecstr		pathcomps ;
+	int		rs ;
+	int		i ;
+	int		opts ;
+	int		size ;
+	int		bl, pl ;
 	const char	*subdname ;
 	const char	*np ;
-
-	char	pathbuf[MAXPATHLEN + 1] ;
-	char	*bp = NULL ;
-	char	*vp ;
+	char		pathbuf[MAXPATHLEN + 1] ;
+	char		*bp = NULL ;
+	char		*vp ;
 
 
 	opts = VECSTR_OORDERED | VECSTR_OSTSIZE ;
@@ -1263,20 +1238,17 @@ vecstr		*elp ;
 
 	    if ((rs >= 0) && ((rs = uc_malloc(size,&bp)) >= 0)) {
 
-	        rs = mkpathval(&pathcomps,bp,(size-1)) ;
+	        rs = vecstr_mkpathval(&pathcomps,bp,(size-1)) ;
 	        bl = rs ;
 	        if (rs >= 0)
 	            rs = vecstr_envadd(elp,np,bp,bl) ;
 
 	        uc_free(bp) ;
-
 	    } /* end if (memory allocation) */
 
 	    vecstr_delall(&pathcomps) ;
 
-	    if (rs < 0)
-	        break ;
-
+	    if (rs < 0) break ;
 	} /* end for */
 
 ret1:
@@ -1288,22 +1260,17 @@ ret0:
 /* end subroutine (uunames_envpaths) */
 
 
-static int uunames_indlist(op)
-UUNAMES		*op ;
+static int uunames_indlist(UUNAMES *op)
 {
 	struct liner	le ;
-
-	uint	lineoff = 0 ;
-
-	int	rs = SR_OK ;
-	int	ml ;
-	int	len ;
-	int	n = 0 ;
-
+	uint		lineoff = 0 ;
+	int		rs = SR_OK ;
+	int		ml ;
+	int		len ;
+	int		n = 0 ;
 	const char	*mp ;
 	const char	*tp ;
 	const char	*filemagic = UUNAMES_DBMAGICSTR ;
-
 
 	mp = (const char *) op->indfmap ;
 	ml = op->indfsize ;
@@ -1321,26 +1288,21 @@ UUNAMES		*op ;
 #endif
 
 	    if (lineoff > 0) {
-
 		if ((le.ll > 0) && (le.lp[0] != '#')) {
 		    n += 1 ;
 		    rs = vecobj_add(&op->list,&le) ;
 		}
-
 	    } else {
-
-		if ((le.ll == 0) || (strncmp(le.lp,filemagic,le.ll) != 0))
+		if ((le.ll == 0) || (strncmp(le.lp,filemagic,le.ll) != 0)) {
 		    rs = SR_LIBBAD ;
-
+		}
 	    }
-
-	    if (rs < 0)
-	    	break ;
 
 	    lineoff += len ;
 	    mp += len ;
 	    ml -= len ;
 
+	    if (rs < 0) break ;
 	} /* end while (processing lines) */
 
 ret0:
@@ -1365,81 +1327,6 @@ static int uunames_indcheck(UUNAMES *op,time_t dt)
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (uunames_indcheck) */
-
-
-static int checkdname(cchar *dname)
-{
-	int		rs = SR_OK ;
-
-	if (dname[0] == '/') {
-	    USTAT	sb ;
-	    if ((rs = u_stat(dname,&sb)) >= 0) {
-		if (S_ISDIR(sb.st_mode)) {
-	    	    rs = perm(dname,-1,-1,NULL,W_OK) ;
-		} else {
-	            rs = SR_NOTDIR ;
-		}
-	    }
-	} else {
-	    rs = SR_INVALID ;
-	}
-
-	return rs ;
-}
-/* end subroutine (checkdname) */
-
-
-#ifdef	COMMENT
-
-static int mkindfname(buf,dname,name,suf,end)
-char		buf[] ;
-const char	dname[] ;
-const char	name[] ;
-const char	suf[] ;
-const char	end[] ;
-{
-	int	rs = SR_OK ;
-	int	buflen = MAXPATHLEN ;
-	int	dnl = 0 ;
-	int	i = 0 ;
-
-
-	if (rs >= 0) {
-	    rs = storebuf_strw(buf,buflen,i,dname,-1) ;
-	    i += rs ;
-	    dnl = rs ;
-	}
-
-	if ((rs >= 0) && (dname[dnl - 1] != '/')) {
-	    rs = storebuf_char(buf,buflen,i,'/') ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_strw(buf,buflen,i,name,-1) ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_char(buf,buflen,i,'.') ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_strw(buf,buflen,i,suf,-1) ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_strw(buf,buflen,i,end,-1) ;
-	    i += rs ;
-	}
-
-	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (mkindfname) */
-
-#endif /* COMMENT */
 
 
 static int vecstr_defenvs(vecstr *elp,cchar **ea)
@@ -1505,10 +1392,7 @@ static int vecstr_loadpath(vecstr *clp,cchar *pp)
 /* end subroutine (vecstr_loadpath) */
 
 
-static int mkpathval(clp,vbuf,vbuflen)
-vecstr		*clp ;
-char		vbuf[] ;
-int		vbuflen ;
+static int vecstr_mkpathval(vecstr *clp,char *vbuf,inyt vlen)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -1547,7 +1431,7 @@ int		vbuflen ;
 	            f_semi = TRUE ;
 	        }
 
-	    }
+	    } /* end if (non-NULL) */
 	    if (rs < 0) break ;
 	} /* end for */
 	} else {
@@ -1556,7 +1440,29 @@ int		vbuflen ;
 
 	return (rs >= 0) ? rlen : rs ;
 }
-/* end subroutine (mkpathval) */
+/* end subroutine (vecstr_mkpathval) */
+
+
+static int checkdname(cchar *dname)
+{
+	int		rs = SR_OK ;
+
+	if (dname[0] == '/') {
+	    USTAT	sb ;
+	    if ((rs = u_stat(dname,&sb)) >= 0) {
+		if (S_ISDIR(sb.st_mode)) {
+	    	    rs = perm(dname,-1,-1,NULL,W_OK) ;
+		} else {
+	            rs = SR_NOTDIR ;
+		}
+	    }
+	} else {
+	    rs = SR_INVALID ;
+	}
+
+	return rs ;
+}
+/* end subroutine (checkdname) */
 
 
 /* find if two entries match (we don't need a "comparison") */
