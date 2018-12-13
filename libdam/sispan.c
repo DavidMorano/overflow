@@ -1,16 +1,16 @@
 /* sispan */
 
-/* subroutine to find a character in a given string */
+/* find the index of character pass a span of a string */
 
 
 /* revision history:
 
-	= 1998-03-23, David A­D­ Morano
+	= 1998-03-23, David AÂ­DÂ­ Morano
 	This subroutine was originally written.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -32,8 +32,8 @@
 
 	Returns:
 
-	>0	number of character skipped
-	==0	no characters were skipped (no whitespace)
+	>0	number of characters skipped
+	==0	no characters were skipped
 
 
 *******************************************************************************/
@@ -42,16 +42,17 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
+#include	<string.h>		/* for |strchr(3c)| but not used */
 
 #include	<localmisc.h>
 
 
 /* external subroutines */
 
+extern int	strnchr(cchar *,int,int) ;	/* handles ISO-8859-1 */
+
 
 /* forward references */
-
-static int	isclass(const char *,int) ;
 
 
 /* exported subroutines */
@@ -59,33 +60,16 @@ static int	isclass(const char *,int) ;
 
 int sispan(cchar *sp,int sl,cchar *class)
 {
-	int	i ;
+	int		i ;
+	int		ch ;
 
 	for (i = 0 ; sl-- && sp[i] ; i += 1) {
-	    if (! isclass(class,sp[i])) break ;
+	    ch = MKCHAR(sp[i]) ;
+	    if (strnchr(class,-1,ch) != NULL) break ;
 	} /* end for */
 
 	return i ;
 }
 /* end subroutine (sispan) */
-
-
-/* local subroutines */
-
-
-static int isclass(const char *class,int ch)
-{
-	int		i ;
-	int		f = FALSE ;
-
-	ch &= 0xff ;
-	for (i = 0 ; class[i] ; i += 1) {
-	    f = (ch == MKCHAR(class[i])) ;
-	    if (f) break ;
-	}
-
-	return f ;
-}
-/* end subroutine (isclass) */
 
 
