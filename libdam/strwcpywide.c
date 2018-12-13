@@ -8,18 +8,20 @@
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
+	= 2000-05-14, David AÂ­DÂ­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2000 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
         Copy a source wide-string to a destination narrow-string buffer until
         either the end of the source wide-string is reached (by its end-marker)
-        or the length of the source wide-string is exhausted.
+        or the length of the source wide-string is exhausted. For any
+	wide-string characters that are out of the ISO-8859-1 (Latin-1) range
+	we just substitute the ISO-8859-1 '??' character.
 
 	Synopsis:
 
@@ -57,12 +59,12 @@ char *strwcpywide(char *dp,const wchar_t *sp,int sl)
 	int		ch ;
 	if (sl >= 0) {
 	    while (sl-- && *sp) {
-		if ((ch = (int) *sp++) >= UCHAR_MAX) ch = '¿' ;
+		if ((ch = (int) *sp++) > UCHAR_MAX) ch = 'Â¿' ;
 	        *dp++ = (char) ch ;
 	    }
 	} else {
 	    while (*sp) {
-		if ((ch = (int) *sp++) >= UCHAR_MAX) ch = '¿' ;
+		if ((ch = (int) *sp++) > UCHAR_MAX) ch = 'Â¿' ;
 	        *dp++ = (char) ch ;
 	    }
 	} /* end if */
