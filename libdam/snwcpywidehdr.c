@@ -13,12 +13,13 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
 	Similar to 'snwcpycompact(3dam)' except that the source consists of 
-	wide-characters.
+	wide-characters. This is meant to be used on wide-character strongs
+	taken from mail-msg header values (consisting of string data).
 
 	Synopsis:
 
@@ -43,7 +44,7 @@
 
 	Implemetation note:
 	We could have used either 'sbuf(3dam)' or 'storebuf(3dam)' or what a
-	few other subroutines of this ilk have done, but this subroutine was
+	few other subroutines of this ilk have done. But this subroutine was
 	written at a time before resort to those interfaces was automatic.
 	It's a little messy, but it works just fine as it is!
 
@@ -83,7 +84,7 @@ extern int	sncpy2(char *,int,cchar *,cchar *) ;
 extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
 extern int	snwcpy(char *,int,cchar *,int) ;
 extern int	wsfnext(const wchar_t *,int,const wchar_t **) ;
-extern int	wsinul(const wchar_t *) ;
+extern int	wsnlen(const wchar_t *,int) ;
 extern int	isprintbad(int) ;
 
 #if	CF_DEBUGS
@@ -117,7 +118,7 @@ int snwcpywidehdr(char *dbuf,int dlen,const wchar_t *wsp,int wsl)
 	int		dl = 0 ;
 
 	if (dlen < 0) dlen = INT_MAX ;
-	if (wsl < 0) wsl = wsinul(wsp) ;
+	if (wsl < 0) wsl = wsnlen(wsp,-1) ;
 
 	if ((rs = strmgr_start(&m,dbuf,dlen)) >= 0) {
 	    int			wl ;
@@ -130,17 +131,17 @@ int snwcpywidehdr(char *dbuf,int dlen,const wchar_t *wsp,int wsl)
 	        if (rs >= 0) {
 	            uint	wch ;
 	            int		i ;
+		    cchar	*ss ;
 	            for (i = 0 ; (rs >= 0) && (i < wl) && wp[i] ; i += 1) {
 	                if ((wch = (uint) wp[i]) > UCHAR_MAX) {
-			    cchar	*ss = straltwchar(wch) ;
-			    if (ss != NULL) {
+			    if ((ss = straltwchar(wch)) != NULL) {
 	                        rs = strmgr_str(&m,ss,-1) ;
 			    } else {
-			        wch = '¿' ;
+			        wch = 'Â¿' ;
 	                        rs = strmgr_char(&m,wch) ;
 			    }
 			} else {
-			    if (isprintbad(wch)) wch = '¿' ;
+			    if (isprintbad(wch)) wch = 'Â¿' ;
 	                    rs = strmgr_char(&m,wch) ;
 			}
 	            } /* end for */
