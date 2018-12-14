@@ -9,12 +9,15 @@
 
 /* revision history:
 
-	= 2016-06-29, David A­D­ Morano
+	= 2016-06-29, David AÂ­DÂ­ Morano
 	This was really made from scratch.
+
+	= 2018-12-14, David A.D. Morano
+	Made a small enhancement for error handling.
 
 */
 
-/* Copyright © 2016 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2016,2018 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -24,6 +27,14 @@
 		qpdecoder_load
 		qpdecoder_read
 		qpdecoder_finish
+
+	Orientation note:
+	Data that is encoded in the Quoted-Printable format is mostly found in
+	MIME-type mail messages. The data can be either in the mail-message
+	header value fields (header keys still need to be normal -- so far)
+	or the data can be in a section of the mail-message body. But sometimes
+	data encoded with the Quoted-Printable mechanism are also found outside
+	of any mail-message context.
 
 
 *******************************************************************************/
@@ -208,7 +219,7 @@ int qpdecoder_load(QPDECODER *op,cchar *sp,int sl)
 	                    }
 	                    sp += 1 ;
 	                    sl -= 1 ;
-	                    if (sl > 0) {
+	                    if ((rs >= 0) && (sl > 0)) {
 	                        const int	rl = op->rl ;
 	                        int		ml = MIN(sl,(nl-op->rl)) ;
 	                        char		*rb = op->rb ;
@@ -223,13 +234,13 @@ int qpdecoder_load(QPDECODER *op,cchar *sp,int sl)
 	                            op->f.esc = FALSE ;
 	                        }
 	                    } /* end if */
+			    if (rs < 0) break ;
 	                } /* end while */
 	                if ((rs >= 0) && (sl > 0)) {
 	                    rs = qpdecoder_add(op,sp,sl) ;
 	                    c += rs ;
 	                    sl = 0 ;
 	                } /* end if (remaining source) */
-	                if (rs < 0) break ;
 	            } /* end if (escape or not) */
 	        } /* end while */
 	    } /* end if (space or not) */
@@ -360,7 +371,7 @@ static int qpdecoder_cvt(QPDECODER *op)
 		v |= (hexval(ch0)<<4) ;
 		v |= (hexval(ch1)<<0) ;
 	    } else {
-	        v = '¿' ;
+	        v = 'Â¿' ;
 	    } 
 	    obp->add(v) ;
 	} else
