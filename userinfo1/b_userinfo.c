@@ -3617,13 +3617,13 @@ static int datauser_groupsfinder(DATAUSER *dup,char *grbuf,int grlen)
 	if ((rs = sysgroup_open(&sgr,NULL)) >= 0) {
 	    struct group	gr ;
 	    vecstr		*glp = &dup->groups ;
-	    cchar		**groups ;
+	    cchar		**users ;
 	    while ((rs = sysgroup_readent(&sgr,&gr,grbuf,grlen)) > 0) {
 	            if (gr.gr_mem != NULL) {
 	                cchar	*un = dup->un ;
-	                cchar	*gn = gr.gr_name ;
-	                groups = (cchar **) gr.gr_mem ;
-	                if (matstr(groups,un,-1) >= 0) {
+	                users = (cchar **) gr.gr_mem ;
+	                if (matstr(users,un,-1) >= 0) {
+			    cchar	*gn = gr.gr_name ;
 	                    rs = vecstr_adduniq(glp,gn,-1) ;
 	                    if (rs < INT_MAX) c += 1 ;
 	                } /* end if (match) */
@@ -3738,7 +3738,7 @@ static int datauser_projectsfinder(DATAUSER *dup,char *pjbuf,int pjlen)
 		struct project	pj ;
 	        vecstr		*glp = &dup->groups ;
 	        vecstr		*plp = &dup->projects ;
-	        const int	rsn = SR_NOTFOUND ;
+		const int	rsn = SR_NOTFOUND ;
 	        int		f ;
 	        cchar		*un = dup->un ;
 	        cchar		*gn = dup->gr.gr_name ;
@@ -3753,18 +3753,24 @@ static int datauser_projectsfinder(DATAUSER *dup,char *pjbuf,int pjlen)
 	                cchar	**groups = (cchar **) pj.pj_groups ;
 	                for (i = 0 ; groups[i] != NULL ; i += 1) {
 	                    if (dup->have.gr) {
-	                        if (strcmp(gn,groups[i]) == 0)
+	                        if (strcmp(gn,groups[i]) == 0) {
 	                            break ;
+				}
 	                    }
 	                    if (dup->have.groups) {
-	                        if (vecstr_find(glp,groups[i]) >= 0)
+	                        if ((rs = vecstr_find(glp,groups[i])) >= 0) {
 	                            break ;
+				} else if (rs == rsn) {
+				    rs = SR_OK ;
+				}
 	                    }
+			    if (rs < 0) break ;
 	                } /* end for */
 	                f = (groups[i] != NULL) ;
 	            } /* end if */
 	            if ((rs >= 0) && f) {
-	                rs = vecstr_adduniq(plp,pj.pj_name,-1) ;
+			cchar	*pn = pj.pj_name ;
+	                rs = vecstr_adduniq(plp,pn,-1) ;
 			if (rs < INT_MAX) c += 1 ;
 	            }
 	            if (rs < 0) break ;
