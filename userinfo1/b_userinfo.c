@@ -13,14 +13,14 @@
 
 /* revision history:
 
-	= 2004-03-01, David A­D­ Morano
+	= 2004-03-01, David AÂ­DÂ­ Morano
 	This subroutine was originally written.  It was inspired by many
 	programs that performs various subset functions of this program.  This
 	can be either a KSH builtin or a stand-alone program.
 
 */
 
-/* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2004 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -395,8 +395,10 @@ static int	datauser_groups(DATAUSER *) ;
 static int	datauser_groupdef(DATAUSER *) ;
 #endif /* CF_DEFGROUP */
 static int	datauser_groupsfind(DATAUSER *) ;
+static int	datauser_groupsfinder(DATAUSER *,char *,int) ;
 static int	datauser_projects(DATAUSER *) ;
 static int	datauser_projectsfind(DATAUSER *) ;
+static int	datauser_projectsfinder(DATAUSER *,char *,int) ;
 static int	datauser_tz(DATAUSER *) ;
 static int	datauser_lastlog(DATAUSER *) ;
 static int	datauser_statvfs(DATAUSER *) ;
@@ -3460,7 +3462,8 @@ static int datauser_gr(DATAUSER *dup)
 	        } else if (isNotPresent(rs)) {
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(5))
-	                debugprintf("userinfo/datauser_gr: getgr_gid() rs=%d\n",rs) ;
+	                debugprintf("userinfo/datauser_gr: getgr_gid() rs=%d\n",
+			    rs) ;
 #endif
 	            rs = SR_OK ;
 	        }
@@ -3553,7 +3556,7 @@ static int datauser_groups(DATAUSER *dup)
 	} else {
 	    if (dup->have.groups) {
 	        rs = vecstr_count(&dup->groups) ;
-	        c = rs ;
+	        c += rs ;
 	    }
 	} /* end if (initialization needed) */
 
@@ -3571,10 +3574,8 @@ static int datauser_groupdef(DAYAUSER *dup)
 	if ((rs = datauser_gr(dup)) >= 0) {
 	    cchar	*gn = dup->gr.gr_name ;
 	    if ((gn != NULL) && (gn[0] != '\0')) {
-	        if (vecstr_find(&dup->groups,gn) == SR_NOTFOUND) {
-	            c += 1 ;
-	            rs = vecstr_add(&dup->groups,gn,-1) ;
-	        }
+	        rs = vecstr_adduniq(&dup->groups,gn,-1) ;
+		if (rs < INT_MAX) c += 1 ;
 	    } /* end if (have a group-name) */
 	} /* end if */
 
@@ -3586,42 +3587,56 @@ static int datauser_groupdef(DAYAUSER *dup)
 
 static int datauser_groupsfind(DATAUSER *dup)
 {
-	struct group	gr ;
-	const int	grlen = getbufsize(getbufsize_gr) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	char		*grbuf ;
+	
+	if ((rs = getbufsize(getbufsize_gr)) >= 0) {
+	    const int	grlen = rs ;
+	    char	*grbuf ;
+	    if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
+	        rs = datauser_groupsfinder(dup,grbuf,grlen) ;
+	        c += rs ;
+	        rs1 = uc_free(grbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (getbufsize) */
 
-	if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
-	    SYSGROUP	sgr ;
-	    if ((rs = sysgroup_open(&sgr,NULL)) >= 0) {
-	        vecstr		*glp = &dup->groups ;
-	        const int	rsn = SR_NOTFOUND ;
-	        cchar		**groups ;
-	        while ((rs = sysgroup_readent(&sgr,&gr,grbuf,grlen)) > 0) {
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (datauser_groupsfind) */
+
+
+static int datauser_groupsfinder(DATAUSER *dup,char *grbuf,int grlen)
+{
+	SYSGROUP	sgr ;
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+
+	if ((rs = sysgroup_open(&sgr,NULL)) >= 0) {
+	    struct group	gr ;
+	    vecstr		*glp = &dup->groups ;
+	    cchar		**groups ;
+	    while ((rs = sysgroup_readent(&sgr,&gr,grbuf,grlen)) > 0) {
 	            if (gr.gr_mem != NULL) {
 	                cchar	*un = dup->un ;
 	                cchar	*gn = gr.gr_name ;
 	                groups = (cchar **) gr.gr_mem ;
 	                if (matstr(groups,un,-1) >= 0) {
-	                    if ((rs = vecstr_find(glp,gn)) == rsn) {
-	                        c += 1 ;
-	                        rs = vecstr_add(glp,gn,-1) ;
-	                    }
+	                    rs = vecstr_adduniq(glp,gn,-1) ;
+	                    if (rs < INT_MAX) c += 1 ;
 	                } /* end if (match) */
 	            } /* end if (non-null) */
 	            if (rs < 0) break ;
-	        } /* end while */
-	        rs1 = sysgroup_close(&sgr) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (sysgroup) */
-	    uc_free(grbuf) ;
-	} /* end if (m-a-f) */
+	    } /* end while */
+	    rs1 = sysgroup_close(&sgr) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (sysgroup) */
 
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (datauser_groupsfind) */
+/* end subroutine (datauser_groupsfinder) */
 
 
 /* find supplemental project names for a given username */
@@ -3653,11 +3668,8 @@ static int datauser_projects(DATAUSER *dup)
 	                    if ((rs = datauser_pj(dup)) >= 0) {
 	                        cchar	*pn = dup->pj.pj_name ;
 	                        if (dup->have.pj && (pn[0] != '\0')) {
-	                            const int	rsn = SR_NOTFOUND ;
-	                            if ((rs = vecstr_find(pjp,pn)) == rsn) {
-	                                c += 1 ;
-	                                rs = vecstr_add(pjp,pn,-1) ;
-	                            }
+	                            rs = vecstr_adduniq(pjp,pn,-1) ;
+				    if (rs < INT_MAX) c += 1 ;
 	                        }
 	                        if (rs >= 0) {
 	                            rs = datauser_projectsfind(dup) ;
@@ -3676,7 +3688,7 @@ static int datauser_projects(DATAUSER *dup)
 	    if (dup->have.projects) {
 	        vecstr	*pjp = &dup->projects ;
 	        rs = vecstr_count(pjp) ;
-	        c = rs ;
+	        c += rs ;
 	    }
 	} /* end if (initialization needed) */
 
@@ -3695,16 +3707,35 @@ static int datauser_projects(DATAUSER *dup)
 
 static int datauser_projectsfind(DATAUSER *dup)
 {
-	struct project	pj ;
-	const int	pjlen = getbufsize(getbufsize_pj) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	char		*pjbuf ;
 
-	if ((rs = uc_malloc((pjlen+1),&pjbuf)) >= 0) {
-	    SYSPROJECT	spj ;
+	if ((rs = getbufsize(getbufsize_pj)) >= 0) {
+	    const int	pjlen = rs ;
+	    char	*pjbuf ;
+	    if ((rs = uc_malloc((pjlen+1),&pjbuf)) >= 0) {
+		rs = datauser_projectsfinder(dup,pjbuf,pjlen) ;
+		c += rs ;
+	        rs1 = uc_free(pjbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (memory-allocation) */
+	} /* end if (getbufsize) */
+
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (datauser_projectsfind) */
+
+
+static int datauser_projectsfinder(DATAUSER *dup,char *pjbuf,int pjlen)
+{
+	SYSPROJECT	spj ;
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+
 	    if ((rs = sysproject_open(&spj,NULL)) >= 0) {
+		struct project	pj ;
 	        vecstr		*glp = &dup->groups ;
 	        vecstr		*plp = &dup->projects ;
 	        const int	rsn = SR_NOTFOUND ;
@@ -3732,21 +3763,19 @@ static int datauser_projectsfind(DATAUSER *dup)
 	                } /* end for */
 	                f = (groups[i] != NULL) ;
 	            } /* end if */
-	            if (f && (vecstr_find(plp,pj.pj_name) == rsn)) {
-	                c += 1 ;
-	                rs = vecstr_add(plp,pj.pj_name,-1) ;
+	            if ((rs >= 0) && f) {
+	                rs = vecstr_adduniq(plp,pj.pj_name,-1) ;
+			if (rs < INT_MAX) c += 1 ;
 	            }
 	            if (rs < 0) break ;
 	        } /* end while (reading entries) */
 	        rs1 = sysproject_close(&spj) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sysproject) */
-	    uc_free(pjbuf) ;
-	} /* end if (memory-allocation) */
 
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (datauser_projectsfind) */
+/* end subroutine (datauser_projectsfinder) */
 
 
 /* timezone */
@@ -3967,8 +3996,7 @@ static int datauser_lastseener(DATAUSER *dup,char *bp,int bl,vecstr *tlp)
 	                            if (sb.st_mode & S_IWGRP) {
 	                                if (sb.st_mtime > max) {
 	                                    max = sb.st_mtime ;
-	                                    len = strdcpy1(bp,bl,lp) - bp
-	                                        ;
+	                                    len = strdcpy1(bp,bl,lp) - bp;
 	                                }
 	                            } /* end if (group-writable) */
 	                        } /* end if (stat) */
