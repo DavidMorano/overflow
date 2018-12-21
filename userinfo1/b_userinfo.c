@@ -3142,7 +3142,7 @@ static int datasys_nisdomain(DATASYS *dsp)
 	        }
 	    }
 	} else {
-	    if (dsp->nisdomainname == NULL) {
+	    if (dsp->nisdomainname != NULL) {
 	        rs = strlen(dsp->nisdomainname) ;
 	    }
 	} /* end if (initialization needed) */
