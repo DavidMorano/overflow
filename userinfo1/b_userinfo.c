@@ -4050,7 +4050,8 @@ static int datauser_realname(DATAUSER *dup,char *cbuf,int clen)
 
 static int datauser_netname(DATAUSER *dup,cchar *nis)
 {
-	int		rs ;
+	int		rs = SR_OK ;
+	int		len = 0 ;
 	if (dup->netname == NULL) {
 	    if ((rs = datauser_pw(dup)) >= 0) {
 	        if (dup->have.pent) {
@@ -4064,17 +4065,18 @@ static int datauser_netname(DATAUSER *dup,cchar *nis)
 			cchar		*d = "." ;
 	                if ((rs = sncpy5(nbuf,nlen,u,d,dbuf,"@",nis)) >= 0) {
 	                    cchar	*np ;
+			    len = rs ;
 	                    if ((rs = uc_mallocstrw(nbuf,rs,&np)) >= 0) {
 	                        dup->netname = np ;
 	                    }
 	                }
 	            }
-	        }
+	        } /* end if (have entry) */
 	    }
 	} else {
-	    rs = strlen(dup->netname) ;
+	    len = strlen(dup->netname) ;
 	}
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (datauser_netname) */
 
