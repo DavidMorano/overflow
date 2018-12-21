@@ -3106,6 +3106,8 @@ static int datasys_domain(DATASYS *dsp)
 	            }
 	        }
 	    } /* end if */
+	} else if (dsp->domainname != NULL) {
+	    rs = strlen(dsp->domainname) ;
 	} /* end if (needed initialization) */
 
 	return rs ;
@@ -3141,10 +3143,8 @@ static int datasys_nisdomain(DATASYS *dsp)
 	            rs = SR_OK ;
 	        }
 	    }
-	} else {
-	    if (dsp->nisdomainname != NULL) {
-	        rs = strlen(dsp->nisdomainname) ;
-	    }
+	} else if (dsp->nisdomainname != NULL) {
+	    rs = strlen(dsp->nisdomainname) ;
 	} /* end if (initialization needed) */
 
 	return rs ;
