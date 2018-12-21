@@ -1,7 +1,20 @@
 /* pwentry */
 
+/* PW-ENTRY object and interface */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/* revision history:
+
+	= 1998-00-00, David A.D. Morano
+	This was originally written.
+
+	= 2018-12-21, David A.D. Morano
+	Added |getpwentrybufsize(3dam)|.
+
+
+***********************************************************************/
+
+/* Copyright Â© 1998,2018 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 #ifndef	PWENTRY_INCLUDE
 #define	PWENTRY_INCLUDE		1
@@ -58,7 +71,8 @@ struct pwentry {
 extern "C" {
 #endif
 
-extern int	pwentry_bufsize() ;
+extern int	pwentry_bufsize(void) ;
+extern int	getpwentrybufsize(void) ;
 
 #ifdef	__cplusplus
 }
