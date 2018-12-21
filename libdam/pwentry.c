@@ -1,4 +1,4 @@
-/* pentry */
+/* pwentry */
 
 /* some miscellaneous PWENTRY subroutines */
 /* version %I% last modified %G% */
@@ -9,28 +9,31 @@
 
 /* revision history:
 
-	= 1998-09-01, David A­D­ Morano
+	= 1998-09-01, David AÂ­DÂ­ Morano
 	This program was originally written.
+
+	= 2018-12-21, David A.D. Morano
+	Added |getpwentrybufsize(3dam)|.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998,2018 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
 	We provide some miscelleneous utility subroutines for the PWENTRY
 	object.
 
-	int pentry_bufsize()
+	Synopsis:
+	int getpwentrybufsize(void)
 
 	Arguments:
-
 	-
 
 	Returns:
-
 	>=0		size of necessary buffer to hold the data for 
 			a PWENTRY object
+	<0		error (yes, due to error from |getbufsize(3uc)|).
 
 
 *******************************************************************************/
@@ -70,14 +73,21 @@
 /* exported subroutines */
 
 
-int pwentry_bufsize()
+int getpwentrybufsize()
 {
 	int		rs ;
 	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
-	    rs += MAXNAMELEN ;
+	    rs += MAXNAMELEN ; /* additional size for some extra stuff */
 	}
 	return rs ;
 }
 /* end subroutine (pwentry_bufsize) */
+
+
+/* legacy only */
+int pwentry_bufsize()
+{
+	return getpwentrybufsize() ;
+}
 
 
