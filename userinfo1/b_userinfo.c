@@ -3154,13 +3154,11 @@ static int datasys_nisdomain(DATASYS *dsp)
 
 static int datauser_start(DATAUSER *dup,PROGINFO *pip,cchar *un,cchar *pwfname)
 {
-	const int	pentlen = pwentry_bufsize() ;
-	const int	grlen = getbufsize(getbufsize_gr) ;
-	const int	pjlen = getbufsize(getbufsize_pj) ;
+	const int	pentlen ;
+	const int	grlen ;
+	const int	pjlen ;
 	int		rs ;
-	int		size = 0 ;
-	char		*bp ;
-
+	
 #if	CF_DEBUGS
 	debugprintf("userinfo/datauser_start: ent un=%s\n",un) ;
 #endif
@@ -3176,30 +3174,43 @@ static int datauser_start(DATAUSER *dup,PROGINFO *pip,cchar *un,cchar *pwfname)
 	dup->un = un ;
 	dup->pwfname = pwfname ;
 
-	size += (pentlen+1) ;
-	size += (grlen+1) ;
-	size += (pjlen+1) ;
-	if ((rs = uc_malloc(size,&bp)) >= 0) {
-	    dup->a = bp ;
-	    dup->pentbuf = bp ;
-	    dup->pentlen = pentlen ;
-	    bp += (pentlen+1) ;
-	    dup->grbuf = bp ;
-	    dup->grlen = grlen ;
-	    bp += (grlen+1) ;
-	    dup->pjbuf = bp ;
-	    dup->pjlen = pjlen ;
-	    {
-	        rs = datauser_pw(dup) ;
-	    }
-	    if (rs < 0) {
-	        uc_free(dup->a) ;
-	        dup->a = NULL ;
-	        dup->pentbuf = NULL ;
-	        dup->pentlen = 0 ;
-	        dup->grbuf = NULL ;
-	        dup->grlen = 0 ;
-	    }
+	if ((rs = getpwentrybufsize()) >= 0) {
+	    pentlen = rs ;
+	    if ((rs = getbufsize(getbufsize_gr)) >= 0) {
+		grlen = rs ;
+		if ((rs = getbufsize(getbufsize_pj)) >= 0) {
+		    int		size = 0 ;
+		    char	*bp ;
+		    pjlen = rs ;
+		    size += (pentlen+1) ;
+		    size += (grlen+1) ;
+		    size += (pjlen+1) ;
+		    if ((rs = uc_malloc(size,&bp)) >= 0) {
+	    		dup->a = bp ;
+	    		dup->pentbuf = bp ;
+	    		dup->pentlen = pentlen ;
+	    		bp += (pentlen+1) ;
+	    		dup->grbuf = bp ;
+	    		dup->grlen = grlen ;
+	    		bp += (grlen+1) ;
+	    		dup->pjbuf = bp ;
+	    		dup->pjlen = pjlen ;
+	    		{
+	        	    rs = datauser_pw(dup) ;
+	    		}
+	    		if (rs < 0) {
+	        	    uc_free(dup->a) ;
+	        	    dup->a = NULL ;
+	        	    dup->pentbuf = NULL ;
+	        	    dup->pentlen = 0 ;
+	        	    dup->grbuf = NULL ;
+	        	    dup->grlen = 0 ;
+	        	    dup->pjbuf = NULL ;
+	        	    dup->pjlen = 0 ;
+	    		}
+		    } /* end if (getbufsize) */
+		} /* end if (getbufsize) */
+	    } /* end if (getbufsize) */
 	} /* end if (memory-allocation) */
 
 #if	CF_DEBUGS
@@ -3244,6 +3255,9 @@ static int datauser_finish(DATAUSER *dup)
 	    dup->pentbuf = NULL ;
 	    dup->grbuf = NULL ;
 	    dup->pjbuf = NULL ;
+	    dup->pentlen = 0 ;
+	    dup->grlen = 0 ;
+	    dup->pjlen = 0 ;
 	}
 
 	return rs ;
