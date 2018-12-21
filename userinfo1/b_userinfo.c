@@ -3272,9 +3272,9 @@ static int datauser_ua(DATAUSER *dup)
 	        int		i ;
 	        int		vl ;
 	        char		vbuf[VBUFLEN + 1] ;
-
 	        for (i = 0 ; uakeys[i] != NULL ; i += 1) {
-	            if ((vl = userattr_lookup(&ua,vbuf,vlen,uakeys[i])) >= 0) {
+	            if ((rs = userattr_lookup(&ua,vbuf,vlen,uakeys[i])) >= 0) {
+			vl = rs ;
 	                switch (i) {
 	                case uakey_tz:
 	                    rs = snwcpy(dup->tz,TZLEN,vbuf,vl) ;
@@ -3285,10 +3285,11 @@ static int datauser_ua(DATAUSER *dup)
 	                    dup->have.dn = (rs > 0) ;
 	                    break ;
 	                } /* end switch */
+		    } else if (rs == SR_NOTFOUND) {
+			rs = SR_OK ;
 	            } /* end if (userattr_lookup) */
 	            if (rs < 0) break ;
 	        } /* end for */
-
 	        rs1 = userattr_close(&ua) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else if (isNotPresent(rs)) {
