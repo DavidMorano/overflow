@@ -79,18 +79,20 @@
 #include	<ugetpw.h>
 #include	<getax.h>
 #include	<getxusername.h>
+#include	<pwentry.h>
 #include	<pwfile.h>
 #include	<getpwentry.h>
 #include	<getutmpent.h>
+#include	<userattr.h>
 #include	<pcsns.h>
 #include	<lastlogfile.h>
-#include	<userattr.h>
+#include	<sncpy.h>
 #include	<ctdec.h>
 #include	<filebuf.h>
 #include	<sysgroup.h>
 #include	<sysproject.h>
 #include	<tmpx.h>
-#include	<pwentry.h>
+
 #include	<estrings.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -154,7 +156,6 @@
 
 /* external subroutines */
 
-extern int	mkfmtphone(char *,int,cchar *,int) ;
 extern int	pathadd(char *,int,cchar *) ;
 extern int	sfskipwhite(cchar *,int,cchar **) ;
 extern int	matstr(cchar **,cchar *,int) ;
@@ -181,6 +182,7 @@ extern int	statvfsdir(cchar *,struct statvfs *) ;
 extern int	mkgecosname(char *,int,cchar *) ;
 extern int	mkrealname(char *,int,cchar *,int) ;
 extern int	mkmailname(char *,int,cchar *,int) ;
+extern int	mkfmtphone(char *,int,cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	getnodeinfo(cchar *,char *,char *,vecstr *,cchar *) ;
 extern int	nisdomainname(char *,int) ;
@@ -2650,29 +2652,29 @@ static int procquery_fullname(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
 
 static int procquery_netname(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
 {
-	int		rs ;
-	int		sl = 0 ;
+	int		rs = SR_OK ;
+	int		cl = 0 ;
 	if (pdp->f.self) {
 	    char	nbuf[MAXNETNAMELEN+1] ;
 	    if ((rs = uc_getnetname(nbuf)) >= 0) {
-	            sl = (strdcpy1w(cbuf,clen,nbuf,rs) - cbuf) ;
+	        cl = (strdcpy1w(cbuf,clen,nbuf,rs) - cbuf) ;
 	    } else if ((rs == SR_NOTFOUND) || (rs == SR_UNAVAIL)) {
-	            rs = SR_OK ;
-	            cbuf[0] = '\0' ;
+	        rs = SR_OK ;
+	        cbuf[0] = '\0' ;
 	    }
 	} /* end if (self) */
-	if ((rs >= 0) && (sl == 0)) {
-	        DATASYS		*dsp = &pdp->ds ;
-	        if ((rs = datasys_nisdomain(dsp)) >= 0) {
-	    	    DATAUSER	*dup = &pdp->du ;
-	            cchar	*nd = dsp->nisdomainname ;
-	            if ((rs = datauser_netname(dup,nd)) >= 0) {
-	                cchar	*nn = dup->netname ;
-	                sl = (strdcpy1w(cbuf,clen,nn,rs) - cbuf) ;
-	            }
+	if ((rs >= 0) && (cl == 0)) {
+	    DATASYS	*dsp = &pdp->ds ;
+	    if ((rs = datasys_nisdomain(dsp)) >= 0) {
+	    	DATAUSER	*dup = &pdp->du ;
+	        cchar	*nd = dsp->nisdomainname ;
+	        if ((rs = datauser_netname(dup,nd)) >= 0) {
+	            cchar	*nn = dup->netname ;
+	            cl = (strdcpy1w(cbuf,clen,nn,rs) - cbuf) ;
 	        }
+	    }
 	} /* end if */
-	return (rs >= 0) ? sl : rs ;
+	return (rs >= 0) ? cl : rs ;
 }
 /* end subroutine (procquery_netname) */
 
@@ -2695,18 +2697,18 @@ static int procquery_projinfo(PROGINFO *pip,PROGDATA *pdp,char *cbuf,int clen)
 {
 	DATAUSER	*dup = &pdp->du ;
 	int		rs ;
-	int		sl = 0 ;
+	int		cl = 0 ;
 	if (pip == NULL) return SR_FAULT ;
 	if ((rs = datauser_pw(dup)) > 0) {
 	    const int	w = pcsnsreq_projinfo ;
-	    cchar	*pun = dup->pent.username ;
-	    if ((rs = procgetns(pip,cbuf,clen,pun,w)) > 0) {
-	        sl = rs ;
+	    cchar	*un = dup->pent.username ;
+	    if ((rs = procgetns(pip,cbuf,clen,un,w)) > 0) {
+	        cl = rs ;
 	    } else if (isNotAccess(rs)) {
 	        rs = SR_OK ;
 	    }
 	} /* end if (datauser_pw) */
-	return (rs >= 0) ? sl : rs ;
+	return (rs >= 0) ? cl : rs ;
 }
 /* end subroutine (procquery_projinfo) */
 
@@ -2806,13 +2808,15 @@ static int progdata_domain(PROGDATA *pdp)
 
 	    if (! pdp->du.init.domain) rs = datauser_domain(&pdp->du) ;
 
-	    if ((rs >= 0) && (pdp->du.domainname[0] != '\0'))
+	    if ((rs >= 0) && (pdp->du.domainname[0] != '\0')) {
 	        sp = pdp->du.domainname ;
+	    }
 
 	    if (sp == NULL) {
 	        if (! pdp->ds.f.domain) rs = datasys_domain(&pdp->ds) ;
-	        if ((rs >= 0) && (pdp->ds.domainname[0] != '\0'))
+	        if ((rs >= 0) && (pdp->ds.domainname[0] != '\0')) {
 	            sp = pdp->ds.domainname ;
+		}
 	    } /* end if */
 
 	    pdp->f.domain = TRUE ;
@@ -2830,6 +2834,7 @@ static int progdata_domain(PROGDATA *pdp)
 static int progdata_host(PROGDATA *pdp)
 {
 	int		rs = SR_OK ;
+	int		len = 0 ;
 
 	if ((! pdp->f.host) && (pdp->hostname[0] == '\0')) {
 	    pdp->f.host = TRUE ;
@@ -2839,14 +2844,17 @@ static int progdata_host(PROGDATA *pdp)
 	    if ((rs >= 0) && (! pdp->f.domain)) {
 	        rs = progdata_domain(pdp) ;
 	    }
-	    if ((rs >= 0) && (pdp->ds.nodename[0] != '\0') &&
-	        (pdp->domainname != NULL)) {
-	        rs = sncpy3(pdp->hostname,MAXHOSTNAMELEN,
-	            pdp->ds.nodename,".",pdp->domainname) ;
+	    if (rs >= 0) {
+		cchar	*nn = pdp->ds.nodename ;
+	        cchar	*dn = pdp->domainname ;
+		if ((nn[0] != '\0') && (dn != NULL)) {
+	            rs = snsds(pdp->hostname,MAXHOSTNAMELEN,nn,dn) ;
+		    len = rs ;
+		}
 	    }
 	}
 
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (progdata_host) */
 
@@ -2948,22 +2956,6 @@ static int datasys_uaux(DATASYS *dsp)
 /* end subroutine (datasys_uaux) */
 
 
-#ifdef	COMMENT
-static int datasys_si(DATASYS *dsp)
-{
-	int		rs = SR_OK ;
-
-	if (! dsp->f.si) {
-	    rs = u_uname(&dsp->si) ;
-	    if (rs >= 0) dsp->f.si = TRUE ;
-	}
-
-	return rs ;
-}
-/* end subroutine (datasys_si) */
-#endif /* COMMENT */
-
-
 static int datasys_node(DATASYS *dsp)
 {
 	PROGINFO	*pip = dsp->pip ;
@@ -2975,13 +2967,15 @@ static int datasys_node(DATASYS *dsp)
 	    dsp->f.node = TRUE ;
 	    if (dsp->nodename == NULL) {
 	        cchar	*cp = getourenv(pip->envv,VARNODE) ;
-	        if ((cp != NULL) && (cp[0] != '\0'))
+	        if ((cp != NULL) && (cp[0] != '\0')) {
 	            dsp->nodename = cp ;
+		    rs = strlen(cp) ;
+		}
 	    }
 	    if ((dsp->nodename == NULL) || (dsp->nodename[0] == '\0')) {
 	        if (! dsp->f.uname) rs = datasys_uname(dsp) ;
 	        if (rs >= 0) {
-	            int	nl = -1 ;
+	            int		nl = -1 ;
 	            cchar	*np = dsp->uname.nodename ;
 	            cchar	**vpp = &dsp->nodename ;
 	            char	*tp ;
@@ -2991,36 +2985,13 @@ static int datasys_node(DATASYS *dsp)
 	            rs = datasys_setentry(dsp,vpp,np,nl) ;
 	        }
 	    }
+	} else if (dsp->nodename != NULL) {
+	    rs = strlen(dsp->nodename) ;
 	} /* end if (initializing) */
 
 	return rs ;
 }
 /* end subroutine (datasys_node) */
-
-
-static int datasys_system(DATASYS *dsp)
-{
-	PROGINFO	*pip = dsp->pip ;
-	int		rs = SR_OK ;
-
-	if (pip == NULL) return SR_FAULT ;
-
-	if (! dsp->f.system) {
-	    dsp->f.system = TRUE ;
-	    if (dsp->systemname == NULL) {
-	        cchar	*cp = getourenv(pip->envv,VARSYSTEM) ;
-	        if ((cp != NULL) && (cp[0] != '\0')) {
-	            dsp->systemname = cp ;
-	        }
-	    }
-	    if (dsp->systemname == NULL) {
-	        rs = datasys_nodeinfo(dsp) ;
-	    } /* end if (needed) */
-	} /* end if (initializing) */
-
-	return rs ;
-}
-/* end subroutine (datasys_system) */
 
 
 static int datasys_cluster(DATASYS *dsp)
@@ -3036,16 +3007,47 @@ static int datasys_cluster(DATASYS *dsp)
 	        cchar	*cp = getourenv(pip->envv,VARCLUSTER) ;
 	        if ((cp != NULL) && (cp[0] != '\0')) {
 	            dsp->clustername = cp ;
+		    rs = strlen(cp) ;
 	        }
 	    }
 	    if (dsp->clustername == NULL) {
 	        rs = datasys_nodeinfo(dsp) ;
 	    } /* end if (needed) */
+	} else if (dsp->clustername != NULL) {
+	    rs = strlen(dsp->clustername) ;
 	} /* end if (initializing) */
 
 	return rs ;
 }
 /* end subroutine (datasys_cluster) */
+
+
+static int datasys_system(DATASYS *dsp)
+{
+	PROGINFO	*pip = dsp->pip ;
+	int		rs = SR_OK ;
+
+	if (pip == NULL) return SR_FAULT ;
+
+	if (! dsp->f.system) {
+	    dsp->f.system = TRUE ;
+	    if (dsp->systemname == NULL) {
+	        cchar	*cp = getourenv(pip->envv,VARSYSTEM) ;
+	        if ((cp != NULL) && (cp[0] != '\0')) {
+	            dsp->systemname = cp ;
+		    rs = strlen(cp) ;
+	        }
+	    }
+	    if (dsp->systemname == NULL) {
+	        rs = datasys_nodeinfo(dsp) ;
+	    } /* end if (needed) */
+	} else if (dsp->systemname != NULL) {
+	    rs = strlen(dsp->systemname) ;
+	} /* end if (initializing) */
+
+	return rs ;
+}
+/* end subroutine (datasys_system) */
 
 
 static int datasys_nodeinfo(DATASYS *dsp)
@@ -3091,6 +3093,7 @@ static int datasys_domain(DATASYS *dsp)
 	        cchar	*cp = getourenv(pip->envv,VARDOMAIN) ;
 	        if ((cp != NULL) && (cp[0] != '\0'))
 	            dsp->domainname = cp ;
+		    rs = strlen(cp) ;
 	    }
 	    if ((dsp->domainname == NULL) || (dsp->domainname[0] == '\0')) {
 	        if (dsp->nodename == NULL) {
