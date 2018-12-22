@@ -2822,8 +2822,11 @@ static int progdata_domain(PROGDATA *pdp)
 	    pdp->f.domain = TRUE ;
 	    if ((rs >= 0) && (sp != NULL)) {
 	        pdp->domainname = sp ;
+		rs = strlen(sp) ;
 	    }
 
+	} else if (pdp->domainname != NULL) {
+	    rs = strlen(pdp->domainname) ;
 	} /* end if (initialization needed) */
 
 	return rs ;
@@ -3011,7 +3014,9 @@ static int datasys_cluster(DATASYS *dsp)
 	        }
 	    }
 	    if (dsp->clustername == NULL) {
-	        rs = datasys_nodeinfo(dsp) ;
+	        if ((rs = datasys_nodeinfo(dsp)) >= 0) {
+		    rs = strlen(dsp->clustername) ;
+		}
 	    } /* end if (needed) */
 	} else if (dsp->clustername != NULL) {
 	    rs = strlen(dsp->clustername) ;
@@ -3039,7 +3044,9 @@ static int datasys_system(DATASYS *dsp)
 	        }
 	    }
 	    if (dsp->systemname == NULL) {
-	        rs = datasys_nodeinfo(dsp) ;
+	        if ((rs = datasys_nodeinfo(dsp)) >= 0) {
+		    rs = strlen(dsp->systemname) ;
+		}
 	    } /* end if (needed) */
 	} else if (dsp->systemname != NULL) {
 	    rs = strlen(dsp->systemname) ;
@@ -3344,15 +3351,17 @@ static int datauser_domain(DATAUSER *dup)
 #ifdef	COMMENT
 	    if ((rs >= 0) && (! dup->have.domain)) {
 	        const int	dlen = MAXHOSTNAMELEN ;
-	        rs1 = udomain(NULL,dup->domainname,dlen,dup->un) ;
-	        if (rs1 <= 0) {
+	        if ((rs = udomain(NULL,dup->domainname,dlen,dup->un)) >= 0) {
+		    dup->have.domain = (dup->domainname[0] != '\0') ;
+		} else if ((rs == SR_NOTFOUND) || (rs == SR_NOSYS)) {
+		    rs = SR_OK ;
 	            dup->domainname[0] = '\0' ;
-	        } else {
-	            dup->have.domain = (dup->domainname[0] != '\0') ;
 	        }
 	    } /* end if */
 #endif /* COMMENT */
 
+	} else if (dup->domainname != NULL) {
+	    rs = strlen(dup->domainname) ;
 	} /* end if (needed) */
 
 #if	CF_DEBUGS
@@ -3806,7 +3815,6 @@ static int datauser_projectsfinder(DATAUSER *dup,char *pjbuf,int pjlen)
 static int datauser_tz(DATAUSER *dup)
 {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
 
 	if (dup == NULL) return SR_FAULT ;
 
@@ -3817,17 +3825,20 @@ static int datauser_tz(DATAUSER *dup)
 	if (! dup->init.tz) {
 	    dup->init.tz = TRUE ;
 	    if (! dup->init.ua) rs = datauser_ua(dup) ;
-	    if ((rs >= 0) && (! dup->have.tz)) {
-	        if ((rs = inittimezone(dup->tz,TZLEN,DEFINITFNAME)) >= 0) {
-	            dup->have.tz = TRUE ;
-	            f = TRUE ;
-	        }
+	    if (rs >= 0) {
+		if (! dup->have.tz) {
+	            if ((rs = inittimezone(dup->tz,TZLEN,DEFINITFNAME)) >= 0) {
+	               dup->have.tz = TRUE ;
+	           }
+		} else {
+		    rs = strlen(dup->tz) ;
+		}
 	    } /* end if */
 	} else {
-	    f = dup->have.tz ;
+	    rs = strlen(dup->tz) ;
 	} /* end if (needed initialization) */
 
-	return (rs >= 0) ? f : rs ;
+	return rs ;
 }
 /* end subroutine (datauser_tz) */
 
@@ -4041,13 +4052,15 @@ static int datauser_lastseener(DATAUSER *dup,char *bp,int bl,vecstr *tlp)
 static int datauser_username(DATAUSER *dup,char *cbuf,int clen)
 {
 	int		rs ;
+	int		len = 0 ;
 	if ((rs = datauser_pw(dup)) >= 0) {
 	    if (dup->have.pent) {
 	        cchar	*un = dup->pent.username ;
 	        rs = sncpy1(cbuf,clen,un) ;
+		len = rs ;
 	    }
 	}
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (datauser_username) */
 
@@ -4055,13 +4068,15 @@ static int datauser_username(DATAUSER *dup,char *cbuf,int clen)
 static int datauser_realname(DATAUSER *dup,char *cbuf,int clen)
 {
 	int		rs ;
+	int		len = 0 ;
 	if ((rs = datauser_pw(dup)) >= 0) {
 	    if (dup->have.pent) {
 	        cchar	*rn = dup->pent.realname ;
 	        rs = mkrealname(cbuf,clen,rn,-1) ;
+		len = rs ;
 	    }
 	}
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (datauser_realname) */
 
