@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
+	= 2000-05-14, David AÂ­DÂ­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2000 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -63,7 +63,7 @@ int wsnwcpynarrow(wchar_t *rarr,int rlen,cchar *sp,int sl)
 	    rarr[c] = ch ;
 	}
 	rarr[c] = '\0' ;
-	if ((c < sl) && (sp[c] != '\0')) rs = SR_OVERFLOW ;
+	if ((c < sl) && (c == rlen)) rs = SR_OVERFLOW ;
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (wsnwcpynarrow) */
