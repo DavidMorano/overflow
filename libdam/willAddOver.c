@@ -16,7 +16,7 @@
 
 /******************************************************************************
 
-	This generic subroutine will determine is an addition will overflow.
+	This generic subroutine will determine if an addition will overflow.
 
 	Synopsis:
 	int willAddOver(long int n1,long int n2)
