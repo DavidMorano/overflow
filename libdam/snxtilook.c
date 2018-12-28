@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-11-01, David AÂ­DÂ­ Morano
 	This subroutine was originally written.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -68,7 +68,7 @@ extern int	sncpy1(char *,int,cchar *) ;
 struct val {
 	int		v ;		/* value */
 	cchar		*n ;		/* name */
-	cchar		*msg ;		/* messaeg */
+	cchar		*msg ;		/* message */
 } ;
 
 
