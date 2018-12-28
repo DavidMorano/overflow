@@ -1,6 +1,6 @@
 /* wsnwcpynarrow */
 
-/* copy a narrow source string to a wide-string recipient */
+/* copy a narrow source string to a wide-string destination */
 
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
@@ -47,7 +47,7 @@
 #include	<sys/types.h>
 #include	<stddef.h>		/* for 'wchar_t' */
 #include	<vsystem.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* for |MKCHAR(3dam)| */
 
 
 /* exported subroutines */
@@ -56,15 +56,15 @@
 int wsnwcpynarrow(wchar_t *rarr,int rlen,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
-	int		c ;
+	int		i ;
 	int		ch ;
-	for (c = 0 ; (c < rlen) && (c < sl) && sp[c] ; c += 1) {
-	    ch = MKCHAR(sp[c]) ;
-	    rarr[c] = ch ;
+	for (i = 0 ; (i < rlen) && (i < sl) && sp[i] ; i += 1) {
+	    ch = MKCHAR(sp[i]) ;
+	    rarr[i] = ch ;
 	}
-	rarr[c] = '\0' ;
-	if ((c < sl) && (c == rlen)) rs = SR_OVERFLOW ;
-	return (rs >= 0) ? c : rs ;
+	rarr[i] = '\0' ;
+	if ((i < sl) && (sp[i] != '\0')) rs = SR_OVERFLOW ;
+	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (wsnwcpynarrow) */
 
