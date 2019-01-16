@@ -13,13 +13,16 @@
 
 */
 
-/* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2010 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	These routines are used when the caller just wants to store an item in
-	a sorted list.  The item us usually just a pointer to the user's real
-	data.
+	This container object is used when the caller wants to store an item by
+	its handle (pointer) alone in a sorted list, but always in sorted 
+	order. This object (unlike some other vector-hand objects that have 
+	sorted behavior) strictly maintains the sort on each addition.
+	Additions are made in O(log-N) time, and searching is also O(log-N)
+	time.
 
 
 *******************************************************************************/
@@ -114,22 +117,19 @@ int vecsorthand_add(vecsorthand *op,const void *buf)
 #endif
 
 	if (op == NULL) return SR_FAULT ;
+	if (buf == NULL) return SR_INVALID ;
 
 #if	CF_DEBUGS
 	debugprintf("vecsorthand_add: i=%d\n",op->i) ;
 #endif
 
 	if ((rs = vecsorthand_extend(op)) >= 0) {
-	    int		bot, top, j ;
-
-/* do the regular thing */
-
-	    op->c += 1 ;			/* increment list count */
+	    int		bot = 0 ;
+	    int		top = MAX((op->i - 1),0) ;
+	    int		j ;
 
 /* find the place in the existing list where this new item should be added */
 
-	    bot = 0 ;
-	    top = MAX((op->i - 1),0) ;
 	    i = (bot + top) / 2 ;
 
 #if	CF_DEBUGS
@@ -173,6 +173,7 @@ int vecsorthand_add(vecsorthand *op,const void *buf)
 	    (op->va)[i] = buf ;
 	    op->i += 1 ;
 	    (op->va)[op->i] = NULL ;
+	    op->c += 1 ;			/* increment list count */
 
 	} /* end if (vecsorthand_extend) */
 
