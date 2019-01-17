@@ -5,13 +5,16 @@
 
 /* revision history:
 
+	= 2010-12-01, David A.D. Morano
+	Original.
+
 	= 2019-01-17, David A.D. Morano
 	Added new method |vecsorthand_dellall(3dam)|. A use for this new method
 	has come up.
 
 */
 
-/* Copyright © 2011,2019 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2010,2019 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	VECSORTHAND_INCLUDE
 #define	VECSORTHAND_INCLUDE	1
