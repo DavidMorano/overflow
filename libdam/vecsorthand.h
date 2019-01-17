@@ -3,7 +3,15 @@
 /* vector of sorted handles */
 
 
-/* Copyright © 2011 David A­D­ Morano.  All rights reserved. */
+/* revision history:
+
+	= 2019-01-17, David A.D. Morano
+	Added new method |vecsorthand_dellall(3dam)|. A use for this new method
+	has come up.
+
+*/
+
+/* Copyright Â© 2011,2019 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 #ifndef	VECSORTHAND_INCLUDE
 #define	VECSORTHAND_INCLUDE	1
@@ -41,6 +49,7 @@ extern int vecsorthand_add(vecsorthand *,const void *) ;
 extern int vecsorthand_finish(vecsorthand *) ;
 extern int vecsorthand_get(vecsorthand *,int,void *) ;
 extern int vecsorthand_del(vecsorthand *,int) ;
+extern int vecsorthand_delall(vecsorthand *) ;
 extern int vecsorthand_delhand(vecsorthand *,const void *) ;
 extern int vecsorthand_count(vecsorthand *) ;
 extern int vecsorthand_search(vecsorthand *,const void *,void *) ;
