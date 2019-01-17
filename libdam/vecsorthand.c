@@ -257,7 +257,7 @@ int vecsorthand_delall(vecsorthand *op)
 	if (op == NULL) return SR_FAULT ;
 
 	if (op->va != NULL) {
-	    rs = op->i ;
+	    rs = op->c ;
 	    if (op->i > 0) {
 		op->va[0] = NULL ;
 	        op->i = 0 ;
