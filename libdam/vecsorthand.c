@@ -11,9 +11,13 @@
 	= 2010-12-01,  David A.D. Morano
 	Module was originally written.
 
+	= 2019-01-17, David A.D. Morano
+	I added a new method |vecsorthand_delall(3dam)|. A use for this
+	has come up.
+
 */
 
-/* Copyright © 2010 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2010,2019 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -243,6 +247,27 @@ int vecsorthand_del(vecsorthand *op,int i)
 	return rs ;
 }
 /* end subroutine (vecsorthand_del) */
+
+
+/* delete all entries */
+int vecsorthand_delall(vecsorthand *op)
+{
+	int		rs = SR_OK ;
+
+	if (op == NULL) return SR_FAULT ;
+
+	if (op->va != NULL) {
+	    rs = op->i ;
+	    if (op->i > 0) {
+		op->va[0] = NULL ;
+	        op->i = 0 ;
+	        op->c = 0 ;
+	    }
+	}
+
+	return rs ;
+}
+/* end subroutine (vecsorthand_delall) */
 
 
 int vecsorthand_delhand(vecsorthand *op,const void *ep)
