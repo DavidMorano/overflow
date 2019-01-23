@@ -6,25 +6,27 @@ New C-language operators
 |	bit-wize OR
 &	bit-wise AND
 ^	bit-wise XOR
+<=>     three-way comparison
 
 - new operators
 
 ^^	logical exclusive OR
 !^^	logical equivalence
-!!	logical equivalence
+!!	already used (as double !) to perform "convert to boolean type"
 |>	rotate right
 <|	rotate left
 <>	equivalence?
 ><	exclusion of some kind?
+===     ? (logical equivalence)
 
-÷	division
-»	?
-«	?
-¡	?
-¿	?
-¦	?
-±	?
-¤	?
+Ã·	division
+Â»	?
+Â«	?
+Â¡	?
+Â¿	?
+Â¦	?
+Â±	?
+Â¤	?
 
 ||>	*unassigned*
 ||<	*unassigned*
@@ -32,10 +34,10 @@ New C-language operators
 >||	*unassigned*
 |<	*unassigned*
 >|	*unassigned*
-|»
-«|
-||»
-»||
+|Â»
+Â«|
+||Â»
+Â»||
 
 **	exponentiation
 
