@@ -8,13 +8,13 @@
 
 /* revision history:
 
-	= 2013-04-20, David A­D­ Morano
+	= 2013-04-20, David AÂ­DÂ­ Morano
         This subroutine was originally written. It obviously just takes
         advantange of the 'termnote(3dam)' object.
 
 */
 
-/* Copyright © 2013 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2013 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -217,15 +217,10 @@ int opentermnote(cchar *pr,cchar **recips,int max,int opts)
 /* local subroutines */
 
 
-static int targs_start(tap,pr,recips,max,opts,rfd)
-TARGS		*tap ;
-const char	*pr ;
-const char	**recips ;
-int		max ;
-int		opts ;
-int		rfd ;
+static int targs_start(TARGS *tap,cchar *pr,cchar **recips,
+		       	int max,int opts,int rfd)
 {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		size ;
 	int		i ;
 	int		nrecips ;
@@ -244,22 +239,22 @@ int		rfd ;
 	    size += (strlen(recips[i]) + 1) ;
 	}
 	nrecips = i ;
+	
 	size += ((nrecips + 1) * sizeof(const char *)) ;
-
 	if ((rs = uc_malloc(size,&vp)) >= 0) {
-	tap->a = vp ;
-	tap->recips = (const char **) vp ;
-	{
-	    char	*bp = vp ;
-	    strp = bp + ((nrecips + 1) * sizeof(const char *)) ;
-	}
-	for (i = 0 ; recips[i] != NULL ; i += 1) {
-	    tap->recips[i] = strp ;
-	    strp = strwcpy(strp,recips[i],-1) + 1 ;
-	}
-	tap->recips[i] = NULL ;
-	tap->pr = strp ;
-	strp = strwcpy(strp,pr,-1) + 1 ;
+	    tap->a = vp ;
+	    tap->recips = (const char **) vp ;
+	    {
+	        char	*bp = vp ;
+	        strp = bp + ((nrecips + 1) * sizeof(const char *)) ;
+	    }
+	    for (i = 0 ; recips[i] != NULL ; i += 1) {
+	        tap->recips[i] = strp ;
+	        strp = strwcpy(strp,recips[i],-1) + 1 ;
+	    }
+	    tap->recips[i] = NULL ;
+	    tap->pr = strp ;
+	    strp = strwcpy(strp,pr,-1) + 1 ;
 	} /* end if (m-a) */
 
 	return rs ;
@@ -290,7 +285,7 @@ static int targs_finish(TARGS *tap)
 static int termnoter(TARGS *tap)
 {
 	TERMNOTE	tn ;
-	int		rs = SR_OK ;
+	int		rs ;
 	int		lenr = TERMNOTELEN ;
 	int		rs1 ;
 	int		rfd ;
