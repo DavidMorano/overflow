@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-02-01, David A≠D≠ Morano
+	= 1998-02-01, David A¬≠D¬≠ Morano
 	This subroutine was originally written.
 
 */
 
-/* Copyright © 1998 David A≠D≠ Morano.  All rights reserved. */
+/* Copyright ¬© 1998 David A¬≠D¬≠ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -73,8 +73,8 @@
 	- y		year within century 00-99
 	- Y		year 0000-9999
 	- Z		time zone abbreviation
-	- O		zone-offset ±HHMM
-	- –		yyyy-mm-dd
+	- O		zone-offset ¬±HHMM
+	- √ê		yyyy-mm-dd
 	- x		dd mmm yyyy
 	- X		HH:MM:SS
 	- :		blinking ':' character
@@ -168,9 +168,9 @@ int sntmtime(char *dbuf,int dlen,TMTIME *tmp,cchar *fmt)
 
 	if ((rs = sbuf_start(ssp,dbuf,dlen)) >= 0) {
 
-	    rs = sbuf_fmtstrs(&ss,tmp,fmt) ;
+	    rs = sbuf_fmtstrs(ssp,tmp,fmt) ;
 
-	    rs1 = sbuf_finish(&ss) ;
+	    rs1 = sbuf_finish(ssp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
 
@@ -322,7 +322,7 @@ static int sbuf_fmtstrs(SBUF *ssp,TMTIME *tmp,cchar *fmt)
 	        case 'D':
 	            rs = sbuf_dated(ssp,tmp) ;
 	            break ;
-	        case MKCHAR('–'):
+	        case MKCHAR('√ê'):
 	            rs = sbuf_dater(ssp,tmp) ;
 	            break ;
 	        case 'x':
