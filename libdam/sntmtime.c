@@ -47,18 +47,20 @@
 
 	Format codes:
 
-	- A		full weekday name (not yet coded)
+	- A		full weekday name
 	- a		abbreviated weekday name
-	- B		full month name (not yet coded)
+	- B		full month name
 	- b		abbreviated month name
 	- C		century 00-99
 	- d		day of month 01-31
 	- D		short for '%m/%d/%y'
 	- e		day of month 1-31 (leading space as appropriate)
 	- h		abbreviated month name
-	- H		24-hour 00-23
-	- I		12-hour 01-24
+	- H		24-hour 00-23 (zero filled)
+	- I		12-hour 01-12 (zero filled)
 	- j		day of year 001-366
+	- k		24-hour 0-23 (space filled)
+	- l		12-hour 1-12 (space filled)
 	- m		month of year 01-12
 	- M		minute 00-61 (for leap-seconds)
 	- n		insert a new-line (NL) character
@@ -99,24 +101,17 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
-#include	<limits.h>
 #include	<stdlib.h>		/* for |abs(3c)| */
-#include	<string.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 
 #include	<vsystem.h>
 #include	<calstrs.h>
 #include	<sbuf.h>
 #include	<tmtime.h>
-#include	<zoffparts.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |MKCHAR(3)| and others */
 
 
 /* local defines */
-
-#ifndef	MKCHAR
-#define	MKCHAR(c)	((c) & 0xff)
-#endif
 
 #ifndef	NYEARS_CENTURY
 #define	NYEARS_CENTURY	100
@@ -196,10 +191,16 @@ static int sbuf_fmtstrs(SBUF *ssp,TMTIME *tmp,cchar *fmt)
 	        case '%':
 	            rs = sbuf_char(ssp,ch) ;
 	            break ;
-	        case 'a':
+		case 'A': /* full weekday */
+	            rs = sbuf_strw(ssp,d[tmp->wday],-1) ;
+	            break ;
+	        case 'a': /* abbreviated weekday */
 	            rs = sbuf_strw(ssp,d[tmp->wday],3) ;
 	            break ;
-	        case 'b':
+		case 'B': /* full month */
+	            rs = sbuf_strw(ssp,m[tmp->mon],-1) ;
+	            break ;
+	        case 'b': /* abbreviated month */
 	        case 'h':
 	            rs = sbuf_strw(ssp,m[tmp->mon],3) ;
 	            break ;
@@ -215,7 +216,7 @@ static int sbuf_fmtstrs(SBUF *ssp,TMTIME *tmp,cchar *fmt)
 	            rs = sbuf_twodig(ssp,tmp->mday) ;
 	            break ;
 	        case 'e':
-	            rs = sbuf_digs(ssp,tmp->mday,2,1) ;
+	            rs = sbuf_digs(ssp,tmp->mday,2,TRUE) ;
 	            break ;
 	        case 'H':
 	            rs = sbuf_twodig(ssp,tmp->hour) ;
@@ -228,16 +229,16 @@ static int sbuf_fmtstrs(SBUF *ssp,TMTIME *tmp,cchar *fmt)
 	            }
 	            break ;
 	        case 'j':
-	            rs = sbuf_digs(ssp,(tmp->yday+1),3,0) ;
+	            rs = sbuf_digs(ssp,(tmp->yday+1),3,FALSE) ;
 	            break ;
 	        case 'k':
-	            rs = sbuf_digs(ssp,tmp->hour,2,1) ;
+	            rs = sbuf_digs(ssp,tmp->hour,2,TRUE) ;
 	            break ;
 	        case 'l':
 	            {
 	                int	h = (tmp->hour%12) ;
 	                if (h == 0) h = 12 ;
-	                rs = sbuf_digs(ssp,h,2,1) ;
+	                rs = sbuf_digs(ssp,h,2,TRUE) ;
 	            }
 	            break ;
 	        case 'm':
@@ -274,7 +275,7 @@ static int sbuf_fmtstrs(SBUF *ssp,TMTIME *tmp,cchar *fmt)
 	            {
 	                int	d = tmp->wday ;
 	                if (d == 0) d = 7 ;
-	                rs = sbuf_digs(ssp,d,1,0) ;
+	                rs = sbuf_digs(ssp,d,1,FALSE) ;
 	            }
 	            break ;
 	        case 'V':
@@ -293,7 +294,7 @@ static int sbuf_fmtstrs(SBUF *ssp,TMTIME *tmp,cchar *fmt)
 	            }
 	            break ;
 	        case 'w':
-	            rs = sbuf_digs(ssp,tmp->wday,1,0) ;
+	            rs = sbuf_digs(ssp,tmp->wday,1,FALSE) ;
 	            break ;
 	        case 'y':
 	            {
@@ -371,8 +372,7 @@ static int sbuf_digs(SBUF *ssp,int v,int n,int f_space)
 	    break ;
 	case 2:
 	    ch = (v/10) + '0' ;
-	    dbuf[0] = ch ;
-	    if ((ch == '0') && f_space) dbuf[0] = ' ' ;
+	    dbuf[0] = ((ch == '0') && f_space) ? ' ' : ch ;
 	    dbuf[1] = (v%10) + '0' ;
 	    break ;
 	case 3:
@@ -380,12 +380,13 @@ static int sbuf_digs(SBUF *ssp,int v,int n,int f_space)
 	    if (f_space) {
 	        int	i ;
 	        for (i = 0 ; i < (n-1) ; i += 1) {
-	            if (dbuf[i] == '0') {
-			dbuf[i] = ' ' ;
-		    } else
-			break ;
+	            if (dbuf[i] != '0') break ;
+		    dbuf[i] = ' ' ;
 	        } /* end for */
 	    } /* end if (space) */
+	    break ;
+	default:
+	    rs = SR_DOM ;
 	    break ;
 	} /* end switch */
 
@@ -398,6 +399,7 @@ static int sbuf_digs(SBUF *ssp,int v,int n,int f_space)
 /* end subroutine (sbuf_digs) */
 
 
+/* standard four digit year (leading filled zeros) yyyy */
 static int sbuf_year(SBUF *ssp,TMTIME *tmp)
 {
 	const int	y = ((tmp->year + TM_YEAR_BASE)%10000) ;
@@ -413,6 +415,7 @@ static int sbuf_year(SBUF *ssp,TMTIME *tmp)
 /* end subroutine (sbuf_year) */
 
 
+/* colon-type time representation HH:MM[:SS] */
 static int sbuf_coder(SBUF *ssp,TMTIME *tmp,int f_sec)
 {
 	int		rs ;
@@ -434,6 +437,7 @@ static int sbuf_coder(SBUF *ssp,TMTIME *tmp,int f_sec)
 /* end subroutine (sbuf_coder) */
 
 
+/* zone representation (like for email) HHMM */
 static int sbuf_zoff(SBUF *ssp,TMTIME *tmp)
 {
 	const int	zo = (tmp->gmtoff / 60) ; /* minutes west of GMT */
@@ -453,6 +457,7 @@ static int sbuf_zoff(SBUF *ssp,TMTIME *tmp)
 /* end subroutine (sbuf_zoff) */
 
 
+/* old-fashioned date mm/dd/yyyy */
 static int sbuf_dated(SBUF *ssp,TMTIME *tmp)
 {
 	int		rs ;
@@ -475,6 +480,7 @@ static int sbuf_dated(SBUF *ssp,TMTIME *tmp)
 /* end subroutine (sbuf_dated) */
 
 
+/* international ISO-something date yyyy-mm-dd */
 static int sbuf_dater(SBUF *ssp,TMTIME *tmp)
 {
 	int		rs ;
@@ -494,6 +500,7 @@ static int sbuf_dater(SBUF *ssp,TMTIME *tmp)
 /* end subroutine (sbuf_dater) */
 
 
+/* military date dd mmm yyyy */
 static int sbuf_datex(SBUF *ssp,TMTIME *tmp)
 {
 	int		rs ;
