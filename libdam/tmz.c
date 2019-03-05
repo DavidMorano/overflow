@@ -10,12 +10,12 @@
 
 /* revision history:
 
-	= 1999-05-01, David A­D­ Morano
+	= 1999-05-01, David AÂ­DÂ­ Morano
         This was created along with the DATE object. This code was based on
         older code I wrote to handle the "STRDIG" form for the BBNEWS facility.
         That goes back in time to possibly as far back as 1992!
 
-	= 2014-07-15, David A­D­ Morano
+	= 2014-07-15, David AÂ­DÂ­ Morano
         I laugh sometimes as how long some of these objects (or subroutines)
         last without change. Yes, most of this code looks pretty bad by today's
         standards. But to the point, I am enhancing this object (specially the
@@ -33,7 +33,7 @@
 
 */
 
-/* Copyright © 1999,2014 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1999,2014 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -180,7 +180,7 @@ int tmz_init(TMZ *op)
 /* end subroutine (tmz_init) */
 
 
-/* format> [Wed] Nov 14 19:24[:04] [EST] [[19]99] [±0400] */
+/* format> [Wed] Nov 14 19:24[:04] [EST] [[19]99] [Â±0400] */
 int tmz_std(TMZ *op,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
@@ -241,7 +241,7 @@ int tmz_std(TMZ *op,cchar *sp,int sl)
 /* end subroutine (tmz_std) */
 
 
-/* format> [Weekday,] DD MMM [CC]YY hh:mm[:ss] [±hhmm] [zname] */
+/* format> [Weekday,] DD MMM [CC]YY hh:mm[:ss] [Â±hhmm] [zname] */
 int tmz_msg(TMZ *op,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
@@ -532,7 +532,7 @@ int tmz_toucht(TMZ *op,cchar *sp,int sl)
 /* end subroutine (date_toucht) */
 
 
-/* format> [[CC]]YYMMDDhhmm[ss][±hhmm][zname] */
+/* format> [[CC]]YYMMDDhhmm[ss][Â±hhmm][zname] */
 int tmz_strdig(TMZ *op,cchar *sp,int sl)
 {
 	struct tm	*stp ;
@@ -954,13 +954,8 @@ int tmz_setyear(TMZ *op,int year)
 
 int tmz_setzone(TMZ *op,cchar *zp,int zl)
 {
-	int		rs ;
-
 	if (op == NULL) return SR_FAULT ;
-
-	rs = strnwcpy(op->zname,TMZ_ZNAMESIZE,zp,zl) - op->zname ;
-
-	return rs ;
+	return (strnwcpy(op->zname,TMZ_ZNAMESIZE,zp,zl) - op->zname) ;
 }
 /* end subroutine (tmz_setzone) */
 
@@ -1013,6 +1008,8 @@ static int tmz_timeparts(TMZ *op,cchar *sp,int sl)
 
 	    if ((rs >= 0) && (fsb.term == ':')) {
 
+/* get minutes */
+
 	        if ((fl = field_get(&fsb,tpterms,&fp)) > 0) {
 	            lp = (fp + fl) ;
 	            rs = cfdeci(fp,fl,&v) ;
@@ -1022,6 +1019,8 @@ static int tmz_timeparts(TMZ *op,cchar *sp,int sl)
 	    } /* end if */
 
 	    if ((rs >= 0) && (fsb.term == ':')) {
+
+/* get seconds */
 
 	        if ((fl = field_get(&fsb,tpterms,&fp)) > 0) {
 	            lp = (fp + fl) ;
@@ -1065,9 +1064,7 @@ static int tmz_stdtrailing(TMZ *op,cchar *sp,int sl)
 	        } else {
 	            rs = SR_INVALID ;
 	        }
-	        si += rs ;
-	        sp += si ;
-	        sl -= si ;
+	        si = rs ;
 	    } /* end if (non-zero string) */
 	} /* end if (siskipwhite) */
 
@@ -1094,9 +1091,7 @@ static int tmz_procday(TMZ *op,cchar *sp,int sl)
 	        int	v ;
 	        rs = cfdeci(cp,cl,&v) ;
 	        op->st.tm_mday = v ;
-	        si += ((cp+cl)-sp) ;
-	        sp += si ;
-	        sl -= si ;
+	        si = ((cp+cl)-sp) ;
 	    } else {
 	        rs = SR_INVALID ;
 	    }
@@ -1133,8 +1128,6 @@ static int tmz_procmonth(TMZ *op,cchar *sp,int sl)
 	                mp = cp ;
 	                ml = cl ;
 	                si += ((cp+cl)-sp) ;
-	                sp += si ;
-	                sl -= si ;
 	            }
 	        }
 	        if (rs >= 0) {
@@ -1166,9 +1159,7 @@ static int tmz_procyear(TMZ *op,cchar *sp,int sl)
 	        rs = tmstrsyear(cp,cl) ;
 	        op->st.tm_year = rs ;
 	        op->f.year = TRUE ;
-	        si += ((cp+cl)-sp) ;
-	        sp += si ;
-	        sl -= si ;
+	        si = ((cp+cl)-sp) ;
 	    }
 	} /* end if (nextfield) */
 
@@ -1199,9 +1190,7 @@ static int tmz_proczoff(TMZ *op,cchar *sp,int sl)
 	        rs = getzoff(&v,cp,cl) ;
 	        op->zoff = v ;
 	        op->f.zoff = TRUE ;
-	        si += ((cp+cl)-sp) ;
-	        sp += si ;
-	        sl -= si ;
+	        si = ((cp+cl)-sp) ;
 	    }
 	} /* end if (nextfield) */
 
@@ -1231,9 +1220,7 @@ static int tmz_proczname(TMZ *op,cchar *sp,int sl)
 	    if (isalphalatin(ch)) {
 	        const int	znl = TMZ_ZNAMESIZE ;
 	        rs = strnwcpy(op->zname,znl,cp,cl)  - op->zname ;
-	        si += ((cp+cl)-sp) ;
-	        sp += si ;
-	        sl -= si ;
+	        si = ((cp+cl)-sp) ;
 	    }
 	} /* end if (nextfield) */
 
@@ -1425,8 +1412,7 @@ static cchar *strnzone(cchar *sp,int sl)
 	int		f = FALSE ;
 	while (sl && *sp) {
 	    const int	ch = MKCHAR(*sp) ;
-	    f = f || (ch == '+') ;
-	    f = f || (ch == '-') ;
+	    f = f || isplusminus(ch) ;
 	    f = f || isalphalatin(ch) ;
 	    if (f) break ;
 	    sp += 1 ;
