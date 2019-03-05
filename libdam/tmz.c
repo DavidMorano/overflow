@@ -211,10 +211,6 @@ int tmz_std(TMZ *op,cchar *sp,int sl)
 	    sl -= rs ;
 	}
 
-	if ((rs >= 0) && (op->st.tm_mday > 31)) {
-	    rs = SR_INVALID ;
-	}
-
 	if ((rs >= 0) && ((rs = tmz_timeparts(op,sp,sl)) > 0)) {
 	    sp += rs ;
 	    sl -= rs ;
@@ -287,10 +283,6 @@ int tmz_msg(TMZ *op,cchar *sp,int sl)
 	if ((rs >= 0) && ((rs = tmz_procmonth(op,sp,sl)) > 0)) {
 	    sp += rs ;
 	    sl -= rs ;
-	}
-
-	if ((rs >= 0) && (op->st.tm_mday > 31)) {
-	    rs = SR_INVALID ;
 	}
 
 	if ((rs >= 0) && ((rs = tmz_procyear(op,sp,sl)) > 0)) {
@@ -1089,9 +1081,14 @@ static int tmz_procday(TMZ *op,cchar *sp,int sl)
 	    const int	tch = MKCHAR(*cp) ;
 	    if (isdigitlatin(tch)) {
 	        int	v ;
-	        rs = cfdeci(cp,cl,&v) ;
-	        op->st.tm_mday = v ;
-	        si = ((cp+cl)-sp) ;
+	        if ((rs = cfdeci(cp,cl,&v)) >= 0) {
+		    if (v <= 31) {
+	        	op->st.tm_mday = v ;
+	        	si = ((cp+cl)-sp) ;
+		    } else {
+			rs = SR_INVALID ;
+		    }
+		}
 	    } else {
 	        rs = SR_INVALID ;
 	    }
