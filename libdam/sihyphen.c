@@ -3,19 +3,22 @@
 /* find a hyphen (a fake hyphen of two minus characters) in a string */
 
 
+#define	CF_STRNCHR	0		/* use |strnchr(3dam)| */
+
+
 /* revision history:
 
-	= 1998-03-23, David A­D­ Morano
+	= 1998-03-23, David AÂ­DÂ­ Morano
 	This subroutine was originally written.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	This finds the string index of a fake hyphen in the given string
-	('s1').  A fake hyphen is two minus characters in a row.
+	This finds the string-index of a fake hyphen in the given string.
+	A fake hyphen is two minus characters in a row.
 
 	Synopsis:
 
@@ -30,8 +33,8 @@
 
 	Returns:
 
-	>=0	index of found substring
-	-1	substring not found
+	>=0	index of found hyphen
+	-1	hyphen not found
 
 
 *******************************************************************************/
@@ -50,11 +53,36 @@
 
 /* external subroutines */
 
-extern int	strnchr(const char *,int,int) ;
+extern int	strnchr(cchar *,int,int) ;
 
 
 /* exported subroutines */
 
+
+#if	CF_STRNCHR
+
+int sihyphen(const char *sp,int sl)
+{
+	int		si = 0 ;
+	int		f = FALSE ;
+	cchar		*tp ;
+
+	if (sl < 0) sl = strlen(sp) ;
+
+	while ((sl >= 2) && ((tp = strnchr(sp,sl,'-')) != NULL) {
+	    si += (tp-sp) ;
+	    f = (((tp-sp)+1) < sl) && (tp[1] == '-') ;
+	    if (f) break ;
+	    si += 1 ;
+	    sl -= ((tp+1)-sp) ;
+	    sp = (tp+1) ;
+	} /* end while */
+
+	return (f) ? si : -1 ;
+}
+/* end subroutine (sihyphen) */
+		    
+#else /* CF_STRNCHR */
 
 int sihyphen(const char *sp,int sl)
 {
@@ -63,13 +91,15 @@ int sihyphen(const char *sp,int sl)
 
 	if (sl < 0) sl = strlen(sp) ;
 
-	for (i = 0 ; (i < sl) && sp[i] ; i += 1) {
-	    f = (sp[i] == '-') && ((i + 1) < sl) && (sp[i + 1] == '-') ;
+	for (i = 0 ; (i < (sl-1)) && sp[i] ; i += 1) {
+	    f = (sp[i] == '-') && (sp[i + 1] == '-') ;
 	    if (f) break ;
 	} /* end for */
 
 	return (f) ? i : -1 ;
 }
 /* end subroutine (sihyphen) */
+
+#endif /* CF_STRNCHR */
 
 
