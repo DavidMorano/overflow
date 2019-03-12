@@ -11,12 +11,12 @@
 
 /* revision history:
 
-	= 2013-03-03, David A­D­ Morano
+	= 2013-03-03, David AÂ­DÂ­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2013 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2013 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -258,7 +258,7 @@ public:
 	    return (c == 0) ;
 	} ;
 	operator int() const {
-	    return (c != 0) ;
+	    return c ;
 	} ;
 	operator bool() const {
 	    return (c != 0) ;
