@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-11-01, David AÂ­DÂ­ Morano
 	This subroutine was originally written.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -55,6 +55,7 @@
 
 /* external subroutines */
 
+extern int	snsd(char *,int,cchar *,uint) ;
 extern int	sncpy1(char *,int,const char *) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	ctdecpui(char *,int,int,uint) ;
@@ -89,7 +90,7 @@ int snerrabbr(char *dbuf,int dlen,int n)
 	if ((s = strerrabbr(n)) != NULL) {
 	    rs = sncpy1(dbuf,dlen,s) ;
 	} else {
-	    rs = ctdeci(dbuf,dlen,n) ;
+	    rs = snsd(dbuf,dlen,"SIG",n) ;
 	}
 
 	return rs ;
