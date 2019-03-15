@@ -35,8 +35,8 @@
 #include	<limits.h>
 
 #include	<vsystem.h>
-#include	<passwdent.h>
 #include	<filemap.h>
+#include	<passwdent.h>
 #include	<localmisc.h>
 
 #include	"syspasswd.h"
@@ -106,8 +106,7 @@ int syspasswd_readent(SYSPASSWD *op,struct passwd *pwp,char *pwbuf,int pwlen)
 {
 	int		rs ;
 	int		ll ;
-	int		pwl = 0 ;
-	char		*lp ;
+	cchar		*lp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (pwp == NULL) return SR_FAULT ;
@@ -118,16 +117,15 @@ int syspasswd_readent(SYSPASSWD *op,struct passwd *pwp,char *pwbuf,int pwlen)
 	    ll = rs ;
 	    if (lp[ll-1] == '\n') ll -= 1 ;
 	    rs = passwdent_parse(pwp,pwbuf,pwlen,lp,ll) ;
-	    pwl = rs ;
-	    if (pwl > 0) break ;
+	    if (rs > 0) break ;
 	    if (rs < 0) break ;
 	} /* end while */
 
 #if	CF_DEBUGS
-	debugprintf("syspasswd_readent: ret rs=%d pwl=%u\n",rs,pwl) ;
+	debugprintf("syspasswd_readent: ret rs=%d\n",rs) ;
 #endif
 
-	return (rs >= 0) ? pwl : rs ;
+	return rs ;
 }
 /* end subroutine (syspasswd_readent) */
 
