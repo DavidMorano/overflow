@@ -32,11 +32,9 @@
 
 #include	<sys/types.h>
 #include	<limits.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
 
 #include	<vsystem.h>
+#include	<filemap.h>
 #include	<getax.h>
 #include	<localmisc.h>
 
@@ -56,14 +54,14 @@ typedef struct project	project_t ;
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
 
 
 /* local structures */
@@ -82,7 +80,7 @@ int sysprojects_open(SYSPROJECTS *op,const char *spfname)
 {
 	const size_t	max = INT_MAX ;
 	int		rs ;
-	const char	*pfname = SYSPROJECTS_FNAME ;
+	cchar		*pfname = SYSPROJECTS_FNAME ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -121,7 +119,7 @@ int sysprojects_readent(SYSPROJECTS *op,project_t *pjp,char *pjbuf,int pjlen)
 	const int	plen = PROJNAMELEN ;
 	int		rs ;
 	int		ll ;
-	const char	*lp ;
+	cchar		*lp ;
 	char		pbuf[PROJNAMELEN+1] ;
 	
 	if (op == NULL) return SR_FAULT ;
