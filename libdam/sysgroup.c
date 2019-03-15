@@ -8,13 +8,13 @@
 
 /* revision history:
 
-	= 1998-03-24, David A­D­ Morano
+	= 1998-03-24, David AÂ­DÂ­ Morano
         This object module was morphed from some previous one. I do not remember
         what the previous one was.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -32,9 +32,9 @@
 
 #include	<sys/types.h>
 #include	<limits.h>
-#include	<string.h>
 
 #include	<vsystem.h>
+#include	<filemap.h>
 #include	<groupent.h>
 #include	<localmisc.h>
 
@@ -46,14 +46,14 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
 
 
 /* local structures */
@@ -68,11 +68,11 @@ extern char	*strdcpy1w(char *,int,const char *,int) ;
 /* exported subroutines */
 
 
-int sysgroup_open(SYSGROUP *op,const char *sgfname)
+int sysgroup_open(SYSGROUP *op,cchar *sgfname)
 {
 	const size_t	max = INT_MAX ;
 	int		rs ;
-	const char	*defgfname = SYSGROUP_FNAME ;
+	cchar		*defgfname = SYSGROUP_FNAME ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -106,11 +106,11 @@ int sysgroup_close(SYSGROUP *op)
 /* end subroutine (sysgroup_close) */
 
 
-int sysgroup_readent(SYSGROUP *op,struct group *grp,char grbuf[],int grlen)
+int sysgroup_readent(SYSGROUP *op,struct group *grp,char *grbuf,int grlen)
 {
 	int		rs ;
 	int		ll ;
-	const char	*lp ;
+	cchar		*lp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (grp == NULL) return SR_FAULT ;
@@ -135,7 +135,7 @@ int sysgroup_readent(SYSGROUP *op,struct group *grp,char grbuf[],int grlen)
 #if	CF_DEBUGS
 	{
 	    int		i ;
-	    cchar	**groups = (const char **) grp->gr_mem ;
+	    cchar	**groups = (cchar **) grp->gr_mem ;
 	    if (groups != NULL) {
 		for (i = 0 ; groups[i] != NULL ; i += 1) {
 		    debugprintf("sysgroup_readent: gm=%s\n",groups[i]) ;
