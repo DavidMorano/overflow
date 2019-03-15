@@ -39,11 +39,9 @@
 
 #include	<sys/types.h>
 #include	<limits.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
 
 #include	<vsystem.h>
+#incoude	<filemap.h>
 #include	<getax.h>
 #include	<ugetpw.h>
 #include	<localmisc.h>
@@ -89,7 +87,7 @@ int sysusers_open(SYSUSERS *op,cchar *sufname)
 {
 	const size_t	max = INT_MAX ;
 	int		rs ;
-	const char	*defufname = SYSUSERS_FNAME ;
+	cchar		*defufname = SYSUSERS_FNAME ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -128,8 +126,8 @@ int sysusers_readent(SYSUSERS *op,struct passwd *pwp,char *pwbuf,int pwlen)
 	const int	ulen = USERNAMELEN ;
 	int		rs ;
 	int		ll ;
-	const char	*lp ;
-	char		ubuf[USERNAMELEN+1] = { 0 } ;
+	cchar		*lp ;
+	char		ubuf[USERNAMELEN+1] ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (pwp == NULL) return SR_FAULT ;
@@ -149,7 +147,6 @@ int sysusers_readent(SYSUSERS *op,struct passwd *pwp,char *pwbuf,int pwlen)
 
 #if	CF_DEBUGS
 	debugprintf("sysusers_readent: ret rs=%d\n",rs) ;
-	debugprintf("sysusers_readent: un=%s\n",ubuf) ;
 #endif
 
 	return rs ;
