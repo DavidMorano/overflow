@@ -90,9 +90,9 @@ int sysprojects_open(SYSPROJECTS *op,const char *spfname)
 
 	memset(op,0,sizeof(SYSPROJECTS)) ;
 
-	    if ((rs = filemap_open(&op->b,spfname,O_RDONLY,max)) >= 0) {
-		op->magic = SYSPROJECTS_MAGIC ;
-	    }
+	if ((rs = filemap_open(&op->b,spfname,O_RDONLY,max)) >= 0) {
+	    op->magic = SYSPROJECTS_MAGIC ;
+	}
 
 	return rs ;
 }
