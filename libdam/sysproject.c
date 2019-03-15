@@ -8,13 +8,13 @@
 
 /* revision history:
 
-	= 1998-03-24, David A­D­ Morano
+	= 1998-03-24, David AÂ­DÂ­ Morano
         This object module was morphed from some previous one. I do not remember
         what the previous one was.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -32,11 +32,9 @@
 
 #include	<sys/types.h>
 #include	<limits.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
 
 #include	<vsystem.h>
+#include	<filemap.h>
 #include	<projectent.h>
 #include	<localmisc.h>
 
@@ -48,14 +46,9 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
 
 
 /* local structures */
@@ -70,11 +63,11 @@ extern char	*strdcpy1w(char *,int,const char *,int) ;
 /* exported subroutines */
 
 
-int sysproject_open(SYSPROJECT *op,const char *spfname)
+int sysproject_open(SYSPROJECT *op,cchar *spfname)
 {
 	const size_t	max = INT_MAX ;
 	int		rs ;
-	const char	*pfname = SYSPROJECT_FNAME ;
+	cchar		*pfname = SYSPROJECT_FNAME ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -112,7 +105,7 @@ int sysproject_readent(SYSPROJECT *op,struct project *pjp,char *pjbuf,int pjlen)
 {
 	int		rs ;
 	int		ll ;
-	const char	*lp ;
+	cchar		*lp ;
 	if (op == NULL) return SR_FAULT ;
 	if (pjp == NULL) return SR_FAULT ;
 	if (pjbuf == NULL) return SR_FAULT ;
