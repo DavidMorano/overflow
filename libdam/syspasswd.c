@@ -33,14 +33,10 @@
 
 #include	<sys/types.h>
 #include	<limits.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
 
 #include	<vsystem.h>
 #include	<passwdent.h>
-#include	<getax.h>
-#include	<ugetpw.h>
+#include	<filemap.h>
 #include	<localmisc.h>
 
 #include	"syspasswd.h"
@@ -48,28 +44,12 @@
 
 /* local defines */
 
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	2048
-#endif
-
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
-#else
-#define	GETPW_NAME	getpw_name
-#endif /* CF_UGETPW */
-#undef	COMMENT
-
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
 
 
 /* local structures */
@@ -88,7 +68,7 @@ int syspasswd_open(SYSPASSWD *op,cchar *sufname)
 {
 	const size_t	max = INT_MAX ;
 	int		rs ;
-	const char	*defufname = SYSPASSWD_FNAME ;
+	cchar		*defufname = SYSPASSWD_FNAME ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -97,7 +77,7 @@ int syspasswd_open(SYSPASSWD *op,cchar *sufname)
 	memset(op,0,sizeof(SYSPASSWD)) ;
 
 	if ((rs = filemap_open(&op->b,sufname,O_RDONLY,max)) >= 0) {
-	        op->magic = SYSPASSWD_MAGIC ;
+	    op->magic = SYSPASSWD_MAGIC ;
 	}
 
 	return rs ;
@@ -125,8 +105,9 @@ int syspasswd_close(SYSPASSWD *op)
 int syspasswd_readent(SYSPASSWD *op,struct passwd *pwp,char *pwbuf,int pwlen)
 {
 	int		rs ;
+	int		ll ;
 	int		pwl = 0 ;
-	const char	*lp ;
+	char		*lp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (pwp == NULL) return SR_FAULT ;
@@ -134,7 +115,9 @@ int syspasswd_readent(SYSPASSWD *op,struct passwd *pwp,char *pwbuf,int pwlen)
 	if (op->magic != SYSPASSWD_MAGIC) return SR_NOTOPEN ;
 
 	while ((rs = filemap_getline(&op->b,&lp)) > 0) {
-	    rs = passwdent_parse(pwp,pwbuf,pwlen,lp,rs) ;
+	    ll = rs ;
+	    if (lp[ll-1] == '\n') ll -= 1 ;
+	    rs = passwdent_parse(pwp,pwbuf,pwlen,lp,ll) ;
 	    pwl = rs ;
 	    if (pwl > 0) break ;
 	    if (rs < 0) break ;
