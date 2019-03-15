@@ -33,8 +33,6 @@
 
 #include	<vsystem.h>
 #include	<ascii.h>
-#include	<char.h>
-#include	<sbuf.h>
 #include	<localmisc.h>
 
 
@@ -97,11 +95,13 @@ int tabexpand(char *dbuf,int dlen,cchar *sbuf,int slen)
 
 	        if (*sp == '\t') {
 	            n = tabcols(NTABCOLS,dcol) ;
-	            for (j = 0 ; (dcol >= 0) && (j < n) ; j += 1) {
+	            for (j = 0 ; j < n ; j += 1) {
 	                rs = dstore_add(&d,' ') ;
 		    } /* end for */
+		    dcol += n ;
 	        } else {
 	            rs = dstore_add(&d,*sp) ;
+		    dcol += 1 ;
 	        }
 
 	        sp += 1 ;
