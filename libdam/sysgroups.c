@@ -32,11 +32,9 @@
 
 #include	<sys/types.h>
 #include	<limits.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
 
 #include	<vsystem.h>
+#include	<filemap.h>
 #include	<getax.h>
 #include	<localmisc.h>
 
@@ -48,14 +46,14 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
 
 
 /* local structures */
@@ -70,11 +68,11 @@ extern char	*strdcpy1w(char *,int,const char *,int) ;
 /* exported subroutines */
 
 
-int sysgroups_open(SYSGROUPS *op,const char *sgfname)
+int sysgroups_open(SYSGROUPS *op,cchar *sgfname)
 {
 	const size_t	max = INT_MAX ;
 	int		rs ;
-	const char	*defgfname = SYSGROUPS_FNAME ;
+	cchar		*defgfname = SYSGROUPS_FNAME ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -113,8 +111,8 @@ int sysgroups_readent(SYSGROUPS *op,struct group *grp,char *grbuf,int grlen)
 	const int	glen = GROUPNAMELEN ;
 	int		rs ;
 	int		ll ;
-	const char	*lp ;
-	char		gbuf[GROUPNAMELEN+1] = { 0 } ;
+	cchar		*lp ;
+	char		gbuf[GROUPNAMELEN+1] ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (grp == NULL) return SR_FAULT ;
@@ -134,7 +132,6 @@ int sysgroups_readent(SYSGROUPS *op,struct group *grp,char *grbuf,int grlen)
 
 #if	CF_DEBUGS
 	debugprintf("sysgroups_readent: ret rs=%d\n",rs) ;
-	debugprintf("sysgroups_readent: gn=%s\n",gbuf) ;
 #endif
 
 	return rs ;
