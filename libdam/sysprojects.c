@@ -122,10 +122,12 @@ int sysprojects_readent(SYSPROJECTS *op,project_t *pjp,char *pjbuf,int pjlen)
 	int		rs ;
 	int		ll ;
 	const char	*lp ;
-	char		pbuf[PROJNAMELEN+1] = { 0 } ;
+	char		pbuf[PROJNAMELEN+1] ;
+	
 	if (op == NULL) return SR_FAULT ;
 	if (pjp == NULL) return SR_FAULT ;
 	if (pjbuf == NULL) return SR_FAULT ;
+	
 	while ((rs = filemap_getline(&op->b,&lp)) > 0) {
 	    ll = rs ;
 	    if (lp[ll-1] == '\n') ll -= 1 ;
@@ -139,7 +141,6 @@ int sysprojects_readent(SYSPROJECTS *op,project_t *pjp,char *pjbuf,int pjlen)
 
 #if	CF_DEBUGS
 	debugprintf("sysprojects_readent: ret rs=%d\n",rs) ;
-	debugprintf("sysprojects_readent: pn=%s\n",pbuf) ;
 #endif
 
 	return rs ;
@@ -157,4 +158,5 @@ int sysprojects_reset(SYSPROJECTS *op)
 	return rs ;
 }
 /* end subroutine (sysprojects_reset) */
+
 
