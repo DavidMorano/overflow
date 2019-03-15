@@ -1,6 +1,6 @@
 /* straltwchar */
 
-/* counted-string copy while compacting white-space from the source */
+/* find an alternate character string for a given (weirdo) wide-char */
 
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
@@ -18,24 +18,21 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1998,2017 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
 	Find a reasonable substitute string for a given wide-character.
 
 	Synopsis:
-
 	cchar *straltwchar(int wch)
 
 	Arguments:
-
 	wch		wide-character to look-up
 
 	Returns:
-
-	<0		error
-	>=0		resulting string length
+	==NULL		no alternate found
+	!=NULL		a suitable alternate was found
 
 
 *******************************************************************************/
@@ -99,14 +96,14 @@ static const struct special	specials[] = {
 	{ 0x044C, "b" },
 	{ 0x0455, "s" },
 	{ 0x0456, "i" },
-	{ 0x0456, "ï" },
+	{ 0x0456, "Ã¯" },
 	{ 0x0456, "j" },
 	{ 0x0474, "V" },
 	{ 0x0475, "v" },
-	{ 0x047A, "Ø" },
-	{ 0x047B, "ø" },
-	{ 0x0480, "Ç" },
-	{ 0x0481, "ç" },
+	{ 0x047A, "Ã˜" },
+	{ 0x047B, "Ã¸" },
+	{ 0x0480, "Ã‡" },
+	{ 0x0481, "Ã§" },
 	{ 0x0484, "^" },
 	{ 0x0487, "~" },
 	{ 0x0493, "f" },
@@ -122,13 +119,13 @@ static const struct special	specials[] = {
 	{ 0x04A3, "h" },
 	{ 0x04A4, "H" },
 	{ 0x04A5, "h" },
-	{ 0x04AA, "Ç" },
-	{ 0x04AB, "ç" },
+	{ 0x04AA, "Ã‡" },
+	{ 0x04AB, "Ã§" },
 	{ 0x04AC, "T" },
 	{ 0x04AD, "t" },
 	{ 0x04AE, "Y" },
 	{ 0x04AF, "y" },
-	{ 0x04B0, "¥" },
+	{ 0x04B0, "Â¥" },
 	{ 0x04B1, "y" },
 	{ 0x04B2, "X" },
 	{ 0x04B3, "x" },
@@ -146,26 +143,26 @@ static const struct special	specials[] = {
 	{ 0x04CD, "M" },
 	{ 0x04CE, "m" },
 	{ 0x04CF, "l" },
-	{ 0x04D0, "Ã" },
-	{ 0x04D1, "ã" },
-	{ 0x04D2, "Ä" },
-	{ 0x04D3, "ä" },
-	{ 0x04D4, "Æ" },
-	{ 0x04D5, "æ" },
-	{ 0x04D6, "Ê" },
-	{ 0x04D7, "ê" },
+	{ 0x04D0, "Ãƒ" },
+	{ 0x04D1, "Ã£" },
+	{ 0x04D2, "Ã„" },
+	{ 0x04D3, "Ã¤" },
+	{ 0x04D4, "Ã†" },
+	{ 0x04D5, "Ã¦" },
+	{ 0x04D6, "ÃŠ" },
+	{ 0x04D7, "Ãª" },
 	{ 0x04DC, "X" },
 	{ 0x04DD, "x" },
 	{ 0x04DE, "3" },
 	{ 0x04DF, "3" },
 	{ 0x04E0, "3" },
 	{ 0x04E1, "3" },
-	{ 0x04E2, "Ñ" },
-	{ 0x04E3, "ñ" },
-	{ 0x04E4, "Ñ" },
-	{ 0x04E5, "ñ" },
-	{ 0x04E6, "Ö" },
-	{ 0x04E7, "ö" },
+	{ 0x04E2, "Ã‘" },
+	{ 0x04E3, "Ã±" },
+	{ 0x04E4, "Ã‘" },
+	{ 0x04E5, "Ã±" },
+	{ 0x04E6, "Ã–" },
+	{ 0x04E7, "Ã¶" },
 	{ 0x04EE, "Y" },
 	{ 0x04EF, "y" },
 	{ 0x04F0, "Y" },
@@ -190,16 +187,16 @@ static const struct special	specials[] = {
 	{ 0x0515, "x" },
 	{ 0x0516, "P" },
 	{ 0x0517, "p" },
-	{ 0x0518, "Æ" },
-	{ 0x0519, "æ" },
+	{ 0x0518, "Ã†" },
+	{ 0x0519, "Ã¦" },
 	{ 0x051A, "Q" },
 	{ 0x051B, "q" },
 	{ 0x051C, "W" },
 	{ 0x051D, "w" },
 	{ 0x051E, "K" },
 	{ 0x051F, "k" },
-	{ 0x2010, "­" },
-	{ 0x2011, "­" },
+	{ 0x2010, "Â­" },
+	{ 0x2011, "Â­" },
 	{ 0x2012, "-" },
 	{ 0x2013, "-" },
 	{ 0x2014, "--" },
@@ -213,12 +210,12 @@ static const struct special	specials[] = {
 	{ 0x201D, "\042" }, /* double-quote */
 	{ 0x201E, ",," },
 	{ 0x201F, "\042" }, /* double-quote */
-	{ 0x2020, "÷" },
-	{ 0x2021, "±" },
-	{ 0x2022, "·" },
+	{ 0x2020, "Ã·" },
+	{ 0x2021, "Â±" },
+	{ 0x2022, "Â·" },
 	{ 0x2023, "->" },
 	{ 0x2024, "." },
-	{ 0x2027, "­" },
+	{ 0x2027, "Â­" },
 	{ 0x2032, "\047" }, /* single-quote */
 	{ 0x2033, "\042" }, /* double-quote */
 	{ 0x2035, "`" }, /* back-quote */
@@ -228,7 +225,7 @@ static const struct special	specials[] = {
 	{ 0x203B, "*" },
 	{ 0x203C, "!!" },
 	{ 0x203D, "?" },
-	{ 0x203E, "¯" },
+	{ 0x203E, "Â¯" },
 	{ 0x2043, "-" },
 	{ 0x2044, "/" },
 	{ 0x2045, "{" },
@@ -236,19 +233,19 @@ static const struct special	specials[] = {
 	{ 0x2047, "??" },
 	{ 0x2048, "?!" },
 	{ 0x2049, "!?" },
-	{ 0x204A, "¬" },
-	{ 0x204B, "¶" },
+	{ 0x204A, "Â¬" },
+	{ 0x204B, "Â¶" },
 	{ 0x204E, "*" },
 	{ 0x2053, "~" },
 	{ 0x2055, "*" },
-	{ 0x2059, "×" },
+	{ 0x2059, "Ã—" },
 	{ 0x205A, ":" },
-	{ 0x2070, "°" },
-	{ 0x2071, "¡" },
-	{ 0x2080, "°" },
-	{ 0x2081, "¹" },
-	{ 0x2082, "²" },
-	{ 0x2083, "³" },
+	{ 0x2070, "Â°" },
+	{ 0x2071, "Â¡" },
+	{ 0x2080, "Â°" },
+	{ 0x2081, "Â¹" },
+	{ 0x2082, "Â²" },
+	{ 0x2083, "Â³" },
 	{ 0x208B, "_" },
 	{ 0x2095, "?" },
 	{ 0x2096, "?" },
@@ -261,8 +258,8 @@ static const struct special	specials[] = {
 	{ 0x209D, "?" },
 	{ 0x209E, "?" },
 	{ 0x209F, "?" },
-	{ 0x20AC, "¤" }, /* this should be the Euro-currency synbol */
-	{ 0x20B5, "¢" },
+	{ 0x20AC, "Â¤" }, /* this should be the Euro-currency synbol */
+	{ 0x20B5, "Â¢" },
 	{ 0x20D2, "|" },
 	{ 0, 0 }
 } ;
