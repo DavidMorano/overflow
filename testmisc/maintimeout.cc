@@ -13,12 +13,12 @@
 
 /* revision history:
 
-	= 2017-10-12, David A­D­ Morano
+	= 2017-10-12, David AÂ­DÂ­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2017 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -167,7 +167,7 @@ int main(int argc,cchar **argv,cchar **envv)
 {
 	TIMEOUT		to ;
 	time_t		dt = time(NULL) ;
-	const int	tval = 20 ;
+	const int	tval = 10 ;
 #if	CF_DEBUGS && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
@@ -206,7 +206,7 @@ int main(int argc,cchar **argv,cchar **envv)
 #endif
 
 	                    printf("id=%d\n",id) ;
-	                    uc_safesleep(tval/2) ;
+	                    uc_safesleep(tval) ;
 
 #if	CF_DEBUGN
 	                    nprintf(NDF,"main: back rs=%d\n",rs) ;
@@ -325,10 +325,10 @@ static int main_sigdump(siginfo_t *sip)
 	    as = abuf ;
 	    break ;
 	case SIGQUIT:
-	    scs = "¤na¤" ;
+	    scs = "Â¤naÂ¤" ;
 	    break ;
 	default:
-	    scs = "¤default¤" ;
+	    scs = "Â¤defaultÂ¤" ;
 	    break ;
 	} /* end switch */
 	fmt = "SIG=%s code=%d(%s) addr=%s\n" ;
