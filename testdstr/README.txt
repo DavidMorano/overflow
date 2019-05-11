@@ -1,4 +1,3 @@
-TESTSTR
+TESTDSTR
 
-This is the test for the 'str' object (development in progress)!
-
+This is the test for the DSTR object (development in progress)!
