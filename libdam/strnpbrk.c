@@ -3,17 +3,14 @@
 /* find a character in a counted string */
 
 
-#define	CF_STRPBRK	1		/* use 'strpbrk(3c)' */
-
-
 /* revision history:
 
-	= 1999-06-08, David A­D­ Morano
+	= 1999-06-08, David AÂ­DÂ­ Morano
 	This subroutine was originally written for some reason.
 
 */
 
-/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1999 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -44,10 +41,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<string.h>
-
 #include	<localmisc.h>
 
 
@@ -57,31 +52,17 @@
 /* exported subroutines */
 
 
+/* exported subroutines */
+
+
+/* find a character in a counted c-string */
 char *strnpbrk(cchar *sp,int sl,cchar *ss)
 {
-	int		ch ;
-	int		f = FALSE ;
 	char		*rsp ;
-
-	if (sl < 0) {
-
-#if	CF_STRPBRK
-	    rsp = strpbrk(sp,ss) ;
-#else
-	    while (*sp) {
-		ch = MKCHAR(*sp) ;
-	        f = (strchr(ss,ch) != NULL) ;
-		if (f) break ;
-	        sp += 1 ;
-	    } /* end while */
-	    rsp = (f) ? ((char *) sp) : NULL ;
-#endif /* CF_STRPBRK */
-
-	} else {
-	    const char	*ssp ;
-	    const char	*lsp ;
-
-	    lsp = (sp+sl) ;
+	if (sl >= 0) {	
+	    int		ch ;
+	    int		f = FALSE ;
+	    const char	*lsp = (sp+sl) ;
 	    while ((sp < lsp) && *sp) {
 		ch = MKCHAR(*sp) ;
 	        f = (strchr(ss,ch) != NULL) ;
@@ -89,9 +70,9 @@ char *strnpbrk(cchar *sp,int sl,cchar *ss)
 	        sp += 1 ;
 	    } /* end while */
 	    rsp = (f) ? ((char *) sp) : NULL ;
-
+	| else if (sl < 0) {
+	    rsp = strpbrl(sp,ss) ;
 	} /* end if */
-
 	return rsp ;
 }
 /* end subroutine (strnpbrk) */
