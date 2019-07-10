@@ -8,17 +8,17 @@
 
 /* revision history:
 
-	- 2008-10-01, David A­D­ Morano
+	- 2008-10-01, David AÂ­DÂ­ Morano
 	This object module was originally written.
 
 */
 
-/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 2008 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
 	This code provides an interface to some time mangement functions that
-	hides some of the (stupid) gory details of the internal UNIX® time-zone
+	hides some of the (stupid) gory details of the internal UNIXÂ® time-zone
 	managemtnt system.
 
 	Implementation notes:
@@ -87,11 +87,6 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* forward references */
-
-int		tmtime_gmtime(TMTIME *,time_t) ;
-int		tmtime_gmtime(TMTIME *,time_t) ;
-int		tmtime_insert(TMTIME *,struct tm *) ;
-int		tmtime_extract(TMTIME *,struct tm *) ;
 
 static int	tmtime_mktimer(TMTIME *,int,time_t *) ;
 
