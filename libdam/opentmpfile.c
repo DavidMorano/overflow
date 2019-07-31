@@ -234,8 +234,6 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf)
 	debugprintf("opentmpx: operm=\\o%06o\n",operm) ;
 #endif
 
-	obuf[0] = '\0' ;
-
 	if (S_ISSOCK(om)) {
 	    if (opt & OTM_DGRAM) {
 		stype = SOCK_DGRAM ;
@@ -253,7 +251,7 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf)
 		f_abuf = TRUE ;
 	    }
 	}
-
+	obuf[0] = '\0' ;
 	if (rs >= 0) rs = randload(&rv) ;
 
 /* loop trying to create a file */
