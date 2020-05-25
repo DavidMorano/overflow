@@ -104,7 +104,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	{
 	    uint	uv ;
 	    uint	ui = 26U ;
-	    int		v ;
+	    int		v = -1 ;
 	    int 	i = us ;
 	    ushort	us = 0xFFFF ;
 	    uchar	uc = (uchar) v ;
@@ -113,8 +113,6 @@ int main(int argc,cchar **argv,cchar **envv)
 		bprintf(ofp,"less (K&R)\n") ;
 	} else if (us > v) {
 		bprintf(ofp,"greater (ANSI)\n") ;
-	} else {
-		bprintf(ofp,"equal\n") ;
 	}
 
 	bprintf(ofp,"uc=%08X us=%08X ui=%08X i=%08X\n",
