@@ -1,7 +1,7 @@
 /* b_userinfo */
 
 /* SHELL built-in: return various user information */
-/* last modified %G% version %I% */
+/* version %I% last-modified %G% */
 
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
@@ -66,7 +66,7 @@
 #include	<bsm/audit.h>
 #endif
 
-#include	<vsystem.h>
+#include	<usystem.h>
 #include	<ugetpid.h>
 #include	<getbufsize.h>
 #include	<bits.h>
@@ -187,8 +187,6 @@ extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	getnodeinfo(cchar *,char *,char *,vecstr *,cchar *) ;
 extern int	nisdomainname(char *,int) ;
 extern int	inittimezone(char *,int,cchar *) ;
-extern int	vstrcmp(const void *,const void *) ;
-extern int	vstrkeycmp(const void *,const void *) ;
 extern int	tmpx_getuserlines(TMPX *,VECSTR *,cchar *) ;
 extern int	hasalldig(cchar *,int) ;
 extern int	isdigitlatin(int) ;
@@ -1157,7 +1155,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	} /* end while (all command line argument processing) */
 
 	if (efname == NULL) efname = getourenv(envv,VAREFNAME) ;
-	if (efname == NULL) efname = STDERRFNAME ;
+	if (efname == NULL) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
 	    pip->open.errfile = TRUE ;
@@ -1571,7 +1569,7 @@ cchar		*afn ;
 #endif
 
 	if ((ofn == NULL) || (ofn[0] == '\0') || (ofn[0] == '-'))
-	    ofn = STDOUTFNAME ;
+	    ofn = STDFNOUT ;
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 	    int		pan = 0 ;
@@ -1601,7 +1599,7 @@ cchar		*afn ;
 	    if ((rs >= 0) && (afn != NULL) && (afn[0] != '\0')) {
 	        SHIO	afile, *afp = &afile ;
 
-	        if (strcmp(afn,"-") == 0) afn = STDINFNAME ;
+	        if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
 	            const int	llen = LINEBUFLEN ;

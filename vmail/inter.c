@@ -65,7 +65,7 @@
 #include	<string.h>
 #include	<stdarg.h>
 
-#include	<vsystem.h>
+#include	<usystem.h>
 #include	<estrings.h>
 #include	<vecstr.h>
 #include	<bfile.h>
@@ -1273,7 +1273,7 @@ static int inter_loadcmdmapfile(INTER *iap,const char *fname)
 	        cchar		*sp, *tp ;
 	        char		lbuf[LINEBUFLEN+1] ;
 
-	        while ((rs = breadline(cfp,lbuf,llen)) > 0) {
+	        while ((rs = breadln(cfp,lbuf,llen)) > 0) {
 	            len = rs ;
 
 	            if (lbuf[len-1] == '\n') len -= 1 ;

@@ -1,7 +1,8 @@
-/* localmisc */
+/* localmisc INCLUDE */
+/* lang=C20 */
 
 /* miscellaneous stuff which essentially every program wants! */
-/* last modified %G% version %I% */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,32 +18,18 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	LOCALMISC_INCLUDE
-#define	LOCALMISC_INCLUDE	1
+#define	LOCALMISC_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<limits.h>
+#include	<clanguage.h>
 
 
-#ifndef	va_begin
-#define	va_begin(ap,arg)	va_start((ap),(arg))
-#endif
-#ifndef	va_finish
-#define	va_finish(ap)		va_end((ap))
-#endif
-#ifndef	va_get
-#define	va_get(ap,atype)	va_arg((ap),(atype))
-#endif
-
-#ifndef	repeat
-#define repeat			do
-#define	until(cond)		while(!(cond))
-#endif
 
 #ifndef	TRUE
 #define	TRUE		1
@@ -91,11 +78,11 @@
 #define	ABS(a)		(((a) < 0) ? (- (a)) : (a))
 #endif
 
-#ifndef	LEQUIV /* should be operator »  !^^  « or perhaps »  !!  « */
+#ifndef	LEQUIV /* should be operator » !^^ « */
 #define	LEQUIV(a,b)	(((a) && (b)) || ((! (a)) && (! (b))))
 #endif
 
-#ifndef	LXOR /* should be operator »  ^^  « */
+#ifndef	LXOR /* should be operator » ^^ « */
 #define	LXOR(a,b)	(((a) && (! (b))) || ((! (a)) && (b)))
 #endif
 
@@ -120,11 +107,11 @@
 #endif
 
 #ifndef	MKCHAR
-#define	MKCHAR(c)	((c) & 0xff)
+#define	MKCHAR(ch)	((ch) & 0xff)
 #endif
 
 #ifndef	MKBOOL
-#define	MKBOOL(c)	((c)!=0)
+#define	MKBOOL(ch)	((ch)!=0)
 #endif
 
 #ifndef	UC
@@ -132,77 +119,10 @@
 #endif
 
 
-#ifndef	PF_LOCAL
-#ifdef	PF_UNIX
-#define	PF_LOCAL	PF_UNIX
-#else
-#define	PF_LOCAL	0
-#endif
-#endif
-
-#ifndef	AF_LOCAL
-#ifdef	AF_UNIX
-#define	AF_LOCAL	AF_UNIX
-#else
-#define	AF_LOCAL	0
-#endif
-#endif
-
 /* basic scalar types */
 
-#ifndef	CHAR
-#define	CHAR		char
-#endif
-
-#ifndef	BYTE
-#define	BYTE		char
-#endif
-
-#ifndef	SHORT
-#define	SHORT		short
-#endif
-
-#ifndef	INT
-#define	INT		int
-#endif
-
-#ifndef	LONGLONG
-#undef	S1
-#define	S1	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-#undef	S2
-#define	S2	defined(OSNAME_IRIX) && (OSNAME_IRIX > 0)
-#undef	S3
-#define	S3	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
-#define	F	(S1 || S2 || S3)
-#if	F
-#define	LONGLONG	long long
-#else
-#define	LONGLONG	long
-#endif /* (whether implementation has 'long long' or not) */
-#undef	S1
-#undef	S2
-#undef	S3
-#undef	F
-#endif
-
 #ifndef	LONG
-#undef	S1
-#define	S1	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-#undef	S2
-#define	S2	defined(OSNAME_IRIX) && (OSNAME_IRIX > 0)
-#undef	S3
-#define	S3	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
-#define	F1	defined(LONGLONG)
-#define	F	(F1 || S1 || S2 || S3)
-#if	F
-#define	LONG	long long
-#else
-#define	LONG	long
-#endif /* (whether implementation has 'long long' or not) */
-#undef	S1
-#undef	S2
-#undef	S3
-#undef	F
+#define	LONG		long
 #endif
 
 #ifndef	SCHAR
@@ -222,174 +142,62 @@
 #endif
 
 #ifndef	ULONG
-#define	ULONG		unsigned LONG
+#define	ULONG		unsigned long
 #endif
-
-#ifndef	ULONGLONG
-#define	ULONGLONG	unsigned long long
-#endif
-
-
-#if	defined(OSNAME_Darwin) && defined(OSNUM) && (OSNUM <= 7)
-#if	(! defined(_POSIX_SOURCE))
-#ifndef	TYPEDEF_USHORT
-#define	TYPEDEF_USHORT	1
-#endif
-#ifndef	TYPEDEF_UINT
-#define	TYPEDEF_UINT	1
-#endif
-#endif /* (! defined(_POSIX_SOURCE)) */
-#endif /* defined(OSNAME_Darwin) */
-
-
-#if	(! defined(__EXTENSIONS__)) && (! defined(P_MYID))
-#if	defined(_POSIX_C_SOURCE) || defined(_XOPEN_SOURCE)
-#if	(! defined(IRIX)) || (! defined(_SYS_BSD_TYPEDEFS_H))
-
-#ifndef	TYPEDEFS_UNSIGNED
-#define	TYPEDEFS_UNSIGNED	1
-
-#ifndef	TYPEDEF_USHORT
-#define	TYPEDEF_USHORT		1
-typedef unsigned short		ushort ;
-#endif
-
-#ifndef	TYPEDEF_UINT
-#define	TYPEDEF_UINT		1
-typedef unsigned int		uint ;
-#endif
-
-#ifndef	TYPEDEF_ULONG
-#define	TYPEDEF_ULONG		1
-typedef unsigned long		ulong ;
-#endif
-
-#ifndef	TYPEDEF_ULONGLONG
-#define	TYPEDEF_ULONGLONG	1
-typedef unsigned long long	ulonglong ;
-#endif
-
-#endif /* TYPEDEFS_UNSIGNED */
-
-#endif
-#endif
-#endif
-
-
-/* do it again! */
-
-#if	(! defined(TYPEDEFS_UNSIGNED)) && (! defined(P_MYID))
-#if	(! defined(IRIX)) || (! defined(_SYS_BSD_TYPEDEFS_H))
-
-#ifndef	TYPEDEFS_UNSIGNED
-#define	TYPEDEFS_UNSIGNED	1
-
-#ifndef	TYPEDEF_USHORT
-#define	TYPEDEF_USHORT		1
-typedef unsigned short		ushort ;
-#endif
-
-#ifndef	TYPEDEF_UINT
-#define	TYPEDEF_UINT		1
-typedef unsigned int		uint ;
-#endif
-
-#ifndef	TYPEDEF_ULONG
-#define	TYPEDEF_ULONG		1
-typedef unsigned long		ulong ;
-#endif
-
-#ifndef	TYPEDEF_ULONGLONG
-#define	TYPEDEF_ULONGLONG	1
-typedef unsigned long long	ulonglong ;
-#endif
-
-#endif /* TYPEDEFS_UNSIGNED */
-
-#endif
-#endif
-
 
 #ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR	1
+#define	TYPEDEF_CCHAR
 typedef const char		cchar ;
 #endif
 
 #ifndef	TYPEDEF_SCHAR
-#define	TYPEDEF_SCHAR	1
+#define	TYPEDEF_SCHAR
 typedef signed char		schar ;
 #endif /* TYPEDEF_SCHAR */
 
-
 #ifndef	TYPEDEF_CSCHAR
-#define	TYPEDEF_CSCHAR	1
+#define	TYPEDEF_CSCHAR
 typedef const signed char	cschar ;
 #endif /* TYPEDEF_SCHAR */
 
-
 #ifndef	TYPEDEF_UCHAR
-#define	TYPEDEF_UCHAR	1
+#define	TYPEDEF_UCHAR
 typedef unsigned char		uchar ;
 #endif /* TYPEDEF_UCHAR */
 
-
 #ifndef	TYPEDEF_CUCHAR
-#define	TYPEDEF_CUCHAR	1
+#define	TYPEDEF_CUCHAR
 typedef const unsigned char	cuchar ;
 #endif /* TYPEDEF_UCHAR */
 
+#ifndef	TYPEDEF_CSHORT
+#define	TYPEDEF_CSHORT
+typedef const short		cshort ;
+#endif /* TYPEDEF_CSHORT */
 
-#ifndef	TYPEDEF_LONGLONG
-#define	TYPEDEF_LONGLONG	1
-typedef long long		longlong ;
-#endif /* TYPEDEF_LONGLONG */
+#ifndef	TYPEDEF_CINT
+#define	TYPEDEF_CINT
+typedef const int		cint ;
+#endif /* TYPEDEF_CINT */
 
+#ifndef	TYPEDEF_CLONG
+#define	TYPEDEF_CLONG
+typedef const long		clong ;
+#endif /* TYPEDEF_CLONG */
 
-#ifndef	TYPEDEF_ULONGLONG
-#define	TYPEDEF_ULONGLONG	1
-typedef unsigned long long	ulonglong ;
-#endif /* TYPEDEF_ULONGLONG */
-
-
-#ifndef	TYPEDEF_LONG64
-#define	TYPEDEF_LONG64	1
-typedef LONG			long64 ;
-#endif /* TYPEDEF_LONG64 */
-
-
-#ifndef	TYPEDEF_ULONG64
-#define	TYPEDEF_ULONG64	1
-typedef ULONG			ulong64 ;
-#endif /* TYPEDEF_ULONG64 */
-
-
-#if	defined(SYSHAS_OFFSET) && (SYSHAS_OFFSET > 0)
-#define	TYPEDEF_OFFSET		1
-#else
-#ifndef	TYPEDEF_OFFSET
-#define	TYPEDEF_OFFSET		1
-typedef long long		offset_t ;
-#endif
-#endif
-
-
-#if	defined(SYSHAS_OFF32) && (SYSHAS_OFF32 > 0)
-#define	TYPEDEF_OFF32		1
-#else
-#ifndef	TYPEDEF_OFF32
-#define	TYPEDEF_OFF32		1
-typedef int			off32_t ;
-#endif /* TYPEDEF_OFF32 */
-#endif
+#ifndef	TYPEDEF_CUINT
+#define	TYPEDEF_CUINT
+typedef const unsigned int	cuint ;
+#endif /* TYPEDEF_CUINT */
 
 
 #ifndef	TYPEDEF_USTIME
-#define	TYPEDEF_USTIME		1
+#define	TYPEDEF_USTIME
 typedef unsigned int		ustime_t ;
 #endif
 
 #ifndef	TYPEDEF_UTIME
-#define	TYPEDEF_UTIME		1
+#define	TYPEDEF_UTIME
 #if	defined(_LP64)
 typedef unsigned long		utime_t ;
 #else
@@ -398,7 +206,7 @@ typedef unsigned long long	utime_t ;
 #endif /* TYPEDEF_UTIME */
 
 #ifndef	TYPEDEF_UNIXTIME
-#define	TYPEDEF_UNIXTIME	1
+#define	TYPEDEF_UNIXTIME
 #if	defined(_LP64)
 typedef long			unixtime_t ;
 #else
@@ -406,31 +214,23 @@ typedef long long		unixtime_t ;
 #endif
 #endif /* TYPEDEF_UNIXTIME */
 
+#ifndef	TYPEDEF_CC
+#define	TYPEDEF_CC
+typedef const char	cc ;
+#endif
 
 /* C-language limits */
 
-#ifndef	LONGLONG_MIN
-#define	LONGLONG_MIN	(-9223372036854775807LL-1LL)
-#endif /* LONGLONG_MIN */
-#ifndef	LONGLONG_MAX
-#define	LONGLONG_MAX	9223372036854775807LL
-#endif /* LONGLONG_MAX */
-#ifndef	ULONGLONG_MAX
-#define	ULONGLONG_MAX	18446744073709551615ULL
-#endif /* ULONGLONG_MAX */
-
-/* some limits! (C-language) */
-
-#ifndef	LONG64_MIN
-#define	LONG64_MIN	(-9223372036854775807L-1LL)
+#ifndef	INT64_MIN
+#define	INT64_MIN	(-9223372036854775807L-1LL)
 #endif
 
-#ifndef	LONG64_MAX
-#define	LONG64_MAX	9223372036854775807LL
+#ifndef	INT64_MAX
+#define	INT64_MAX	9223372036854775807LL
 #endif
 
-#ifndef	ULONG64_MAX
-#define	ULONG64_MAX	18446744073709551615ULL
+#ifndef	UINT64_MAX
+#define	UINT64_MAX	18446744073709551615ULL
 #endif
 
 /* it would be nice if the implemenation had these */
@@ -466,14 +266,6 @@ typedef long long		unixtime_t ;
 #define	MSGBUFLEN	2048
 #endif
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
 /* timezone (zoneinfo) name */
 #ifndef	TZLEN
 #define	TZLEN		60
@@ -497,134 +289,46 @@ typedef long long		unixtime_t ;
 #define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
 #endif
 
+#ifndef	DIGBUFLEN
+#define	DIGBUFLEN	80		/* can hold |int128_t| in decimal */
+#endif
+
+#ifndef	HEXBUFLEN
+#define	HEXBUFLEN	64		/* can hold |int256_t| in hexadecimal */
+#endif
+
 #ifndef	NOFILE
 #define	NOFILE		20
 #endif
 
-#ifndef	INET4_ADDRSTRLEN
-#ifdef	INET_ADDRSTRLEN
-#define	INET4_ADDRSTRLEN	INET_ADDRSTRLEN
-#else
-#define	INET4_ADDRSTRLEN	16
-#endif
-#endif
+/* missing library subroutines */
 
-#ifndef	INET6_ADDRSTRLEN
-#define	INET6_ADDRSTRLEN	46
-#endif
-
-#ifndef	INETX_ADDRSTRLEN
-#define	INETX_ADDRSTRLEN	MAX(INET4_ADDRSTRLEN,INET6_ADDRSTRLEN)
-#endif
-
-
-/* language features */
-
-#ifndef	LANGUAGE_FOREVER
-#define	LANGUAGE_FOREVER	1
-#define	forever		for (;;)
-#endif /* LANGUAGE_FOREVER */
-
-#ifndef	LANGUAGE_NELEMENTS
-#define	LANGUAGE_NELEMENTS	1
-#ifndef	nelements
-#define	nelements(n)	(sizeof(n) / sizeof((n)[0]))
-#endif
-#endif /* LANGUAGE_NELEMENTS */
-
-#ifndef	LANGUAGE_NELEM
-#define	LANGUAGE_NELEM		1
-#ifndef	nelem
-#ifdef	nelements
-#define	nelem		nelements
-#else
-#define	nelem(n)	(sizeof(n) / sizeof((n)[0]))
-#endif
-#endif
-#endif /* LANGUAGE_NELEM */
-
-#ifndef	NULL
-#define	NULL		0
-#endif
-
-#ifndef	VOID
-#define	VOID		void
-#endif
-
-#ifndef	VOLATILE
-#define	VOLATILE	volatile
-#endif
-
-#ifndef	CONST
-#define	CONST		const
-#endif
-
-#ifndef	RESTRICT
-#define	RESTRICT	/* restrict */
-#endif
-
-#ifndef	STRUCT_MAPEX
-#define	STRUCT_MAPEX	1
-
-#ifndef	MAPEX
-#define	MAPEX		struct mapex
-#endif
-
-struct mapex {
-	int	rs, ex ;
-} ;
-
-#endif /* STRUCT_MAPEX */
-
-
-#ifndef	EXTERN_MAXEX
-#define	EXTERN_MAXEX	1
-
+#if	(!defined(SYSHAS_STRNLEN)) || (SYSHAS_STRNLEN == 0)
+#ifndef	SUBROUTINE_STRNLEN
+#define	SUBROUTINE_STRNLEN
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
-extern int	mapex(const struct mapex *,int) ;
-
+extern int	strnlen(const char *,int) noex ;
 #ifdef	__cplusplus
 }
 #endif
-
-#endif /* EXTERN_MAXPEX */
-
-
-#if	defined(SYSHAS_STRNLEN) && (SYSHAS_STRNLEN > 0)
-#else
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int	strnlen(const char *,int) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
+#endif /* SUBROUTINE_STRNLEN */
 #endif /* defined(SYSHAS_STRNLEN) */
 
-
-/* names */
-
-#ifndef	STDNULLFNAME
-#define	STDNULLFNAME	"*STDNULL*"
+#if	(!defined(SYSHAS_STRLCPY)) || (SYSHAS_STRLCPY == 0)
+#ifndef	SUBROUTINE_STRLCPY
+#define	SUBROUTINE_STRLCPY
+#ifdef	__cplusplus
+extern "C" {
 #endif
-
-#ifndef	STDINFNAME
-#define	STDINFNAME	"*STDIN*"
+extern int	strlcpy(char *,cchar *,int) noex ;
+#ifdef	__cplusplus
+}
 #endif
+#endif /* SUBROUTINE_STRLCPY */
+#endif /* defined(SYSHAS_STRLCPY) */
 
-#ifndef	STDOUTFNAME
-#define	STDOUTFNAME	"*STDOUT*"
-#endif
-
-#ifndef	STDERRFNAME
-#define	STDERRFNAME	"*STDERR*"
-#endif
 
 #ifndef	NULLFNAME
 #define	NULLFNAME	"/dev/null"
