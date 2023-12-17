@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* this provides a variable with a buffer-size */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -28,6 +29,7 @@
 
 #ifndef	BUFSIZEVAR_INCLUDE
 #define	BUFSIZEVAR_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>
@@ -50,6 +52,7 @@ public:
 } ; /* end class (bufsizevar) */
 
 
+#endif	/* __cplusplus */
 #endif /* BUFSIZEVAR_INCLUDE */
 
 
