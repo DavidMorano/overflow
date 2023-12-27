@@ -19,7 +19,6 @@
 
 /* Copyright © 2000,2017,2023 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	SYSHAS_INCLUDE
 #define	SYSHAS_INCLUDE
 

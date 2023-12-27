@@ -145,11 +145,6 @@
 #define	ULONG		unsigned long
 #endif
 
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR
-typedef const char		cchar ;
-#endif
-
 #ifndef	TYPEDEF_SCHAR
 #define	TYPEDEF_SCHAR
 typedef signed char		schar ;
@@ -345,6 +340,8 @@ extern int	strlcpy(char *,cchar *,int) noex ;
 #ifndef	TIMEBUFLEN
 #define	TIMEBUFLEN	80
 #endif
+
+#define	eol		'\n'
 
 
 #endif /* LOCALMISC_INCLUDE */

@@ -19,13 +19,22 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
+
+
+#ifndef	TYPEDEF_MAINV
+#define	TYPEDEF_MAINV
+typedef const char *const	*mainv ;
+#endif
+
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int matkeystr(cchar **,cchar *,int) noex ;
+extern int matkeystr(mainv,cchar *,int) noex ;
 
 #ifdef	__cplusplus
 }

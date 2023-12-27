@@ -37,14 +37,30 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<sys/utsname.h>
+#include	<unistd.h>
+#include	<fcntl.h>
 #include	<limits.h>
-#include	<unistd.h>
-#include	<unistd.h>
 #include	<pwd.h>
 #if	defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0)
 #include	<shadow.h>
 #endif
 
+
+/* missing from some operating systems */
+
+#ifndef	S_IAMB
+#define	S_IAMB		0x1FF
+#endif
+
+#ifndef	S_IFNAM
+#define	S_IFNAM		0x5000		/* MicroSoft XENIX® named file */
+#endif
+
+#ifndef	S_IFDOOR
+#define	S_IFDOOR	0xD000		/* Solaris® "door" file */
+#endif
+
+/* various limits (that might be missing) */
 
 #ifndef	SIZE_MAX
 #define	SIZE_MAX	ULONG_MAX
