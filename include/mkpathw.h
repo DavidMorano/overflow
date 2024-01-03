@@ -1,4 +1,4 @@
-/* mkpathxw INCLUDE */
+/* mkpathxw HEADER */
 /* lang=C20 */
 
 /* make a file-path from multiple component c-strings */

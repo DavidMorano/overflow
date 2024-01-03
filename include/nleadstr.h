@@ -1,4 +1,4 @@
-/* nleadstr INCLUDE */
+/* nleadstr HEADER */
 /* lang=C++20 */
 
 /* match on the leading part of a string */

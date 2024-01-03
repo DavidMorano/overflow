@@ -1,4 +1,4 @@
-/* strcpyxc INCLUDE */
+/* strcpyxc HEADER */
 /* lang=C20 */
 
 

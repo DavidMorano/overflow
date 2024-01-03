@@ -1,4 +1,4 @@
-/* mknpathxw INCLUDE */
+/* mknpathxw HEADER */
 /* lang=C20 */
 
 /* make a file-path using multople component c-strings */

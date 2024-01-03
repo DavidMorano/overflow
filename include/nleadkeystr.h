@@ -1,4 +1,4 @@
-/* nleadkeystr INCLUDE */
+/* nleadkeystr HEADER */
 /* lang=C++20 */
 
 /* match on the leading part of a string */
@@ -19,6 +19,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 

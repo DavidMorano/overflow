@@ -1,4 +1,4 @@
-/* timewatch INCLUDE */
+/* timewatch HEADER */
 /* lang=C++20 */
 
 /* watch time and variables simultaneously */

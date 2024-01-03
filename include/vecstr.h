@@ -1,4 +1,4 @@
-/* vecstr INCLUDE */
+/* vecstr HEADER */
 /* lang=C20 */
 
 /* vector-string container (Vector-String) */
@@ -84,6 +84,42 @@ enum vecstrmems {
 	vecstrmem_finish,
 	vecstrmem_overlast
 } ;
+struct vecstr_iter {
+	cchar		**va = nullptr ;
+	int		i = -1 ;
+	int		ii = -1 ;
+	vecstr_iter() = default ;
+	vecstr_iter(cchar **ov,int oi,int oii) noex : va(ov), i(oi) {
+	    ii = oii ;
+	} ;
+	vecstr_iter(const vecstr_iter &oit) noex {
+	    if (this != &oit) {
+		va = oit.va ;
+		i = oit.i ;
+		ii = oit.ii ;
+	    }
+	} ;
+	vecstr_iter &operator = (const vecstr_iter &oit) noex {
+	    if (this != &oit) {
+		va = oit.va ;
+		i = oit.i ;
+		ii = oit.ii ;
+	    }
+	    return *this ;
+	} ;
+	bool operator != (const vecstr_iter &) noex ;
+	bool operator == (const vecstr_iter &) noex ;
+	cchar *operator * () noex {
+	    cchar	*rp = nullptr ;
+	    if (i < ii) rp = va[i] ;
+	    return rp ;
+	} ;
+	vecstr_iter operator + (int) const noex ;
+	vecstr_iter operator += (int) noex ;
+	vecstr_iter operator ++ () noex ; /* pre */
+	vecstr_iter operator ++ (int) noex ; /* post */
+	void increment(int = 1) noex ;
+} ; /* end struct vecstr_iter) */
 struct vecstr ;
 struct vecstr_co {
 	vecstr		*op = nullptr ;
@@ -119,6 +155,14 @@ struct vecstr : vecstr_head {
 	int adduniq(cchar *,int = -1) noex ;
 	int insert(int,cchar *,int = -1) noex ;
 	int del(int = -1) noex ;
+	vecstr_iter begin() noex {
+	    vecstr_iter		it(va,0,i) ;
+	    return it ;
+	} ;
+	vecstr_iter end() noex {
+	    vecstr_iter		it(va,i,i) ;
+	    return it ;
+	} ;
 	~vecstr() noex {
 	    (void) int(finish) ;
 	} ;

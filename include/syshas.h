@@ -1,4 +1,4 @@
-/* syshas INCLUDE */
+/* syshas HEADER */
 /* lang=C20 */
 
 

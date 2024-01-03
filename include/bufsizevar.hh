@@ -1,4 +1,4 @@
-/* bufsizevar INCLUDE */
+/* bufsizevar HEADER */
 /* lang=C++20 */
 
 /* this provides a variable with a buffer-size */

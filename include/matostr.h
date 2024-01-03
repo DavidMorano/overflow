@@ -1,4 +1,4 @@
-/* matostr INCLUDE */
+/* matostr HEADER */
 /* lang=C++20 */
 
 /* Match-Option-String */

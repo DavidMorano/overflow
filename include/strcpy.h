@@ -1,4 +1,4 @@
-/* strcpy INCLUDE */
+/* strcpy HEADER */
 /* lang=C20 */
 
 

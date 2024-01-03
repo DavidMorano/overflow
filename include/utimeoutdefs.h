@@ -1,4 +1,4 @@
-/* utimeotdefs INCLUDE */
+/* utimeotdefs HEADER */
 /* lang=C20 */
 
 /* manage UNIX® kernal-call (and std-c library) timeouts */

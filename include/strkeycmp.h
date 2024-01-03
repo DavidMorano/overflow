@@ -1,4 +1,4 @@
-/* strkeycmp INCLUDE */
+/* strkeycmp HEADER */
 /* lang=C++20 */
 
 /* make a character out of an integer */

@@ -1,4 +1,4 @@
-/* snwcpy INCLUDE */
+/* snwcpy HEADER */
 /* lang=C20 */
 
 /* copy a c-string to a sized destination buffer */
@@ -21,7 +21,6 @@
 #include	<envstandards.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
-
 #include	<snwcpyx.h>
 
 

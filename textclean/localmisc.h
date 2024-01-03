@@ -1,4 +1,4 @@
-/* localmisc INCLUDE */
+/* localmisc HEADER */
 /* lang=C20 */
 
 /* miscellaneous stuff which essentially every program wants! */

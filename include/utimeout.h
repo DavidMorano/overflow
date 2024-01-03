@@ -1,4 +1,4 @@
-/* utimeout INCLUDE */
+/* utimeout HEADER */
 /* lang=C20 */
 
 /* manage UNIX® kernal-call (and std-c library) timeouts */

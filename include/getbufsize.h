@@ -1,4 +1,4 @@
-/* getbufsize INCLUDE */
+/* getbufsize HEADER */
 /* lang=C20 */
 
 /* interface for getting system buffer sizes */

@@ -1,4 +1,4 @@
-/* utimeouts INCLUDE */
+/* utimeouts HEADER */
 /* lang=C20 */
 
 /* some helper management for UNIX® kernal-call timeouts */

@@ -1,4 +1,4 @@
-/* matkeystr INCLUDE */
+/* matkeystr HEADER */
 /* lang=C++20 */
 
 /* match the key part of a string */

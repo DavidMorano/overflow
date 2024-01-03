@@ -1,4 +1,4 @@
-/* matstr INCLUDE */
+/* matstr HEADER */
 /* lang=C++20 */
 
 /* Match a String */

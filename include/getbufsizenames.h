@@ -1,4 +1,4 @@
-/* getbufsizenames INCLUDE */
+/* getbufsizenames HEADER */
 /* lang=C20 */
 
 /* list the various system buffer-size names (as strings) */

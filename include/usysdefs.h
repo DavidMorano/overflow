@@ -1,4 +1,4 @@
-/* usysdefs INCLUDE */
+/* usysdefs HEADER */
 /* lang=C20 */
 
 /* define the various system buffer sizes */
