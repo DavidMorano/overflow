@@ -61,7 +61,7 @@ struct vecstr_flags {
 	uint		osorted:1 ;
 	uint		oordered:1 ;
 	uint		oconserve:1 ;
-	uint		stsize:1 ;
+	uint		stsize:1 ;		/* not option (just flag) */
 } ; /* end struct (vecstr_flags) */
 
 struct vecstr_head {
@@ -163,8 +163,9 @@ struct vecstr : vecstr_head {
 	    vecstr_iter		it(va,i,i) ;
 	    return it ;
 	} ;
+	void dtor() noex ;
 	~vecstr() noex {
-	    (void) int(finish) ;
+	    dtor() ;
 	} ;
 } ; /* end struct (vecstr) */
 #else	/* __cplusplus */

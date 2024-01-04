@@ -257,6 +257,14 @@ typedef const char	cc ;
 
 /* parameters */
 
+#ifndef	MAXPATHLEN
+#define	MAXPATHLEN	1024
+#endif
+
+#ifndef	MAXNAMELEN
+#define	MAXNAMELEN	256
+#endif
+
 #ifndef	MSGBUFLEN
 #define	MSGBUFLEN	2048
 #endif
@@ -340,6 +348,11 @@ extern int	strlcpy(char *,cchar *,int) noex ;
 #ifndef	TIMEBUFLEN
 #define	TIMEBUFLEN	80
 #endif
+
+#ifndef	COLUMNS
+#define	COLUMNS		80
+#endif
+
 
 #define	eol		'\n'
 
