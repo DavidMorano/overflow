@@ -295,7 +295,7 @@ typedef const char	cc ;
 
 /* timezone (zoneinfo) name */
 #ifndef	TZNAMELEN
-#define	TZNAMELEN	60
+#define	TZNAMELEN	32
 #endif
 
 /* timezone abbreviation */
@@ -303,6 +303,7 @@ typedef const char	cc ;
 #define	ZNAMELEN	8
 #endif
 
+/* timezone abbreviation */
 #ifndef	TZABBRLEN
 #define	TZABBRLEN	8
 #endif
@@ -318,7 +319,7 @@ typedef const char	cc ;
 #endif
 
 #ifndef	DIGBUFLEN
-#define	DIGBUFLEN	80		/* can hold |int128_t| in decimal */
+#define	DIGBUFLEN	80		/* can hold |int256_t| in decimal */
 #endif
 
 #ifndef	HEXBUFLEN
