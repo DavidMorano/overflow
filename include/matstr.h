@@ -28,9 +28,9 @@
 extern "C" {
 #endif
 
-extern int matbasestr(cchar *const *,cchar *,int) noex ;
-extern int matcasestr(cchar *const *,cchar *,int) noex ;
-extern int matfoldstr(cchar *const *,cchar *,int) noex ;
+extern int matbasestr(mainv,cchar *,int) noex ;
+extern int matcasestr(mainv,cchar *,int) noex ;
+extern int matfoldstr(mainv,cchar *,int) noex ;
 
 #ifdef	__cplusplus
 }
