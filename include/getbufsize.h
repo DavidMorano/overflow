@@ -37,15 +37,11 @@
 #define	GETBUFSIZE_DEFVAL	(4*1024)
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	getbufsize(int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* GETBUFSIZE_INCLUDE */

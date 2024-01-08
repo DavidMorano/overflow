@@ -96,6 +96,10 @@ how this f*ck-sh*t works on Darwin.
 #define	_DARWIN_C_SOURCE
 #endif
 
+#ifndef	_REENTRANT
+#define	_REENTRANT
+#endif
+
 /* operating system capabilities */
 
 #include	<syshas.h>
