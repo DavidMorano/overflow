@@ -30,15 +30,11 @@ typedef const char *const	*mainv ;
 #endif
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int matkeystr(mainv,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif /* __cplusplus */
+EXTERNC_end
 
 
 #endif /* MATKEYSTR_INCLUDE */

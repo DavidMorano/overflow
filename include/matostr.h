@@ -24,17 +24,13 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int matobasestr(cchar *const *,int,cchar *,int) noex ;
 extern int matocasestr(cchar *const *,int,cchar *,int) noex ;
 extern int matofoldstr(cchar *const *,int,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif /* __cplusplus */
+EXTERNC_end
 
 #ifdef	__cplusplus
 inline int matostr(cchar *const *bs,int n,cchar *sp,int sl = -1) noex {

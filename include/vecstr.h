@@ -172,9 +172,7 @@ struct vecstr : vecstr_head {
 typedef struct vecstr_head	vecstr ;
 #endif /* __cplusplus */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 typedef int (*vecstr_vcmp)(cchar **,cchar **) noex ;
 
@@ -205,9 +203,7 @@ extern int vecstr_recmkstr(vecstr *,int *,int,char *,int) noex ;
 extern int vecstr_audit(vecstr *) noex ;
 extern int vecstr_finish(vecstr *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* VECSTR_INCLUDE */

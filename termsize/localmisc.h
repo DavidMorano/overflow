@@ -86,12 +86,12 @@
 #define	LXOR(a,b)	(((a) && (! (b))) || ((! (a)) && (b)))
 #endif
 
-#ifndef	BCEIL
-#define	BCEIL(v,m)	(((v) + ((m) - 1)) & (~ ((m) - 1)))
-#endif
-
 #ifndef	BFLOOR
 #define	BFLOOR(v,m)	((v) & (~ ((m) - 1)))
+#endif
+
+#ifndef	BCEIL
+#define	BCEIL(v,m)	(((v) + ((m) - 1)) & (~ ((m) - 1)))
 #endif
 
 #ifndef	CEILINT

@@ -49,7 +49,7 @@
 /* missing from some operating systems */
 
 #ifndef	S_IAMB
-#define	S_IAMB		0x1FF
+#define	S_IAMB		0x1FF		/* mask for the permissions field */
 #endif
 
 #ifndef	S_IFNAM
@@ -255,13 +255,20 @@
 #define	SVCNAMELEN	32
 #endif
 
+/* maximum PID on the system (could be wrong) */
+#ifndef	PID_MAX
+#define	PID_MAX		99999		/* historic value (in decimal) */
+#endif
+
 /* C-C++ memory order */
+#ifndef	memord_relaxed
 #define	memord_relaxed	std::memory_order_relaxed
 #define	memord_consume	std::memory_order_consume
 #define	memord_aquire	std::memory_order_acquire
 #define	memord_release	std::memory_order_release
 #define	memord_acqrel	std::memory_order_acq_rel
 #define	memord_seq	std::memory_order_seq_cst
+#endif /* memord_relaxed */
 
 
 #endif /* USYSDEFS_INCLUDE */

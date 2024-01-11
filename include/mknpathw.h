@@ -22,9 +22,7 @@
 #include	<usystem.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int mknpathxw(char *,int,int,...) noex ;
 
@@ -34,9 +32,7 @@ extern int mknpath3w(char *,int,cc *,cc *,cc *,int) noex ;
 extern int mknpath4w(char *,int,cc *,cc *,cc *,cc *,int) noex ;
 extern int mknpath5w(char *,int,cc *,cc *,cc *,cc *,cc *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

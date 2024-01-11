@@ -25,9 +25,7 @@
 #include	<mknpathxw.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int mkpath1(char *,cc *) noex ;
 extern int mkpath2(char *,cc *,cc *) noex ;
@@ -36,9 +34,7 @@ extern int mkpath4(char *,cc *,cc *,cc *,cc *) noex ;
 extern int mkpath5(char *,cc *,cc *,cc *, cc *,cc *) noex ;
 extern int mkpath6(char *,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 
