@@ -1,6 +1,9 @@
 /* syshas HEADER */
 /* lang=C20 */
 
+/* specify what features each operating system has */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
