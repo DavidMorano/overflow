@@ -24,15 +24,11 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int nleadkeystr(cchar *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif /* __cplusplus */
+EXTERNC_end
 
 
 #endif /* NLEADKEYSTR_INCLUDE */

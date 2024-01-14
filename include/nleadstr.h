@@ -23,17 +23,13 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int nleadbasestr(cchar *,cchar *,int) noex ;
 extern int nleadcasestr(cchar *,cchar *,int) noex ;
 extern int nleadfoldstr(cchar *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif /* __cplusplus */
+EXTERNC_end
 
 #ifdef	__cplusplus
 inline int nleadstr(cchar *bs,cchar *sp,int sl) noex {

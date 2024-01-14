@@ -46,15 +46,11 @@ enum utos {
 
 extern int	utimeout[] ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int u_timeout(int,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UTIMEOUT_INCLUDE */
