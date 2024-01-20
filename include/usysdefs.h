@@ -264,7 +264,7 @@
 #ifndef	memord_relaxed
 #define	memord_relaxed	std::memory_order_relaxed
 #define	memord_consume	std::memory_order_consume
-#define	memord_aquire	std::memory_order_acquire
+#define	memord_acquire	std::memory_order_acquire
 #define	memord_release	std::memory_order_release
 #define	memord_acqrel	std::memory_order_acq_rel
 #define	memord_seq	std::memory_order_seq_cst
