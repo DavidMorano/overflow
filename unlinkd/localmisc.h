@@ -257,14 +257,6 @@ typedef const char	cc ;
 
 /* parameters */
 
-#ifndef	MAXPATHLEN
-#ifdef	PATH_MAX
-#define	MAXPATHLEN	PATH_MAX
-#else
-#define	MAXPATHLEN	1024
-#endif
-#endif
-
 #ifndef	MAXNAMELEN
 #ifdef	NAME_MAX
 #define	MAXNAMELEN	NAME_MAX
@@ -273,11 +265,28 @@ typedef const char	cc ;
 #endif
 #endif
 
+#ifndef	MAXPATHLEN
+#ifdef	PATH_MAX
+#define	MAXPATHLEN	PATH_MAX
+#else
+#define	MAXPATHLEN	1024
+#endif
+#endif
+
 #ifndef	MAXLINELEN
 #ifdef	LINE_MAX
 #define	MAXLINELEN	LINE_MAX
 #else
 #define	MAXLINELEN	(2*1024)
+#endif
+#endif
+
+/* timezone (zoneinfo) name */
+#ifndef	TZNAMELEN
+#ifdef	TZNAME_MAX
+#define	TZNAMELEN	TZNAME_MAX
+#else
+#define	TZNAMELEN	256
 #endif
 #endif
 
@@ -291,11 +300,6 @@ typedef const char	cc ;
 
 #ifndef	MSGBUFLEN
 #define	MSGBUFLEN	2048
-#endif
-
-/* timezone (zoneinfo) name */
-#ifndef	TZNAMELEN
-#define	TZNAMELEN	32
 #endif
 
 /* timezone abbreviation */
@@ -315,7 +319,19 @@ typedef const char	cc ;
 
 /* mail address */
 #ifndef	MAILADDRLEN
-#define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
+#define	MAILADDRLEN	(3 * HOSTNAMELEN)
+#endif
+
+#ifndef	NAMEBUFLEN
+#define	NAMEBUFLEN	MAXNAMELEN
+#endif
+
+#ifndef	PATHBUFLEN
+#define	PATHBUFLEN	MAXPATHLEN
+#endif
+
+#ifndef	LINEBUFLEN
+#define	LINEBUFLEN	MAXLINELEN
 #endif
 
 #ifndef	DIGBUFLEN
