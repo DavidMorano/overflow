@@ -303,11 +303,6 @@ typedef const char	cc ;
 #endif
 
 /* timezone abbreviation */
-#ifndef	ZNAMELEN
-#define	ZNAMELEN	8
-#endif
-
-/* timezone abbreviation */
 #ifndef	TZABBRLEN
 #define	TZABBRLEN	8
 #endif
