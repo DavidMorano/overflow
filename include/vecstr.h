@@ -194,7 +194,7 @@ extern int vecstr_find(vecstr *,cchar *) noex ;
 extern int vecstr_findn(vecstr *,cchar *,int) noex ;
 extern int vecstr_finder(vecstr *,cchar *,vecstr_vcmp,cchar **) noex ;
 extern int vecstr_findaddr(vecstr *,cchar *) noex ;
-extern int vecstr_getvec(vecstr *,cchar ***) noex ;
+extern int vecstr_getvec(vecstr *,mainv *) noex ;
 extern int vecstr_strsize(vecstr *) noex ;
 extern int vecstr_strmk(vecstr *,char *,int) noex ;
 extern int vecstr_recsize(vecstr *) noex ;
