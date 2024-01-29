@@ -1,5 +1,5 @@
 /* nleadstr HEADER */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* match on the leading part of a string */
 /* version %I% last-modified %G% */
@@ -20,7 +20,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
-#include	<localmisc.h>
+#include	<clanguage.h>
 
 
 EXTERNC_begin
