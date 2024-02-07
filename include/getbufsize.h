@@ -28,9 +28,10 @@
 #define	GETBUFSIZE_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<getbufsizenames.h>
-#include	<localmisc.h>
 
 
 #define	GETBUFSIZE_CONF		"/etc/default/bufsize"
