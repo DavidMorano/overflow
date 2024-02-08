@@ -139,6 +139,9 @@
 #define	SYSHAS_GETSVXXXR	1
 #define	SYSHAS_GETSVGNUR	0	/* has GNU (GLIBC) interface */
 
+/* Solaris®: getlogin__r(3c) */
+#define	SYSHAS_GETLOGINR	1
+
 /* Solaris®: localtime_r(3c) */
 #define	SYSHAS_LOCALTIMER	1
 
@@ -342,6 +345,9 @@
 #define	SYSHAS_GETSVXXXR	0
 #define	SYSHAS_GETSVGNUR	0	/* has GNU (GLIBC) interface */
 
+/* Darwin: getlogin__r(3c) */
+#define	SYSHAS_GETLOGINR	0
+
 /* Darwin: localtime_r(3c) */
 #define	SYSHAS_LOCALTIMER	1
 
@@ -523,6 +529,9 @@
 /* Linux: getservbyxxx_r(3c) */
 #define	SYSHAS_GETSVXXXR	1	/* has a reentrant interface */
 #define	SYSHAS_GETSVGNUR	1	/* has GNU (GLIBC) interface */
+
+/* Linux: getlogin__r(3c) */
+#define	SYSHAS_GETLOGINR	1
 
 /* Linux: localtime_r(3c) */
 #define	SYSHAS_LOCALTIMER	1
