@@ -32,7 +32,7 @@
 #ifdef	__cplusplus /* everything is C++ only */
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<localmisc.h>
