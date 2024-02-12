@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* make a character out of an integer */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -22,19 +23,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int strkeycmp(cchar *,cchar *) noex ;
 extern int strnkeycmp(cchar *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif /* _cplusplus */
+EXTERNC_end
 
 
 #endif /* STRKEYCMP_INCLUDE */
