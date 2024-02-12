@@ -361,6 +361,9 @@ typedef const char	cc ;
 #define	POLLINTMULT	1000		/* poll-time multiplier */
 #endif
 
+#ifndef	NYEARS_CENTURY
+#define	NYEARS_CENTURY	100		/* years in a century */
+#endif
 
 #define	eol		'\n'
 
