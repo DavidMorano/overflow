@@ -26,8 +26,7 @@
 #define	UTIMEOUTS_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<localmisc.h>		/* for extra unsigned types */
+#include	<envstandards.h>	/* ordered first to configure */
 
 
 /* NO PUBLIC INTERFACES */
