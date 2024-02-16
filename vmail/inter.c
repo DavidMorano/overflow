@@ -301,10 +301,10 @@ static int	inter_cmdshell(INTER *) ;
 static int	inter_cmdmarkspam(INTER *,int) ;
 static int	inter_cmdmarkspamer(INTER *,int,const char *,const char *) ;
 
-static int	inter_msgoutfile(INTER *,const char *,int,offset_t,int) ;
-static int	inter_msgoutpipe(INTER *,const char *,offset_t,int) ;
-static int	inter_msgoutprog(INTER *,const char *,offset_t,int) ;
-static int	inter_msgoutproger(INTER *,cchar *,offset_t,int) ;
+static int	inter_msgoutfile(INTER *,const char *,int,off_t,int) ;
+static int	inter_msgoutpipe(INTER *,const char *,off_t,int) ;
+static int	inter_msgoutprog(INTER *,const char *,off_t,int) ;
+static int	inter_msgoutproger(INTER *,cchar *,off_t,int) ;
 static int	inter_msgoutview(INTER *,const char *,const char *) ;
 static int	inter_msgappend(INTER *,int,const char *) ;
 static int	inter_msgdel(INTER *,int,int) ;
@@ -3143,7 +3143,7 @@ static int inter_cmdwrite(INTER *iap,int f_whole,int argnum)
 		    MBCACHE_SCAN	*msp ;
 		    rl = rs ;
 	            if ((rs = mbcache_msgscan(&iap->mc,mi,&msp)) >= 0) {
-		        offset_t	outoff ;
+		        off_t	outoff ;
 		        int		outlen ;
 	                if (f_whole) {
 	                    outoff = msp->moff ;
@@ -3190,7 +3190,7 @@ static int inter_cmdpipe(INTER *iap,int f_whole,int argnum)
 		    MBCACHE_SCAN	*msp ;
 
 		    if ((rs = mbcache_msgscan(&iap->mc,mi,&msp)) >= 0) {
-	    	        offset_t	outoff ;
+	    	        off_t	outoff ;
 	    	        int		outlen ;
 	    	        if (f_whole) {
 	                    outoff = msp->moff ;
@@ -3279,7 +3279,7 @@ static int inter_cmdmarkspam(INTER *iap,int argnum)
 static int inter_cmdmarkspamer(INTER *iap,int mi,cchar *mbname,cchar *cmd)
 {
 	PROGINFO	*pip = iap->pip ;
-	offset_t	moff ;
+	off_t	moff ;
 	int		rs ;
 
 	if ((rs = mbcache_msgoff(&iap->mc,mi,&moff)) >= 0) {
@@ -3447,7 +3447,7 @@ static int inter_msgviewfile(INTER *iap,MBCACHE_SCAN *msp,cchar *mid,
 	    rs = SR_OK ;
 	    if (iap->mfd < 0) rs = inter_mbviewopen(iap) ;
 	    if (rs >= 0) {
-	  	const offset_t	boff = msp->boff ;
+	  	const off_t	boff = msp->boff ;
 		const int	mfd = iap->mfd ;
 		const int	blen = msp->blen ;
 	 	if ((rs = mailmsgfile_new(mmfp,mt,mid,mfd,boff,blen)) >= 0) {
@@ -3774,7 +3774,7 @@ static int inter_cmdsubject(INTER *iap,int argnum)
 /* end subroutine (inter_cmdsubject) */
 
 
-static int inter_msgoutfile(INTER *iap,cchar *cp,int cl,offset_t moff,int mlen)
+static int inter_msgoutfile(INTER *iap,cchar *cp,int cl,off_t moff,int mlen)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
@@ -3836,7 +3836,7 @@ static int inter_msgoutfile(INTER *iap,cchar *cp,int cl,offset_t moff,int mlen)
 /* end subroutine (inter_msgoutfile) */
 
 
-static int inter_msgoutpipe(INTER *iap,cchar *cmd,offset_t outoff,int outlen)
+static int inter_msgoutpipe(INTER *iap,cchar *cmd,off_t outoff,int outlen)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs = SR_OK ;
@@ -3966,7 +3966,7 @@ ret0:
 /* end subroutine (inter_msgoutpipe) */
 
 
-static int inter_msgoutprog(INTER *iap,cchar *cmd,offset_t ooff,int olen)
+static int inter_msgoutprog(INTER *iap,cchar *cmd,off_t ooff,int olen)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
@@ -4017,7 +4017,7 @@ static int inter_msgoutprog(INTER *iap,cchar *cmd,offset_t ooff,int olen)
 
 
 /* ARGSUSED */
-static int inter_msgoutproger(INTER *iap,cchar *cmd,offset_t off,int olen)
+static int inter_msgoutproger(INTER *iap,cchar *cmd,off_t off,int olen)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
@@ -4216,7 +4216,7 @@ static int inter_filecopy(INTER *iap,cchar *srcfname,cchar *dstfname)
 static int inter_msgappend(INTER *iap,int mi,cchar *mbname)
 {
 	PROGINFO	*pip = iap->pip ;
-	offset_t	moff ;
+	off_t	moff ;
 	int		rs ;
 	int		rs1 ;
 	int		mlen ;

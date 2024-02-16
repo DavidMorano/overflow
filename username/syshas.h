@@ -35,10 +35,10 @@
 /* Solaris®: projects */
 #define	SYSHAS_PROJECT		1
 
-/* Solaris®: system has 'statvfs(2)' call and friends */
+/* Solaris®: system has |statvfs(2)| call and friends */
 #define	SYSHAS_STATVFS		1
 
-/* Solaris®: system has 'poll(2)' call and friends */
+/* Solaris®: system has |poll(2)| call and friends */
 #define	SYSHAS_POLL		1
 
 /* Solaris®: system has STREAMS framework */
@@ -63,7 +63,7 @@
 /* Solaris®: system information header for 'sysinfo(2)' */
 #define	SYSHAS_SYSINFO		1
 
-/* Solaris®: system has a 'offset_t' data type (assumed to be 64 bits) */
+/* Solaris®: system has a 'off_t' data type (assumed to be 64 bits) */
 #define	SYSHAS_OFFSET		1
 
 /* Solaris®: getcwd(3c) */
@@ -221,14 +221,14 @@
 /* Darwin: projects */
 #define	SYSHAS_PROJECT		0
 
-/* Darwin: system has 'statvfs(2)' call and friends */
+/* Darwin: system has |statvfs(2)| call and friends */
 #if	defined(OSNUM) && (OSNUM >= 8)
 #define	SYSHAS_STATVFS		1
 #else
 #define	SYSHAS_STATVFS		0
 #endif
 
-/* Darwin: system has 'poll(2)' call and friends */
+/* Darwin: system has |poll(2)| call and friends */
 #if	defined(OSNUM) && (OSNUM >= 8)
 #define	SYSHAS_POLL		1
 #else
@@ -257,7 +257,7 @@
 /* Darwin: system information header for 'sysinfo(2)' */
 #define	SYSHAS_SYSINFO		0
 
-/* Darwin: system has a 'offset_t' data type (assumed to be 64 bits) */
+/* Darwin: system has a 'off_t' data type (assumed to be 64 bits) */
 #define	SYSHAS_OFFSET		0
 
 /* Darwin: getcwd(3c) */
@@ -426,10 +426,10 @@
 /* Linux: projects */
 #define	SYSHAS_PROJECT		0
 
-/* Linux: system has 'statvfs(2)' call and friends */
+/* Linux: system has |statvfs(2)| call and friends */
 #define	SYSHAS_STATVFS		1
 
-/* Linux: system has 'poll(2)' call and friends */
+/* Linux: system has |poll(2)| call and friends */
 #define	SYSHAS_POLL		1
 
 /* Linux: system has STREAMS framework */
@@ -454,7 +454,7 @@
 /* Linux: system information header for 'sysinfo(2)' */
 #define	SYSHAS_SYSINFO		1
 
-/* Linux: system has a 'offset_t' data type (assumed to be 64 bits) */
+/* Linux: system has a 'off_t' data type (assumed to be 64 bits) */
 #define	SYSHAS_OFFSET		1
 
 /* Linux: getcwd(3c) */
