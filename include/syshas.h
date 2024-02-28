@@ -90,9 +90,6 @@
 #define	SYSHAS_LOADAVG		1
 #define	SYSHAS_LOADAVGINT	1
 
-/* Solaris®: gethrtime(3c) */
-#define	SYSHAS_HRTIME		1
-
 /* Solaris®: readdir_r(3c) */
 #define	SYSHAS_READDIRR		1
 
@@ -211,6 +208,11 @@
 /* Solaris®: Memory |plock(2)| */
 #define	SYSHAS_MEMPLOCK		1
 
+/* Solaris®: |gethrtime(3c)| */
+#define	SYSHAS_GETHRTIME	1
+
+/* Solaris®: |getrandom(2)| */
+#define	SYSHAS_GETRANDOM	1
 
 /******************************************************************************/
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
@@ -295,9 +297,6 @@
 /* Darwin: loadavg(3c) */
 #define	SYSHAS_LOADAVG		1
 #define	SYSHAS_LOADAVGINT	0
-
-/* Darwin: gethrtime(3c) */
-#define	SYSHAS_HRTIME		0
 
 /* Darwin: readdir_r(3c) */
 #define	SYSHAS_READDIRR		1
@@ -417,6 +416,12 @@
 /* Darwin: Memory |plock(2)| */
 #define	SYSHAS_MEMPLOCK		0
 
+/* Darwin: |gethrtime(3c)| */
+#define	SYSHAS_GETHRTIME	0
+
+/* Darwin: |getrandom(2)| */
+#define	SYSHAS_GETRANDOM	0
+
 /******************************************************************************/
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
@@ -480,9 +485,6 @@
 /* Linux: loadavg(3c) */
 #define	SYSHAS_LOADAVG		1
 #define	SYSHAS_LOADAVGINT	0
-
-/* Linux: gethrtime(3c) */
-#define	SYSHAS_HRTIME		0
 
 /* Linux: readdir_r(3c) */
 #define	SYSHAS_READDIRR		1
@@ -601,6 +603,12 @@
 
 /* Linux: Memory |plock(2)| */
 #define	SYSHAS_MEMPLOCK		0
+
+/* Linux: |gethrtime(3c)| */
+#define	SYSHAS_GETHRTIME	0
+
+/* Linux: |getrandom(2)| */
+#define	SYSHAS_GETRANDOM	1
 
 /******************************************************************************/
 #endif /* OSNAME */

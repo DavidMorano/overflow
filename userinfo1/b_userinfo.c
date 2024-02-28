@@ -1,8 +1,8 @@
-/* b_userinfo */
+/* b_userinfo SUPPORT */
+/* lang=C++20 */
 
 /* SHELL built-in: return various user information */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -10,13 +10,13 @@
 #define	CF_DEFGROUP	0		/* for compatibility w/ 'id(1)' */
 #define	CF_AUID		0		/* can handle Audit-UID */
 
-
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-	This subroutine was originally written.  It was inspired by many
-	programs that performs various subset functions of this program.  This
-	can be either a KSH builtin or a stand-alone program.
+	This subroutine was originally written.  It was inspired
+	by many programs that performs various subset functions of
+	this program.  This can be either a KSH builtin or a
+	stand-alone program.
 
 */
 
@@ -24,16 +24,14 @@
 
 /*******************************************************************************
 
-	This command queries and returns numerous values associated with a
-	particular system user.
+	Description:
+	This command queries and returns numerous values associated
+	with a particular system user.
 
 	Synopsis:
-
 	$ userinfo [[<username>|-] <qkey(s)>] [-af <qkeyfile>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* must be first to configure */
 
@@ -3289,13 +3287,13 @@ static int datauser_ua(DATAUSER *dup)
 	    dup->init.ua = TRUE ;
 	    dup->tz[0] = '\0' ;
 	    dup->dn[0] = '\0' ;
-	    if ((rs = userattr_open(&ua,dup->un)) >= 0) {
+	    if ((rs = userattrdb_open(&ua,dup->un)) >= 0) {
 	        const int	vlen = VBUFLEN ;
 	        int		i ;
 	        int		vl ;
 	        char		vbuf[VBUFLEN + 1] ;
 	        for (i = 0 ; uakeys[i] != NULL ; i += 1) {
-	            if ((rs = userattr_lookup(&ua,vbuf,vlen,uakeys[i])) >= 0) {
+	            if ((rs = userattrdb_lookup(&ua,vbuf,vlen,uakeys[i])) >= 0) {
 			vl = rs ;
 	                switch (i) {
 	                case uakey_tz:
@@ -3309,10 +3307,10 @@ static int datauser_ua(DATAUSER *dup)
 	                } /* end switch */
 		    } else if (rs == SR_NOTFOUND) {
 			rs = SR_OK ;
-	            } /* end if (userattr_lookup) */
+	            } /* end if (userattrdb_lookup) */
 	            if (rs < 0) break ;
 	        } /* end for */
-	        rs1 = userattr_close(&ua) ;
+	        rs1 = userattrdb_close(&ua) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } else if (isNotPresent(rs)) {
 	        rs = SR_OK ;
