@@ -76,7 +76,7 @@
 #include	<uinfo.h>
 #include	<ugetpw.h>
 #include	<getax.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<pwentry.h>
 #include	<pwfile.h>
 #include	<getpwentry.h>
