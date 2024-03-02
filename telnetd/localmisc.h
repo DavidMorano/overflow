@@ -24,8 +24,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
 #include	<limits.h>
 #include	<clanguage.h>
 
@@ -366,6 +364,15 @@ typedef const char	cc ;
 #endif
 
 #define	eol		'\n'
+
+
+static inline bool lequiv(bool a1,bool a2) noex {
+	return LEQUIV(a1,a2) ;
+}
+
+static inline bool lxor(bool a1,bool a2) noex {
+	return LXOR(a1,a2) ;
+}
 
 
 #endif /* LOCALMISC_INCLUDE */
