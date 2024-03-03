@@ -62,16 +62,6 @@
 #define	MAX(a,b)	(((a) > (b)) ? (a) : (b))
 #endif
 
-#ifndef	UMIN
-#define	UMIN(a,b)	((((unsigned long) (a)) < ((unsigned long) (b))) \
-				 ? (a) : (b))
-#endif
-
-#ifndef	UMAX
-#define	UMAX(a,b)	((((unsigned long) (a)) > ((unsigned long) (b))) \
-				? (a) : (b))
-#endif
-
 #ifndef	ABS
 #define	ABS(a)		(((a) < 0) ? (- (a)) : (a))
 #endif

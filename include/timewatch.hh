@@ -31,7 +31,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
-#include	<usupport.h>
+#include	<msleep.h>
 #include	<localmisc.h>
 
 
