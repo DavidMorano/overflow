@@ -43,6 +43,7 @@ enum utos {
 	uto_poll,
 	uto_nolck,
 	uto_capture,
+	uto_txtbusy,
 	uto_overlast
 } ; /* end enum (utos) */
 

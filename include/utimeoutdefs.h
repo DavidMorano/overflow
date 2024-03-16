@@ -66,7 +66,6 @@
 
 
 /* all time-intervals below are in seconds */
-
 #define	UTO_AGAIN	10
 #define	UTO_INTR	(10 * 60)
 #define	UTO_NOMEM	(5 * 60)
@@ -85,7 +84,7 @@
 #define	UTO_POLL	10
 #define	UTO_NOLCK	10
 #define	UTO_CAPURE	5
-
+#define	UTO_TXTBUSY	5
 #define	UTO_DEFAULT	(5*60)
 
 
