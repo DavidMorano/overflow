@@ -214,6 +214,9 @@
 /* Solaris®: |getrandom(2)| */
 #define	SYSHAS_GETRANDOM	1
 
+/* Solaris®: |mkdirp(3gen)| */
+#define	SYSHAS_MKDIRP		1
+
 /******************************************************************************/
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
@@ -422,6 +425,9 @@
 /* Darwin: |getrandom(2)| */
 #define	SYSHAS_GETRANDOM	0
 
+/* Darwin: |mkdirp(3gen)| */
+#define	SYSHAS_MKDIRP		0
+
 /******************************************************************************/
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
@@ -609,6 +615,9 @@
 
 /* Linux: |getrandom(2)| */
 #define	SYSHAS_GETRANDOM	1
+
+/* Linux: |mkdirp(3gen)| */
+#define	SYSHAS_MKDIRP		0
 
 /******************************************************************************/
 #endif /* OSNAME */
