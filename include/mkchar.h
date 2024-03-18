@@ -19,7 +19,7 @@
 
 */
 
-/* Copyright (c) 1998,2018,23023 David A-D- Morano.  All rights reserved. */
+/* Copyright © 1998,2018,23023 David A-D- Morano.  All rights reserved. */
 
 #ifndef	MKCHAR_INCLUDE
 #define	MKCHAR_INCLUDE

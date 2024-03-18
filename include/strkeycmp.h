@@ -16,7 +16,7 @@
   
 */
 
-/* Copyright (c) 1998,2018 David A-D- Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	STRKEYCMP_INCLUDE
 #define	STRKEYCMP_INCLUDE
