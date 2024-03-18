@@ -7,8 +7,9 @@
 	Originally written for Rightcore Network Services.
 
 	= 2023-10-09, David A­D­ Morano
-	I had to f*ck-sh*t with the preprocessor define named 
-	'_XOPEN_SOURCE'. See below.
+	I had to experiment with the preprocessor define named 
+	'_XOPEN_SOURCE' in order to get a reasonably working 
+	system.  See below.
 
 */
 
@@ -19,8 +20,8 @@
 	This file is included in pretty much all other user-created
 	header files.  The reason is so that the name, type, and
 	version of the operating system (made available through
-	some C/C++ pre-processor defines) and some compilation
-	options (also made available through some C/C++ pre-processor
+	some C-C++ pre-processor defines) and some compilation
+	options (also made available through some C-C++ pre-processor
 	defines) can be made available to user code.
 
 *******************************************************************************/
@@ -54,35 +55,35 @@
 #define	_POSIX_PTHREAD_SEMANTICS	1
 
 /****
-On (f*ck-sh*t) Darwin OS, one must define the preprocessor symbol
+On (messed-up) Darwin OS, one must define the preprocessor symbol
 '_ANSI_SOURCE' in order to get the declaration for the kernel
-subroutine |waitid(2)|.  But if we do so (on f*ck-sh*t Darwin)
+subroutine |waitid(2)|.  But if we do so (on messed-up Darwin)
 we get all hell breaking loose with many other declarions being
-missing (for whatever f*ck-sh*t reason). So we instead are
+missing (for whatever messed-up reason). So we instead are
 careful top NOT define that preprocessior sysmbol. 
-Long live f*ck-sh*t Darwin OS!
+Long live the messed-up Darwin OS!
 Oh, and thanks so much for making me take hours to figure out
-how this f*ck-sh*t works on Darwin.
+how this messed-up envronment works on Darwin.
 ****/
 
-#ifdef	COMMENT /* f*cken brain-damaged Darwin f*ck-sh*t */
+#ifdef	COMMENT /* messed-up brain-damaged Darwin */
 #ifndef _ANSI_SOURCE
 #define	_ANSI_SOURCE
 #endif
 #endif
 
 /****
-On (f*ck-sh*t) Darwin OS, if we define the preprocessor symbol
+On (the messed-up) Darwin OS, if we define the preprocessor symbol
 '_XOPEN_SOURCE' to anything at all (rather than a blank definition)
 we get all hell breaking loose with many other declarions being
-missing (for whatever f*ck-sh*t reaoson). So we instead are
+missing (for whatever messed-up reaoson). So we instead are
 careful to NOT define with any sort of value.
-Long live f*ck-sh*t Darwin OS!
+Long live the messed-up Darwin OS!
 Oh, and thanks so much for making me take hours to figure out
-how this f*ck-sh*t works on Darwin.
+how this messed-up system works on Darwin.
 ****/
 
-#ifdef	COMMENT /* f*cken brain-damaged Darwin f*ck-sh*t */
+#ifdef	COMMENT /* messed-up brain-damaged Darwin */
 #ifndef	_XOPEN_SOURCE
 #define	_XOPEN_SOURCE			500
 #endif
