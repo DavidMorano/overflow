@@ -27,6 +27,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* need types */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
@@ -201,6 +202,25 @@ extern int vecstr_recmk(vecstr *,int *,int) noex ;
 extern int vecstr_recmkstr(vecstr *,int *,int,char *,int) noex ;
 extern int vecstr_audit(vecstr *) noex ;
 extern int vecstr_finish(vecstr *) noex ;
+/* extras (so-called) */
+extern int vecstr_addpathclean(vecstr *,cchar *,int) noex ;
+extern int vecstr_addpath(vecstr *,cchar *,int) noex ;
+extern int vecstr_addcspath(vecstr *) noex ;
+extern int vecstr_adds(vecstr *,cchar *,int) noex ;
+extern int vecstr_addsubdirs(vecstr *,cchar *) noex ;
+extern int vecstr_loaddirs(vecstr *,cchar *) noex ;
+extern int vecstr_adduniqs(vecstr *,cchar *,int) noex ;
+extern int vecstr_adduniqs(vecstr *,cchar *,int) noex ;
+extern int vecstr_envadd(vecstr *,cchar *,cchar *,int) noex ;
+extern int vecstr_envadds(vecstr *,cchar *,int) noex ;
+extern int vecstr_envset(vecstr *,cchar *,cchar *,int) noex ;
+extern int vecstr_envget(vecstr *,cchar *,cchar **) noex ;
+extern int vecstr_envfile(vecstr *,cchar *) noex ;
+extern int vecstr_foilcmp(vecstr *,vecstr *) noex ;
+extern int vecstr_loadfile(vecstr *,int,cchar *) noex ;
+extern int vecstr_loadgrusers(vecstr *,gid_t) noex ;
+extern int vecstr_srvargs(vecstr *,cchar *) noex ;
+extern int vecstr_svcargs(vecstr *,int *,cchar *) noex ;
 
 EXTERNC_end
 
