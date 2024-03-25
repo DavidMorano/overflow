@@ -24,12 +24,6 @@
 #include	<localmisc.h>
 
 
-#ifndef	TYPEDEF_MAINV
-#define	TYPEDEF_MAINV
-typedef const char *const	*mainv ;
-#endif
-
-
 EXTERNC_begin
 
 extern int matkeystr(mainv,cchar *,int) noex ;
