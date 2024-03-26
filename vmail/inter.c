@@ -1,7 +1,8 @@
-/* inter */
+/* inter SUPPORT */
+/* lang=C++20 */
 
 /* the user interface (command interpreter) for VMAIL */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
@@ -17,7 +18,6 @@
 #define	CF_MARKSPAMSYNC	0		/* mark spam synchronously */
 #define	CF_TESTGO1	1		/* test-go-1 */
 #define	CF_TRANSPROC	1		/* use |inter-trans()| */
-
 
 /* revision history:
 
@@ -39,32 +39,24 @@
 
 	Implimentation notes:
 
-        Caching: We cache scanlines (scan-line data) in two places. This is
-        probably needless but we are doing it anyway. It is first cached in the
-        mailbox-cache (MBCACHE) object. It is secondarily cached in our own
-        DISPLAY object. Mail-message viewing data is cached in the MAILMSGFILE
-        object.
-
+	Caching: We cache scanlines (scan-line data) in two places.
+	This is probably needless but we are doing it anyway. It
+	is first cached in the mailbox-cache (MBCACHE) object. It
+	is secondarily cached in our own DISPLAY object. Mail-message
+	viewing data is cached in the MAILMSGFILE object.
 
 *******************************************************************************/
 
-
-#define	INTER_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
-
+#include	<csignal>
+#include	<ctime>
+#include	<cstdlib>
+#include	<cstdarg>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<vecstr.h>

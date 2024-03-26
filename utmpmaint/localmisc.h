@@ -353,6 +353,10 @@ typedef const char	cc ;
 #define	NYEARS_CENTURY	100		/* years in a century */
 #endif
 
+#ifndef	NTABCOLS
+#define	NTABCOLS	8		/* eight columns per TAB character */
+#endif
+
 #define	eol		'\n'
 
 
